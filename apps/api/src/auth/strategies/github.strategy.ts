@@ -2,20 +2,18 @@ import { Injectable } from '@nestjs/common';
 import type { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-github2';
-import type { AuthService } from '../auth.service';
+import type { ValidateOAuthService } from '../services/validate-oauth.service';
 
 @Injectable()
 export class GitHubStrategy extends PassportStrategy(Strategy, 'github') {
   constructor(
     configService: ConfigService,
-    private readonly authService: AuthService,
+    private readonly validateOAuthService: ValidateOAuthService,
   ) {
     super({
-      clientID: configService.get('GITHUB_CLIENT_ID') || 'not-set',
-      clientSecret: configService.get('GITHUB_CLIENT_SECRET') || 'not-set',
-      callbackURL:
-        configService.get('GITHUB_CALLBACK_URL') ||
-        'http://localhost:3001/api/auth/github/callback',
+      clientID: configService.getOrThrow<string>('oauth.github.clientId'),
+      clientSecret: configService.getOrThrow<string>('oauth.github.clientSecret'),
+      callbackURL: configService.getOrThrow<string>('oauth.github.callbackUrl'),
       scope: ['user:email'],
     });
   }
@@ -26,7 +24,7 @@ export class GitHubStrategy extends PassportStrategy(Strategy, 'github') {
     profile: any,
     done: (err: any, user: any) => void,
   ) {
-    const tokens = await this.authService.validateOAuthUser({
+    const tokens = await this.validateOAuthService.execute({
       email: profile.emails?.[0]?.value || `${profile.username}@github.local`,
       firstName: profile.displayName?.split(' ')[0] || profile.username,
       lastName: profile.displayName?.split(' ').slice(1).join(' ') || '',

@@ -1,15 +1,24 @@
+import { CacheModule } from '@flama/backend-cache';
+import { AllExceptionsFilter, RequestContextInterceptor } from '@flama/backend-core';
+import { EmailModule } from '@flama/backend-email';
+import { StorageModule } from '@flama/backend-storage';
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoggerModule } from 'nestjs-pino';
 import { AuthModule } from './auth/auth.module';
-import { CommonModule } from './common/common.module';
-import { appConfig } from './config/app.config';
-import { databaseConfig } from './config/database.config';
-import { redisConfig } from './config/redis.config';
+import {
+  appConfig,
+  databaseConfig,
+  emailConfig,
+  oauthConfig,
+  redisConfig,
+  storageConfig,
+} from './config';
 import { HealthModule } from './health/health.module';
 import { QueueModule } from './queue/queue.module';
 import { UsersModule } from './users/users.module';
@@ -18,48 +27,55 @@ import { UsersModule } from './users/users.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, redisConfig],
+      load: [appConfig, databaseConfig, redisConfig, emailConfig, storageConfig, oauthConfig],
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: () => ({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        host: process.env.DB_HOST || 'localhost',
-        port: Number.parseInt(process.env.DB_PORT || '5432', 10),
-        username: process.env.DB_USERNAME || 'flama',
-        password: process.env.DB_PASSWORD || 'flama',
-        database: process.env.DB_DATABASE || 'flama',
+        host: configService.get('database.host'),
+        port: configService.get('database.port'),
+        username: configService.get('database.username'),
+        password: configService.get('database.password'),
+        database: configService.get('database.database'),
         autoLoadEntities: true,
-        synchronize: process.env.NODE_ENV !== 'production',
+        synchronize: configService.get('app.nodeEnv') !== 'production',
       }),
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 100,
-      },
-    ]),
-    LoggerModule.forRoot({
-      pinoHttp: {
-        transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty' } : undefined,
-      },
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
+    LoggerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        pinoHttp: {
+          transport:
+            configService.get('app.nodeEnv') !== 'production'
+              ? { target: 'pino-pretty' }
+              : undefined,
+        },
+      }),
     }),
-    BullModule.forRoot({
-      connection: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: Number.parseInt(process.env.REDIS_PORT || '6379', 10),
-      },
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        connection: {
+          host: configService.get('redis.host'),
+          port: configService.get('redis.port'),
+        },
+      }),
     }),
+    EventEmitterModule.forRoot(),
+    EmailModule.register(),
+    StorageModule.register(),
+    CacheModule.register(),
     AuthModule,
     UsersModule,
     HealthModule,
     QueueModule,
-    CommonModule,
   ],
   providers: [
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_FILTER, useClass: AllExceptionsFilter },
+    { provide: APP_INTERCEPTOR, useClass: RequestContextInterceptor },
   ],
 })
 export class AppModule {}

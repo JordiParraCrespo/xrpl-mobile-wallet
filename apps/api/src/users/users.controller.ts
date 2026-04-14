@@ -1,4 +1,3 @@
-import type { UpdateUserDto } from '@flama/shared';
 import {
   Body,
   Controller,
@@ -9,44 +8,76 @@ import {
   Patch,
   Query,
   UseGuards,
+  Version,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import type { UsersService } from './users.service';
+import { PoliciesGuard } from '../auth/guards/policies.guard';
+import { UserResponseDto } from './dtos/user-response.dto';
+import type { FindUsersRequest } from './requests/find-users.request';
+import type { UpdateUserRequest } from './requests/update-user.request';
+import type { DeleteUserService } from './services/delete-user.service';
+import type { UpdateUserService } from './services/update-user.service';
+import type { UsersService } from './services/users.service';
+import type { UserMapper } from './user.mapper';
 
 @ApiTags('Users')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PoliciesGuard)
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly updateUserService: UpdateUserService,
+    private readonly deleteUserService: DeleteUserService,
+    private readonly userMapper: UserMapper,
+  ) {}
 
   @Get()
+  @Version('1')
+  @CheckPolicies({ action: 'read', subject: 'User' })
   @ApiOperation({ summary: 'List all users' })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'limit', required: false, type: Number })
-  findAll(@Query('page') page?: string, @Query('limit') limit?: string) {
-    return this.usersService.findAll({
-      page: page ? Number.parseInt(page, 10) : 1,
-      limit: limit ? Number.parseInt(limit, 10) : 20,
-    });
+  @ApiResponse({ status: 200 })
+  async findAll(@Query() query: FindUsersRequest) {
+    const result = await this.usersService.findAll(query);
+    return {
+      data: result.data.map((user) =>
+        this.userMapper.toController(this.userMapper.toService(user)),
+      ),
+      meta: result.meta,
+    };
   }
 
   @Get(':id')
+  @Version('1')
+  @CheckPolicies({ action: 'read', subject: 'User' })
   @ApiOperation({ summary: 'Get user by ID' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.usersService.findById(id);
+  @ApiResponse({ status: 200, type: UserResponseDto })
+  @ApiResponse({ status: 404, description: 'USER_001: User not found' })
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const user = await this.usersService.findById(id);
+    return this.userMapper.toController(this.userMapper.toService(user));
   }
 
   @Patch(':id')
+  @Version('1')
+  @CheckPolicies({ action: 'update', subject: 'User' })
   @ApiOperation({ summary: 'Update user' })
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateUserDto) {
-    return this.usersService.update(id, dto);
+  @ApiResponse({ status: 200, type: UserResponseDto })
+  @ApiResponse({ status: 404, description: 'USER_001: User not found' })
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateUserRequest) {
+    const user = await this.updateUserService.execute(id, dto);
+    return this.userMapper.toController(this.userMapper.toService(user));
   }
 
   @Delete(':id')
+  @Version('1')
+  @CheckPolicies({ action: 'delete', subject: 'User' })
   @ApiOperation({ summary: 'Delete user' })
+  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: 404, description: 'USER_001: User not found' })
   remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.usersService.delete(id);
+    return this.deleteUserService.execute(id);
   }
 }

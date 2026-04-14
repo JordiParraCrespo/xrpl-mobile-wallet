@@ -1,15 +1,15 @@
-import type { AuthProvider, Role } from "@flama/shared";
+import type { AuthProvider, Role } from '@flama/shared';
 import {
   Column,
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from "typeorm";
+} from 'typeorm';
 
-@Entity("users")
+@Entity('users')
 export class User {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column({ unique: true })
@@ -24,10 +24,10 @@ export class User {
   @Column()
   lastName!: string;
 
-  @Column({ default: "user" })
+  @Column({ default: 'user' })
   role!: Role;
 
-  @Column({ default: "local" })
+  @Column({ default: 'local' })
   provider!: AuthProvider;
 
   @Column({ nullable: true })
@@ -36,13 +36,13 @@ export class User {
   @Column({ default: true })
   isActive!: boolean;
 
-  @Column({ nullable: true, type: "timestamp" })
+  @Column({ nullable: true, type: 'timestamp' })
   emailVerifiedAt!: Date | null;
 
   @Column({ nullable: true })
   resetPasswordToken!: string | null;
 
-  @Column({ nullable: true, type: "timestamp" })
+  @Column({ nullable: true, type: 'timestamp' })
   resetPasswordExpires!: Date | null;
 
   @Column({ nullable: true })

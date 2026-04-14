@@ -1,6 +1,14 @@
 import { registerAs } from '@nestjs/config';
+import { z } from 'zod';
 
-export const redisConfig = registerAs('redis', () => ({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: Number.parseInt(process.env.REDIS_PORT || '6379', 10),
-}));
+const schema = z.object({
+  host: z.string().default('localhost'),
+  port: z.coerce.number().default(6379),
+});
+
+export const redisConfig = registerAs('redis', () => {
+  return schema.parse({
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+  });
+});
