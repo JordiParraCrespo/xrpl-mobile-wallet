@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CheckPolicies } from '../auth/decorators/check-policies.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PoliciesGuard } from '../auth/guards/policies.guard';
 import { UserResponseDto } from './dtos/user-response.dto';
@@ -47,6 +48,15 @@ export class UsersController {
       ),
       meta: result.meta,
     };
+  }
+
+  @Get('me')
+  @Version('1')
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiResponse({ status: 200, type: UserResponseDto })
+  async me(@CurrentUser('sub') userId: string) {
+    const user = await this.usersService.findById(userId);
+    return this.userMapper.toController(this.userMapper.toService(user));
   }
 
   @Get(':id')

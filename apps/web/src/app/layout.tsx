@@ -1,15 +1,20 @@
-import type { Metadata } from 'next';
-import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server';
-import { QueryProvider } from '@/providers/query-provider';
-import './globals.css';
+import type { Metadata } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
+import { QueryProvider } from "@/providers/query-provider";
+import { WebFlamaProvider } from "@/providers/flama-provider";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: 'Flama',
-  description: 'Built with Flama boilerplate',
+  title: "Flama",
+  description: "Built with Flama boilerplate",
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const locale = await getLocale();
   const messages = await getMessages();
 
@@ -17,7 +22,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang={locale}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            <WebFlamaProvider>{children}</WebFlamaProvider>
+          </QueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -1,8 +1,8 @@
-import { tamaguiConfig } from '@flama/design-system/mobile';
-import { TamaguiProvider } from '@tamagui/core';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { type ReactNode, useState } from 'react';
-import '../lib/i18n';
+import { FlamaProvider } from "@flama/frontend/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { type ReactNode, useState } from "react";
+import "../lib/i18n";
+import { app } from "../lib/flama";
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -14,12 +14,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
             retry: 1,
           },
         },
-      }),
+      })
   );
 
   return (
-    <TamaguiProvider config={tamaguiConfig}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </TamaguiProvider>
+    <QueryClientProvider client={queryClient}>
+      <FlamaProvider app={app}>{children}</FlamaProvider>
+    </QueryClientProvider>
   );
 }

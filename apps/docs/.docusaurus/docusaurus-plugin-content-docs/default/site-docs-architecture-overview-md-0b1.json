@@ -20,7 +20,7 @@
     "permalink": "/getting-started/project-structure"
   },
   "next": {
-    "title": "Frontend Architecture",
-    "permalink": "/architecture/frontend-architecture"
+    "title": "Backend Packages",
+    "permalink": "/architecture/backend-packages"
   }
 }

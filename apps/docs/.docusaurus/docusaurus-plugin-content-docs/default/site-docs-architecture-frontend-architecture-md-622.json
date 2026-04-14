@@ -16,8 +16,8 @@
   },
   "sidebar": "docs",
   "previous": {
-    "title": "Architecture Overview",
-    "permalink": "/architecture/overview"
+    "title": "API Architecture",
+    "permalink": "/architecture/api-architecture"
   },
   "next": {
     "title": "Tier 1: Low-Cost Deployment (~€4/mo)",

@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@flama/api-client": "workspace:*",
-    "@flama/design-system": "workspace:*",
+    "@flama/design-system-mobile": "workspace:*",
     "@flama/frontend": "workspace:*",
     "@flama/shared": "workspace:*",
     "@flama/translations": "workspace:*",

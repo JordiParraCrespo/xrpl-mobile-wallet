@@ -11,6 +11,16 @@
           "mainDocId": "intro",
           "docs": [
             {
+              "id": "architecture/api-architecture",
+              "path": "/architecture/api-architecture",
+              "sidebar": "docs"
+            },
+            {
+              "id": "architecture/backend-packages",
+              "path": "/architecture/backend-packages",
+              "sidebar": "docs"
+            },
+            {
               "id": "architecture/frontend-architecture",
               "path": "/architecture/frontend-architecture",
               "sidebar": "docs"

@@ -53,6 +53,7 @@ export class UserMapper implements Mapper<User, UserServiceModel, UserResponseDt
     dto.firstName = model.firstName;
     dto.lastName = model.lastName;
     dto.role = model.role;
+    dto.provider = model.provider;
     dto.isActive = model.isActive;
     dto.createdAt = model.createdAt;
     dto.updatedAt = model.updatedAt;

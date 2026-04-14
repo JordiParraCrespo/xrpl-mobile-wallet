@@ -17,7 +17,7 @@
     "docker:dev": "docker compose -f docker/docker-compose.dev.yml up -d",
     "docker:dev:down": "docker compose -f docker/docker-compose.dev.yml down",
     "docker:prod": "docker compose -f docker/docker-compose.prod.yml up -d",
-    "generate:api-client": "turbo run generate --filter=@flama/api-client",
+    "generate:api-client": "pnpm --filter @flama/api-client generate",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "changeset publish"

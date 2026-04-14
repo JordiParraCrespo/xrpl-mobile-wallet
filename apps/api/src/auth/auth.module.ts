@@ -5,7 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
-import { AuthMapper } from './auth.mapper';
+
 import { ForgotPasswordService } from './services/forgot-password.service';
 import { LoginService } from './services/login.service';
 import { LogoutService } from './services/logout.service';
@@ -35,7 +35,6 @@ import { LocalStrategy } from './strategies/local.strategy';
     ForgotPasswordService,
     ResetPasswordService,
     ValidateOAuthService,
-    AuthMapper,
     JwtStrategy,
     JwtRefreshStrategy,
     LocalStrategy,

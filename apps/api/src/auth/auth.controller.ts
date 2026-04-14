@@ -15,11 +15,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
-import { UsersService } from '../users/services/users.service';
-import { AuthMapper } from './auth.mapper';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { AuthResponseDto } from './dtos/auth-response.dto';
-import { ProfileResponseDto } from './dtos/profile-response.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import type { ForgotPasswordRequest } from './requests/forgot-password.request';
@@ -43,8 +40,6 @@ export class AuthController {
     private readonly logoutService: LogoutService,
     private readonly forgotPasswordService: ForgotPasswordService,
     private readonly resetPasswordService: ResetPasswordService,
-    private readonly usersService: UsersService,
-    private readonly authMapper: AuthMapper,
     private readonly configService: ConfigService,
   ) {}
 
@@ -112,17 +107,6 @@ export class AuthController {
   })
   resetPassword(@Body() body: ResetPasswordRequest) {
     return this.resetPasswordService.execute(body.token, body.password);
-  }
-
-  @Get('profile')
-  @Version('1')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get current user profile' })
-  @ApiResponse({ status: 200, type: ProfileResponseDto })
-  async getProfile(@CurrentUser('sub') userId: string) {
-    const user = await this.usersService.findById(userId);
-    return this.authMapper.toProfileResponse(user);
   }
 
   @Get('google')

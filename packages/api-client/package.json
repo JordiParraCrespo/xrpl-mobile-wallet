@@ -8,10 +8,24 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./auth": {
+      "types": "./dist/clients/auth.client.d.ts",
+      "import": "./dist/clients/auth.client.js"
+    },
+    "./users": {
+      "types": "./dist/clients/users.client.d.ts",
+      "import": "./dist/clients/users.client.js"
+    },
+    "./models": {
+      "types": "./dist/models/index.d.ts",
+      "import": "./dist/models/index.js"
     }
   },
   "scripts": {
-    "generate": "openapi-typescript http://localhost:3001/api-json -o src/generated/api.ts",
+    "generate:types": "openapi-typescript openapi.json -o src/generated/api.ts",
+    "generate:clients": "tsx scripts/generate-clients.ts",
+    "generate": "pnpm generate:types && pnpm generate:clients",
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",
     "clean": "rm -rf dist",
@@ -23,6 +37,7 @@
   "devDependencies": {
     "@flama/config": "workspace:^",
     "openapi-typescript": "^7.4.0",
+    "tsx": "^4.19.0",
     "typescript": "^6.0.2"
   }
 }

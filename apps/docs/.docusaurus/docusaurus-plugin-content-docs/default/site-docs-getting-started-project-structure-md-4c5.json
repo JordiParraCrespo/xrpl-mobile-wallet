@@ -1,7 +1,7 @@
 {
   "id": "getting-started/project-structure",
   "title": "Project Structure",
-  "description": "",
+  "description": "Dependency flow",
   "source": "@site/docs/getting-started/project-structure.md",
   "sourceDirName": "getting-started",
   "slug": "/getting-started/project-structure",
