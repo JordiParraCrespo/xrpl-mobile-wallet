@@ -1,8 +1,15 @@
 import "../global.css";
 import "react-native-gesture-handler";
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from "react-native-reanimated";
 
+configureReanimatedLogger({ level: ReanimatedLogLevel.warn, strict: false });
+
+import { PortalHost } from "@rn-primitives/portal";
 import { ThemeProvider } from "@react-navigation/native";
-import { Drawer } from "expo-router/drawer";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as React from "react";
 import { Text, View } from "react-native";
@@ -12,83 +19,59 @@ import { NAV_THEME } from "../lib/theme";
 export default function RootLayout() {
   const { colorScheme } = useColorScheme();
   const theme = colorScheme === "dark" ? darkVars : lightVars;
+  const isDark = colorScheme === "dark";
 
   return (
     <ThemeProvider value={NAV_THEME[colorScheme ?? "light"]}>
       <View
         style={vars(theme)}
-        className={colorScheme === "dark" ? "dark flex-1 bg-background" : "flex-1 bg-background"}
+        className={
+          isDark ? "dark flex-1 bg-background" : "flex-1 bg-background"
+        }
       >
-        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-        <Drawer
+        <StatusBar style={isDark ? "light" : "dark"} />
+        <Stack
           screenOptions={{
-            drawerPosition: "left",
             headerStyle: {
-              backgroundColor:
-                colorScheme === "dark" ? "hsl(0 0% 3.9%)" : "hsl(0 0% 100%)",
+              backgroundColor: isDark ? "hsl(0 0% 3.9%)" : "hsl(0 0% 100%)",
             },
-            headerTintColor:
-              colorScheme === "dark" ? "hsl(0 0% 98%)" : "hsl(0 0% 3.9%)",
-            sceneStyle: {
-              backgroundColor:
-                colorScheme === "dark" ? "hsl(0 0% 3.9%)" : "hsl(0 0% 100%)",
-            },
-            drawerStyle: {
-              backgroundColor:
-                colorScheme === "dark" ? "hsl(0 0% 3.9%)" : "hsl(0 0% 100%)",
-            },
-            drawerLabelStyle: {
-              color:
-                colorScheme === "dark" ? "hsl(0 0% 98%)" : "hsl(0 0% 3.9%)",
+            headerTintColor: isDark ? "hsl(0 0% 98%)" : "hsl(0 0% 3.9%)",
+            contentStyle: {
+              backgroundColor: isDark ? "hsl(0 0% 3.9%)" : "hsl(0 0% 100%)",
             },
             headerTitle(props) {
               const title =
                 typeof props.children === "string"
                   ? props.children
                   : typeof props.children === "number"
-                    ? String(props.children)
-                    : "";
+                  ? String(props.children)
+                  : "";
 
               return (
                 <Text className="text-xl font-medium text-foreground">
-                  {toOptions(title.split("/").pop() ?? "")}
+                  {title}
                 </Text>
               );
             },
           }}
         >
-          <Drawer.Screen
+          <Stack.Screen
             name="index"
             options={{
               headerTitle: "Showcase",
-              drawerLabel: "Home",
               headerShadowVisible: false,
             }}
           />
-          <Drawer.Screen
-            name="buttons"
-            options={{
-              headerTitle: "Buttons",
-              drawerLabel: "Buttons",
-            }}
-          />
-          <Drawer.Screen
+          <Stack.Screen name="buttons" options={{ headerTitle: "Buttons" }} />
+          <Stack.Screen
             name="components/[slug]"
-            options={{
-              drawerItemStyle: { display: "none" },
-            }}
+            options={{ headerTitle: "Component" }}
           />
-        </Drawer>
+        </Stack>
+        <PortalHost />
       </View>
     </ThemeProvider>
   );
-}
-
-function toOptions(name: string) {
-  return name
-    .split("-")
-    .map((str) => str.replace(/\b\w/g, (char) => char.toUpperCase()))
-    .join(" ");
 }
 
 const lightVars = {

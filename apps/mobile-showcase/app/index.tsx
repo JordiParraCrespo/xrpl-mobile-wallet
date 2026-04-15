@@ -2,20 +2,23 @@ import { Button } from "@flama/design-system-mobile/button";
 import { Text } from "@flama/design-system-mobile/text";
 import { Link } from "expo-router";
 import * as React from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
+import { COMPONENTS } from "../lib/constants";
 
 export default function HomeScreen() {
   return (
-    <View className="flex-1 items-center justify-center p-6 gap-4">
+    <ScrollView contentContainerClassName="p-6 gap-3">
       <Text className="text-3xl font-bold text-foreground">Showcase</Text>
-      <Text className="text-base text-muted-foreground text-center">
-        Open the drawer to browse components, or tap below.
+      <Text className="text-base text-muted-foreground mb-2">
+        Browse all design system components.
       </Text>
-      <Link href="/buttons" asChild>
-        <Button size="lg" className="w-full">
-          <Text>Browse Buttons</Text>
-        </Button>
-      </Link>
-    </View>
+      {COMPONENTS.map(({ slug, name }) => (
+        <Link key={slug} href={`/components/${slug}`} asChild>
+          <Button variant="outline" size="lg" className="w-full">
+            <Text>{name}</Text>
+          </Button>
+        </Link>
+      ))}
+    </ScrollView>
   );
 }
