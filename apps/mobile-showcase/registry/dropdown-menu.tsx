@@ -1,4 +1,4 @@
-import { Button } from "@flama/design-system-mobile/button";
+import { Button } from '@flama/design-system-mobile/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,10 +7,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@flama/design-system-mobile/dropdown-menu";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+} from '@flama/design-system-mobile/dropdown-menu';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function DropdownMenuScreen() {
   return (

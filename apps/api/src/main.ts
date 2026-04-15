@@ -6,11 +6,11 @@ import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import helmet from "helmet";
-import { writeFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { Logger } from "nestjs-pino";
-import { ZodValidationPipe } from "nestjs-zod";
+import { ZodValidationPipe, patchNestJsSwagger } from "nestjs-zod";
 import { AppModule } from "./app.module";
+
+patchNestJsSwagger();
 
 export function createSwaggerConfig() {
   return new DocumentBuilder()
@@ -47,12 +47,6 @@ async function bootstrap() {
 
   const document = createSwaggerDocument(app);
   SwaggerModule.setup("api/docs", app, document);
-
-  const specPath = resolve(
-    __dirname,
-    "../../../packages/api-client/openapi.json"
-  );
-  writeFileSync(specPath, JSON.stringify(document, null, 2));
 
   setupBullBoard(app, [QUEUE_NAMES.EMAIL, QUEUE_NAMES.FILE_PROCESSING]);
 

@@ -1,26 +1,26 @@
-import { Button } from "@flama/design-system-mobile/button";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import { Button } from '@flama/design-system-mobile/button';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 
 const VARIANTS = [
-  { label: "Default", variant: "default" as const, tone: "light" as const },
+  { label: 'Default', variant: 'default' as const, tone: 'light' as const },
   {
-    label: "Destructive",
-    variant: "destructive" as const,
-    tone: "light" as const,
+    label: 'Destructive',
+    variant: 'destructive' as const,
+    tone: 'light' as const,
   },
-  { label: "Outline", variant: "outline" as const, tone: "dark" as const },
-  { label: "Secondary", variant: "secondary" as const, tone: "dark" as const },
-  { label: "Ghost", variant: "ghost" as const, tone: "dark" as const },
-  { label: "Link", variant: "link" as const, tone: "link" as const },
+  { label: 'Outline', variant: 'outline' as const, tone: 'dark' as const },
+  { label: 'Secondary', variant: 'secondary' as const, tone: 'dark' as const },
+  { label: 'Ghost', variant: 'ghost' as const, tone: 'dark' as const },
+  { label: 'Link', variant: 'link' as const, tone: 'link' as const },
 ];
 
 const SIZES = [
-  { label: "Small", size: "sm" as const },
-  { label: "Default", size: "default" as const },
-  { label: "Large", size: "lg" as const },
-  { label: "Icon", size: "icon" as const },
+  { label: 'Small', size: 'sm' as const },
+  { label: 'Default', size: 'default' as const },
+  { label: 'Large', size: 'lg' as const },
+  { label: 'Icon', size: 'icon' as const },
 ];
 
 export default function ButtonsScreen() {
@@ -35,7 +35,7 @@ export default function ButtonsScreen() {
               variant={variant}
               size="lg"
               className="w-full"
-              onPress={() => Alert.alert("Button", label)}
+              onPress={() => Alert.alert('Button', label)}
             >
               <Text className={labelToneClassName[tone]}>{label}</Text>
             </Button>
@@ -51,9 +51,9 @@ export default function ButtonsScreen() {
               key={size}
               size={size}
               variant="default"
-              onPress={() => Alert.alert("Button", label)}
+              onPress={() => Alert.alert('Button', label)}
             >
-              <Text>{size === "icon" ? "◎" : label}</Text>
+              <Text>{size === 'icon' ? '◎' : label}</Text>
             </Button>
           ))}
         </View>
@@ -63,9 +63,9 @@ export default function ButtonsScreen() {
 }
 
 const labelToneClassName = {
-  light: "text-base font-semibold",
-  dark: "text-base font-semibold",
-  link: "text-base font-semibold underline",
+  light: 'text-base font-semibold',
+  dark: 'text-base font-semibold',
+  link: 'text-base font-semibold underline',
 } as const;
 
 const styles = StyleSheet.create({
@@ -77,12 +77,12 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   sectionTitle: {
-    color: "#111827",
+    color: '#111827',
     fontSize: 22,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   stack: {
     gap: 14,
-    alignItems: "flex-start",
+    alignItems: 'flex-start',
   },
 });

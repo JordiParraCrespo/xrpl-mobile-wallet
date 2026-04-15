@@ -1,3 +1,6 @@
+import { Alert, AlertDescription, AlertTitle } from '@flama/design-system-web/alert';
+import { Avatar, AvatarFallback, AvatarImage } from '@flama/design-system-web/avatar';
+import { Badge } from '@flama/design-system-web/badge';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -5,46 +8,25 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@flama/design-system-web/breadcrumb";
-import { Separator } from "@flama/design-system-web/separator";
-import { SidebarTrigger } from "@flama/design-system-web/sidebar";
-import { Button } from "@flama/design-system-web/button";
-import { Input } from "@flama/design-system-web/input";
-import { Label } from "@flama/design-system-web/label";
-import { Badge } from "@flama/design-system-web/badge";
-import {
-  Alert,
-  AlertTitle,
-  AlertDescription,
-} from "@flama/design-system-web/alert";
-import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-} from "@flama/design-system-web/avatar";
+} from '@flama/design-system-web/breadcrumb';
+import { Button } from '@flama/design-system-web/button';
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-} from "@flama/design-system-web/card";
-import { Checkbox } from "@flama/design-system-web/checkbox";
-import { Switch } from "@flama/design-system-web/switch";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@flama/design-system-web/tabs";
-import { Toggle } from "@flama/design-system-web/toggle";
-import { Skeleton } from "@flama/design-system-web/skeleton";
-import {
-  AlertCircleIcon,
-  BoldIcon,
-  ItalicIcon,
-  UnderlineIcon,
-} from "lucide-react";
+} from '@flama/design-system-web/card';
+import { Checkbox } from '@flama/design-system-web/checkbox';
+import { Input } from '@flama/design-system-web/input';
+import { Label } from '@flama/design-system-web/label';
+import { Separator } from '@flama/design-system-web/separator';
+import { SidebarTrigger } from '@flama/design-system-web/sidebar';
+import { Skeleton } from '@flama/design-system-web/skeleton';
+import { Switch } from '@flama/design-system-web/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@flama/design-system-web/tabs';
+import { Toggle } from '@flama/design-system-web/toggle';
+import { AlertCircleIcon, BoldIcon, ItalicIcon, UnderlineIcon } from 'lucide-react';
 
 function Section({
   id,
@@ -137,16 +119,12 @@ export default function ComponentsPage() {
           <Alert className="w-full max-w-lg">
             <AlertCircleIcon className="size-4" />
             <AlertTitle>Heads up!</AlertTitle>
-            <AlertDescription>
-              You can add components to your app using the cli.
-            </AlertDescription>
+            <AlertDescription>You can add components to your app using the cli.</AlertDescription>
           </Alert>
           <Alert variant="destructive" className="w-full max-w-lg">
             <AlertCircleIcon className="size-4" />
             <AlertTitle>Error</AlertTitle>
-            <AlertDescription>
-              Something went wrong. Please try again.
-            </AlertDescription>
+            <AlertDescription>Something went wrong. Please try again.</AlertDescription>
           </Alert>
         </Section>
 
@@ -194,9 +172,7 @@ export default function ComponentsPage() {
               </p>
             </TabsContent>
             <TabsContent value="password">
-              <p className="text-sm text-muted-foreground p-4">
-                Change your password here.
-              </p>
+              <p className="text-sm text-muted-foreground p-4">Change your password here.</p>
             </TabsContent>
           </Tabs>
         </Section>

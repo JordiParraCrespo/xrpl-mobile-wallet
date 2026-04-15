@@ -1,8 +1,8 @@
-import type { UpdateUserDto } from "@flama/shared";
-import { inject, injectable } from "inversify";
-import { TOKENS } from "../../di/tokens";
-import type { UsersRepository } from "./users.repository";
-import type { UserEntity } from "./user.entity";
+import type { UpdateUserDto } from '@flama/shared';
+import { inject, injectable } from 'inversify';
+import { TOKENS } from '../../di/tokens';
+import type { UserEntity } from './user.entity';
+import type { UsersRepository } from './users.repository';
 
 @injectable()
 export class UsersService {
@@ -10,6 +10,10 @@ export class UsersService {
     @inject(TOKENS.UserRepository)
     private readonly usersRepository: UsersRepository,
   ) {}
+
+  async findAll(page = 1, pageSize = 20): Promise<UserEntity[]> {
+    return this.usersRepository.findAll(page, pageSize);
+  }
 
   async me(): Promise<UserEntity> {
     return this.usersRepository.me();

@@ -6,10 +6,10 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@flama/design-system-mobile/select";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+} from '@flama/design-system-mobile/select';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function SelectScreen() {
   return (

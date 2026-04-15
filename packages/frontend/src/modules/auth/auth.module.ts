@@ -1,8 +1,8 @@
-import { ContainerModule } from "inversify";
-import { TOKENS } from "../../di/tokens";
-import { AuthRepository } from "./auth.repository";
-import { AuthService } from "./auth.service";
-import { createAuthStore } from "./auth.state";
+import { ContainerModule } from 'inversify';
+import { TOKENS } from '../../di/tokens';
+import { AuthRepository } from './auth.repository';
+import { AuthService } from './auth.service';
+import { createAuthStore } from './auth.state';
 
 export const AuthModule = new ContainerModule(({ bind }) => {
   bind(TOKENS.AuthStore).toConstantValue(createAuthStore());

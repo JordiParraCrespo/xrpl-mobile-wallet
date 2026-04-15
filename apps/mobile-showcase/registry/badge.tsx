@@ -1,7 +1,7 @@
-import { Badge } from "@flama/design-system-mobile/badge";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+import { Badge } from '@flama/design-system-mobile/badge';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function BadgeScreen() {
   return (

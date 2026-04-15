@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useProfile } from "@flama/frontend/react";
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-} from "@flama/design-system-web";
+} from '@flama/design-system-web';
+import { useProfile } from '@flama/frontend/react';
 
 export default function DashboardPage() {
   const { data: user } = useProfile();
@@ -16,9 +16,7 @@ export default function DashboardPage() {
     <>
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome back, {user?.firstName}.
-        </p>
+        <p className="text-muted-foreground">Welcome back, {user?.firstName}.</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -55,8 +53,8 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            Your role is <strong>{user?.role}</strong> and your account is{" "}
-            <strong>{user?.isActive ? "active" : "inactive"}</strong>.
+            Your role is <strong>{user?.role}</strong> and your account is{' '}
+            <strong>{user?.isActive ? 'active' : 'inactive'}</strong>.
           </p>
         </CardContent>
       </Card>

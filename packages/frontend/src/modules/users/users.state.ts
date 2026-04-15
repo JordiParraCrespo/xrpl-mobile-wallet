@@ -1,5 +1,5 @@
-import { createStore } from "zustand/vanilla";
-import type { UserEntity } from "./user.entity";
+import { createStore } from 'zustand/vanilla';
+import type { UserEntity } from './user.entity';
 
 export interface UsersState {
   users: UserEntity[];

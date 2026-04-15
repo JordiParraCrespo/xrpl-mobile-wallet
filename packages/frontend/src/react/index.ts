@@ -1,17 +1,21 @@
-export { FlamaProvider, useFlamaApp } from "./context";
-export { useAuth, useAuthState } from "./hooks";
 export {
-  useLogin,
-  useRegister,
-  useLogout,
+  authKeys,
+  useChangePassword,
   useForgotPassword,
+  useLogin,
+  useLogout,
+  useRegister,
   useResetPassword,
-} from "./auth.queries";
+  useSessionRestore,
+} from './auth.queries';
+export { FlamaProvider, useFlamaApp } from './context';
+export { useAuthState } from './hooks';
 export {
-  useProfile,
-  useUser,
-  useUpdateUser,
-  useDeleteUser,
-  usersKeys,
   profileQueryKey,
-} from "./users.queries";
+  useDeleteUser,
+  useProfile,
+  usersKeys,
+  useUpdateUser,
+  useUser,
+  useUsers,
+} from './users.queries';

@@ -1,8 +1,8 @@
-import { Input } from "@flama/design-system-mobile/input";
-import { Label } from "@flama/design-system-mobile/label";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+import { Input } from '@flama/design-system-mobile/input';
+import { Label } from '@flama/design-system-mobile/label';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function InputScreen() {
   return (
@@ -13,9 +13,7 @@ export default function InputScreen() {
       </View>
 
       <View className="gap-2">
-        <Text className="text-lg font-semibold text-foreground">
-          With Label
-        </Text>
+        <Text className="text-lg font-semibold text-foreground">With Label</Text>
         <View className="gap-2">
           <Label nativeID="email">Email</Label>
           <Input placeholder="m@example.com" aria-labelledby="email" />

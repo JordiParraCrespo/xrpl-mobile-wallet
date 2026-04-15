@@ -1,24 +1,18 @@
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@flama/design-system-mobile/avatar";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+import { Avatar, AvatarFallback, AvatarImage } from '@flama/design-system-mobile/avatar';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function AvatarScreen() {
   return (
     <ScrollView contentContainerClassName="p-6 gap-6">
       <View className="gap-2">
-        <Text className="text-lg font-semibold text-foreground">
-          With Image
-        </Text>
+        <Text className="text-lg font-semibold text-foreground">With Image</Text>
         <View className="flex-row gap-4 items-center">
           <Avatar alt="John Doe">
             <AvatarImage
               source={{
-                uri: "https://api.dicebear.com/9.x/initials/png?seed=JD",
+                uri: 'https://api.dicebear.com/9.x/initials/png?seed=JD',
               }}
             />
             <AvatarFallback>
@@ -28,7 +22,7 @@ export default function AvatarScreen() {
           <Avatar alt="Adam Brown">
             <AvatarImage
               source={{
-                uri: "https://api.dicebear.com/9.x/initials/png?seed=AB",
+                uri: 'https://api.dicebear.com/9.x/initials/png?seed=AB',
               }}
             />
             <AvatarFallback>
@@ -39,9 +33,7 @@ export default function AvatarScreen() {
       </View>
 
       <View className="gap-2">
-        <Text className="text-lg font-semibold text-foreground">
-          Fallback Only
-        </Text>
+        <Text className="text-lg font-semibold text-foreground">Fallback Only</Text>
         <View className="flex-row gap-4 items-center">
           <Avatar alt="Large">
             <AvatarFallback>

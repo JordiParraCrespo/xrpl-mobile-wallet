@@ -1,51 +1,46 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button } from "@flama/design-system-web";
-import { Input } from "@flama/design-system-web";
 import {
+  Button,
   Field,
+  FieldError,
   FieldGroup,
   FieldLabel,
-  FieldError,
   FieldSeparator,
-} from "@flama/design-system-web";
-import { useAuth } from "@flama/frontend/react";
+  Input,
+} from '@flama/design-system-web';
+import { useLogin } from '@flama/frontend/react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function LoginPage() {
-  const auth = useAuth();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const login = useLogin({
+    onSuccess: () => router.push('/dashboard'),
+    onError: () => setError('Invalid email or password'),
+  });
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setIsLoading(true);
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
 
-    try {
-      await auth.login({ email, password });
-      router.push("/dashboard");
-    } catch {
-      setError("Invalid email or password");
-    } finally {
-      setIsLoading(false);
-    }
+    login.mutate({ email, password });
   }
+
+  const isLoading = login.isPending;
 
   return (
     <div className="relative flex min-h-screen items-center justify-center lg:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="relative hidden h-full flex-col p-10 text-primary lg:flex dark:border-r">
         <div className="absolute inset-0 bg-primary/5" />
-        <div className="relative z-20 flex items-center text-lg font-medium">
-          Flama
-        </div>
+        <div className="relative z-20 flex items-center text-lg font-medium">Flama</div>
         <div className="relative z-20 mt-auto">
           <blockquote className="leading-normal text-balance">
             &ldquo;The full-stack boilerplate that lets you ship faster.&rdquo;
@@ -91,7 +86,7 @@ export default function LoginPage() {
               {error && <FieldError>{error}</FieldError>}
               <Field>
                 <Button disabled={isLoading} className="w-full">
-                  {isLoading ? "Signing in..." : "Sign in"}
+                  {isLoading ? 'Signing in...' : 'Sign in'}
                 </Button>
               </Field>
             </FieldGroup>
@@ -116,11 +111,7 @@ export default function LoginPage() {
               variant="outline"
               type="button"
               disabled={isLoading}
-              render={
-                <a
-                  href={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google`}
-                />
-              }
+              render={<a href={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google`} />}
             >
               Google
             </Button>
@@ -128,11 +119,7 @@ export default function LoginPage() {
               variant="outline"
               type="button"
               disabled={isLoading}
-              render={
-                <a
-                  href={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/github`}
-                />
-              }
+              render={<a href={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/github`} />}
             >
               GitHub
             </Button>

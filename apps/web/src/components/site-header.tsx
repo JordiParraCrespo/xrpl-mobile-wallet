@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { SidebarTrigger, Separator } from "@flama/design-system-web";
+import { Separator, SidebarTrigger } from '@flama/design-system-web';
 
 export function SiteHeader() {
   return (

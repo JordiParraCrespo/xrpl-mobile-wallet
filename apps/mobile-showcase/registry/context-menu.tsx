@@ -6,10 +6,10 @@ import {
   ContextMenuLabel,
   ContextMenuSeparator,
   ContextMenuTrigger,
-} from "@flama/design-system-mobile/context-menu";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+} from '@flama/design-system-mobile/context-menu';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function ContextMenuScreen() {
   return (
@@ -22,9 +22,7 @@ export default function ContextMenuScreen() {
         <ContextMenu>
           <ContextMenuTrigger>
             <View className="items-center justify-center rounded-lg border-2 border-dashed border-border py-16">
-              <Text className="text-sm text-muted-foreground">
-                Long press here
-              </Text>
+              <Text className="text-sm text-muted-foreground">Long press here</Text>
             </View>
           </ContextMenuTrigger>
           <ContextMenuContent className="w-64">

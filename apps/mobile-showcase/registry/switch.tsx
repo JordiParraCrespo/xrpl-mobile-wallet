@@ -1,8 +1,8 @@
-import { Label } from "@flama/design-system-mobile/label";
-import { Switch } from "@flama/design-system-mobile/switch";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+import { Label } from '@flama/design-system-mobile/label';
+import { Switch } from '@flama/design-system-mobile/switch';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function SwitchScreen() {
   const [airplane, setAirplane] = React.useState(false);

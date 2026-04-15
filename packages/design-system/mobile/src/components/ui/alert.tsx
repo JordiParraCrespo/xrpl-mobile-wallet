@@ -1,9 +1,9 @@
-import { Icon } from './icon';
-import { Text, TextClassContext } from './text';
-import { cn } from '../../lib/utils';
 import type { LucideIcon } from 'lucide-react-native';
 import * as React from 'react';
 import { View } from 'react-native';
+import { cn } from '../../lib/utils';
+import { Icon } from './icon';
+import { Text, TextClassContext } from './text';
 
 function Alert({
   className,
@@ -13,24 +13,26 @@ function Alert({
   iconClassName,
   ...props
 }: React.ComponentProps<typeof View> & {
-    icon: LucideIcon;
-    variant?: 'default' | 'destructive';
-    iconClassName?: string;
-  }) {
+  icon: LucideIcon;
+  variant?: 'default' | 'destructive';
+  iconClassName?: string;
+}) {
   return (
     <TextClassContext.Provider
       value={cn(
         'text-sm text-foreground',
         variant === 'destructive' && 'text-destructive',
-        className
-      )}>
+        className,
+      )}
+    >
       <View
         role="alert"
         className={cn(
           'bg-card border-border relative w-full rounded-lg border px-4 pb-2 pt-3.5',
-          className
+          className,
         )}
-        {...props}>
+        {...props}
+      >
         <View className="absolute left-3.5 top-3">
           <Icon
             as={icon}
@@ -43,10 +45,7 @@ function Alert({
   );
 }
 
-function AlertTitle({
-  className,
-  ...props
-}: React.ComponentProps<typeof Text>) {
+function AlertTitle({ className, ...props }: React.ComponentProps<typeof Text>) {
   return (
     <Text
       className={cn('mb-1 ml-0.5 min-h-4 pl-6 font-medium leading-none tracking-tight', className)}
@@ -55,17 +54,14 @@ function AlertTitle({
   );
 }
 
-function AlertDescription({
-  className,
-  ...props
-}: React.ComponentProps<typeof Text>) {
+function AlertDescription({ className, ...props }: React.ComponentProps<typeof Text>) {
   const textClass = React.useContext(TextClassContext);
   return (
     <Text
       className={cn(
         'text-muted-foreground ml-0.5 pb-1.5 pl-6 text-sm leading-relaxed',
         textClass?.includes('text-destructive') && 'text-destructive/90',
-        className
+        className,
       )}
       {...props}
     />

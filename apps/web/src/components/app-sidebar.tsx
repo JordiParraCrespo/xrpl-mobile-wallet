@@ -1,19 +1,6 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useProfile, useLogout } from "@flama/frontend/react";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
   Avatar,
   AvatarFallback,
   DropdownMenu,
@@ -22,18 +9,29 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@flama/design-system-web";
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '@flama/design-system-web';
+import { useLogout, useProfile } from '@flama/frontend/react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export function AppSidebar() {
   const { data: user } = useProfile();
   const router = useRouter();
   const logout = useLogout({
-    onSuccess: () => router.push("/auth/login"),
+    onSuccess: () => router.push('/auth/login'),
   });
 
-  const initials = user
-    ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`
-    : "";
+  const initials = user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}` : '';
 
   return (
     <Sidebar>
@@ -52,9 +50,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton render={<Link href="/dashboard" />}>
-                  Dashboard
-                </SidebarMenuButton>
+                <SidebarMenuButton render={<Link href="/dashboard" />}>Dashboard</SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
@@ -67,17 +63,13 @@ export function AppSidebar() {
               <DropdownMenuTrigger>
                 <SidebarMenuButton size="lg">
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarFallback className="rounded-lg">
-                      {initials}
-                    </AvatarFallback>
+                    <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">
                       {user?.firstName} {user?.lastName}
                     </span>
-                    <span className="truncate text-xs text-muted-foreground">
-                      {user?.email}
-                    </span>
+                    <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
                   </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -90,24 +82,18 @@ export function AppSidebar() {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarFallback className="rounded-lg">
-                        {initials}
-                      </AvatarFallback>
+                      <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-medium">
                         {user?.firstName} {user?.lastName}
                       </span>
-                      <span className="truncate text-xs text-muted-foreground">
-                        {user?.email}
-                      </span>
+                      <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => logout.mutate()}>
-                  Log out
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => logout.mutate()}>Log out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>

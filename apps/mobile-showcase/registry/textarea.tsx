@@ -1,8 +1,8 @@
-import { Label } from "@flama/design-system-mobile/label";
-import { Text } from "@flama/design-system-mobile/text";
-import { Textarea } from "@flama/design-system-mobile/textarea";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+import { Label } from '@flama/design-system-mobile/label';
+import { Text } from '@flama/design-system-mobile/text';
+import { Textarea } from '@flama/design-system-mobile/textarea';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function TextareaScreen() {
   return (
@@ -13,15 +13,10 @@ export default function TextareaScreen() {
       </View>
 
       <View className="gap-2">
-        <Text className="text-lg font-semibold text-foreground">
-          With Label
-        </Text>
+        <Text className="text-lg font-semibold text-foreground">With Label</Text>
         <View className="gap-2">
           <Label nativeID="bio">Bio</Label>
-          <Textarea
-            placeholder="Tell us about yourself"
-            aria-labelledby="bio"
-          />
+          <Textarea placeholder="Tell us about yourself" aria-labelledby="bio" />
         </View>
       </View>
 

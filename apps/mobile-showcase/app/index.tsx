@@ -1,9 +1,9 @@
-import { Button } from "@flama/design-system-mobile/button";
-import { Text } from "@flama/design-system-mobile/text";
-import { Link } from "expo-router";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
-import { COMPONENTS } from "../lib/constants";
+import { Button } from '@flama/design-system-mobile/button';
+import { Text } from '@flama/design-system-mobile/text';
+import { Link } from 'expo-router';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
+import { COMPONENTS } from '../lib/constants';
 
 export default function HomeScreen() {
   return (

@@ -1,12 +1,12 @@
+import { Button } from '@flama/design-system-mobile/button';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@flama/design-system-mobile/collapsible";
-import { Button } from "@flama/design-system-mobile/button";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+} from '@flama/design-system-mobile/collapsible';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function CollapsibleScreen() {
   const [open, setOpen] = React.useState(false);
@@ -22,21 +22,17 @@ export default function CollapsibleScreen() {
             </Text>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm">
-                <Text>{open ? "−" : "+"}</Text>
+                <Text>{open ? '−' : '+'}</Text>
               </Button>
             </CollapsibleTrigger>
           </View>
           <View className="rounded-md border border-border px-4 py-3 mt-2">
-            <Text className="text-sm text-foreground">
-              @radix-ui/primitives
-            </Text>
+            <Text className="text-sm text-foreground">@radix-ui/primitives</Text>
           </View>
           <CollapsibleContent>
             <View className="gap-2 mt-2">
               <View className="rounded-md border border-border px-4 py-3">
-                <Text className="text-sm text-foreground">
-                  @radix-ui/colors
-                </Text>
+                <Text className="text-sm text-foreground">@radix-ui/colors</Text>
               </View>
               <View className="rounded-md border border-border px-4 py-3">
                 <Text className="text-sm text-foreground">@stitches/react</Text>

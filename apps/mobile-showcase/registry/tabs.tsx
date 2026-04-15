@@ -1,12 +1,4 @@
-import { Button } from "@flama/design-system-mobile/button";
-import { Input } from "@flama/design-system-mobile/input";
-import { Label } from "@flama/design-system-mobile/label";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@flama/design-system-mobile/tabs";
+import { Button } from '@flama/design-system-mobile/button';
 import {
   Card,
   CardContent,
@@ -14,13 +6,16 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@flama/design-system-mobile/card";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+} from '@flama/design-system-mobile/card';
+import { Input } from '@flama/design-system-mobile/input';
+import { Label } from '@flama/design-system-mobile/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@flama/design-system-mobile/tabs';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function TabsScreen() {
-  const [tab, setTab] = React.useState("account");
+  const [tab, setTab] = React.useState('account');
 
   return (
     <ScrollView contentContainerClassName="p-6 gap-6">
@@ -39,24 +34,16 @@ export default function TabsScreen() {
             <Card>
               <CardHeader>
                 <CardTitle>Account</CardTitle>
-                <CardDescription>
-                  Make changes to your account here.
-                </CardDescription>
+                <CardDescription>Make changes to your account here.</CardDescription>
               </CardHeader>
               <CardContent className="gap-3">
                 <View className="gap-2">
                   <Label nativeID="tab-name">Name</Label>
-                  <Input
-                    defaultValue="Pedro Duarte"
-                    aria-labelledby="tab-name"
-                  />
+                  <Input defaultValue="Pedro Duarte" aria-labelledby="tab-name" />
                 </View>
                 <View className="gap-2">
                   <Label nativeID="tab-username">Username</Label>
-                  <Input
-                    defaultValue="@peduarte"
-                    aria-labelledby="tab-username"
-                  />
+                  <Input defaultValue="@peduarte" aria-labelledby="tab-username" />
                 </View>
               </CardContent>
               <CardFooter>

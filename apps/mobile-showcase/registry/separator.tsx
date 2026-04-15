@@ -1,19 +1,15 @@
-import { Separator } from "@flama/design-system-mobile/separator";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+import { Separator } from '@flama/design-system-mobile/separator';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function SeparatorScreen() {
   return (
     <ScrollView contentContainerClassName="p-6 gap-6">
       <View className="gap-2">
-        <Text className="text-lg font-semibold text-foreground">
-          Horizontal
-        </Text>
+        <Text className="text-lg font-semibold text-foreground">Horizontal</Text>
         <View>
-          <Text className="text-base font-medium text-foreground">
-            Radix Primitives
-          </Text>
+          <Text className="text-base font-medium text-foreground">Radix Primitives</Text>
           <Text className="text-sm text-muted-foreground">
             An open-source UI component library.
           </Text>

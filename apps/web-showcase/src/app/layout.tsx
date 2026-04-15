@@ -1,21 +1,14 @@
-import type { Metadata } from "next";
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@flama/design-system-web/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
-import "./globals.css";
+import { SidebarInset, SidebarProvider } from '@flama/design-system-web/sidebar';
+import type { Metadata } from 'next';
+import { AppSidebar } from '@/components/app-sidebar';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "Flama Showcase",
-  description: "Design system component showcase",
+  title: 'Flama Showcase',
+  description: 'Design system component showcase',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>

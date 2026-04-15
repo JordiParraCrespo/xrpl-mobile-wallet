@@ -1,12 +1,12 @@
-import { Button } from "@flama/design-system-mobile/button";
+import { Button } from '@flama/design-system-mobile/button';
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from "@flama/design-system-mobile/hover-card";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+} from '@flama/design-system-mobile/hover-card';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function HoverCardScreen() {
   return (
@@ -24,15 +24,11 @@ export default function HoverCardScreen() {
           </HoverCardTrigger>
           <HoverCardContent className="w-72">
             <View className="gap-2">
-              <Text className="text-sm font-semibold text-foreground">
-                Next.js
-              </Text>
+              <Text className="text-sm font-semibold text-foreground">Next.js</Text>
               <Text className="text-sm text-muted-foreground">
                 The React Framework — created and maintained by @vercel.
               </Text>
-              <Text className="text-xs text-muted-foreground">
-                Joined December 2021
-              </Text>
+              <Text className="text-xs text-muted-foreground">Joined December 2021</Text>
             </View>
           </HoverCardContent>
         </HoverCard>

@@ -1,16 +1,15 @@
-import { Text } from "@flama/design-system-mobile/text";
-import { useLocalSearchParams, useNavigation } from "expo-router";
-import * as React from "react";
-import { View } from "react-native";
-import { COMPONENTS } from "../../lib/constants";
-import { REGISTRY } from "../../registry";
+import { Text } from '@flama/design-system-mobile/text';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
+import * as React from 'react';
+import { View } from 'react-native';
+import { COMPONENTS } from '../../lib/constants';
+import { REGISTRY } from '../../registry';
 
 export default function ComponentScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const navigation = useNavigation();
 
-  const title =
-    COMPONENTS.find((c) => c.slug === slug)?.name ?? slug ?? "Component";
+  const title = COMPONENTS.find((c) => c.slug === slug)?.name ?? slug ?? 'Component';
 
   React.useLayoutEffect(() => {
     navigation.setOptions({ headerTitle: title });
@@ -21,9 +20,7 @@ export default function ComponentScreen() {
   if (!Demo) {
     return (
       <View className="flex-1 items-center justify-center p-6">
-        <Text className="text-lg text-muted-foreground">
-          No demo for "{slug}"
-        </Text>
+        <Text className="text-lg text-muted-foreground">No demo for "{slug}"</Text>
       </View>
     );
   }

@@ -1,12 +1,8 @@
-import { Button } from "@flama/design-system-mobile/button";
-import { Text } from "@flama/design-system-mobile/text";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@flama/design-system-mobile/tooltip";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+import { Button } from '@flama/design-system-mobile/button';
+import { Text } from '@flama/design-system-mobile/text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@flama/design-system-mobile/tooltip';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function TooltipScreen() {
   return (
@@ -26,9 +22,7 @@ export default function TooltipScreen() {
       </View>
 
       <View className="gap-2">
-        <Text className="text-lg font-semibold text-foreground">
-          Side Variants
-        </Text>
+        <Text className="text-lg font-semibold text-foreground">Side Variants</Text>
         <View className="gap-3 items-start">
           <Tooltip>
             <TooltipTrigger asChild>

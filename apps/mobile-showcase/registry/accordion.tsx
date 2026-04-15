@@ -3,10 +3,10 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@flama/design-system-mobile/accordion";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+} from '@flama/design-system-mobile/accordion';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function AccordionScreen() {
   return (
@@ -16,9 +16,7 @@ export default function AccordionScreen() {
         <Accordion type="single" collapsible>
           <AccordionItem value="item-1">
             <AccordionTrigger>
-              <Text className="text-base font-medium text-foreground">
-                Is it accessible?
-              </Text>
+              <Text className="text-base font-medium text-foreground">Is it accessible?</Text>
             </AccordionTrigger>
             <AccordionContent>
               <Text className="text-sm text-muted-foreground">
@@ -28,9 +26,7 @@ export default function AccordionScreen() {
           </AccordionItem>
           <AccordionItem value="item-2">
             <AccordionTrigger>
-              <Text className="text-base font-medium text-foreground">
-                Is it styled?
-              </Text>
+              <Text className="text-base font-medium text-foreground">Is it styled?</Text>
             </AccordionTrigger>
             <AccordionContent>
               <Text className="text-sm text-muted-foreground">
@@ -40,9 +36,7 @@ export default function AccordionScreen() {
           </AccordionItem>
           <AccordionItem value="item-3">
             <AccordionTrigger>
-              <Text className="text-base font-medium text-foreground">
-                Is it animated?
-              </Text>
+              <Text className="text-base font-medium text-foreground">Is it animated?</Text>
             </AccordionTrigger>
             <AccordionContent>
               <Text className="text-sm text-muted-foreground">
@@ -58,9 +52,7 @@ export default function AccordionScreen() {
         <Accordion type="multiple">
           <AccordionItem value="a">
             <AccordionTrigger>
-              <Text className="text-base font-medium text-foreground">
-                First section
-              </Text>
+              <Text className="text-base font-medium text-foreground">First section</Text>
             </AccordionTrigger>
             <AccordionContent>
               <Text className="text-sm text-muted-foreground">
@@ -70,9 +62,7 @@ export default function AccordionScreen() {
           </AccordionItem>
           <AccordionItem value="b">
             <AccordionTrigger>
-              <Text className="text-base font-medium text-foreground">
-                Second section
-              </Text>
+              <Text className="text-base font-medium text-foreground">Second section</Text>
             </AccordionTrigger>
             <AccordionContent>
               <Text className="text-sm text-muted-foreground">

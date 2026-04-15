@@ -1,7 +1,7 @@
-import { Text } from "@flama/design-system-mobile/text";
-import { Toggle } from "@flama/design-system-mobile/toggle";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+import { Text } from '@flama/design-system-mobile/text';
+import { Toggle } from '@flama/design-system-mobile/toggle';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function ToggleScreen() {
   return (

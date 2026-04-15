@@ -1,11 +1,11 @@
-import { NativeOnlyAnimatedView } from './native-only-animated-view';
-import { TextClassContext } from './text';
-import { cn } from '../../lib/utils';
 import * as HoverCardPrimitive from '@rn-primitives/hover-card';
 import * as React from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { FadeIn, FadeOut } from 'react-native-reanimated';
 import { FullWindowOverlay as RNFullWindowOverlay } from 'react-native-screens';
+import { cn } from '../../lib/utils';
+import { NativeOnlyAnimatedView } from './native-only-animated-view';
+import { TextClassContext } from './text';
 
 const HoverCard = HoverCardPrimitive.Root;
 
@@ -34,10 +34,10 @@ function HoverCardContent({
                     web: cn(
                       'animate-in fade-in-0 zoom-in-95 origin-(--radix-hover-card-content-transform-origin) cursor-default [&>*]:cursor-auto',
                       props.side === 'bottom' && 'slide-in-from-top-2',
-                      props.side === 'top' && 'slide-in-from-bottom-2'
+                      props.side === 'top' && 'slide-in-from-bottom-2',
                     ),
                   }),
-                  className
+                  className,
                 )}
                 {...props}
               />

@@ -1,21 +1,21 @@
-import type { ExpoConfig } from "expo/config";
+import type { ExpoConfig } from 'expo/config';
 
 const config: ExpoConfig = {
-  name: "Flama Showcase",
-  slug: "flama-showcase",
-  version: "0.1.0",
-  scheme: "flama-showcase",
+  name: 'Flama Showcase',
+  slug: 'flama-showcase',
+  version: '0.1.0',
+  scheme: 'flama-showcase',
   newArchEnabled: true,
-  platforms: ["ios", "android"],
-  userInterfaceStyle: "automatic",
+  platforms: ['ios', 'android'],
+  userInterfaceStyle: 'automatic',
   ios: {
-    bundleIdentifier: "com.flama.showcase",
+    bundleIdentifier: 'com.flama.showcase',
     supportsTablet: true,
   },
   android: {
-    package: "com.flama.showcase",
+    package: 'com.flama.showcase',
   },
-  plugins: ["expo-router"],
+  plugins: ['expo-router'],
 };
 
 export default config;

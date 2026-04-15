@@ -1,14 +1,10 @@
-import { Button } from "@flama/design-system-mobile/button";
-import { Input } from "@flama/design-system-mobile/input";
-import { Label } from "@flama/design-system-mobile/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@flama/design-system-mobile/popover";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+import { Button } from '@flama/design-system-mobile/button';
+import { Input } from '@flama/design-system-mobile/input';
+import { Label } from '@flama/design-system-mobile/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@flama/design-system-mobile/popover';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function PopoverScreen() {
   return (
@@ -24,9 +20,7 @@ export default function PopoverScreen() {
           <PopoverContent className="w-80">
             <View className="gap-4">
               <View className="gap-1">
-                <Text className="text-base font-medium text-foreground">
-                  Dimensions
-                </Text>
+                <Text className="text-base font-medium text-foreground">Dimensions</Text>
                 <Text className="text-sm text-muted-foreground">
                   Set the dimensions for the layer.
                 </Text>

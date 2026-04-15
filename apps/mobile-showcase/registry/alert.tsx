@@ -1,12 +1,8 @@
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@flama/design-system-mobile/alert";
-import { Text } from "@flama/design-system-mobile/text";
-import { AlertTriangle, Info, Terminal } from "lucide-react-native";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+import { Alert, AlertDescription, AlertTitle } from '@flama/design-system-mobile/alert';
+import { Text } from '@flama/design-system-mobile/text';
+import { AlertTriangle, Info, Terminal } from 'lucide-react-native';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function AlertScreen() {
   return (
@@ -15,21 +11,15 @@ export default function AlertScreen() {
         <Text className="text-lg font-semibold text-foreground">Default</Text>
         <Alert icon={Terminal}>
           <AlertTitle>Heads up!</AlertTitle>
-          <AlertDescription>
-            You can add components to your app using the CLI.
-          </AlertDescription>
+          <AlertDescription>You can add components to your app using the CLI.</AlertDescription>
         </Alert>
       </View>
 
       <View className="gap-2">
-        <Text className="text-lg font-semibold text-foreground">
-          Destructive
-        </Text>
+        <Text className="text-lg font-semibold text-foreground">Destructive</Text>
         <Alert icon={AlertTriangle} variant="destructive">
           <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            Your session has expired. Please log in again.
-          </AlertDescription>
+          <AlertDescription>Your session has expired. Please log in again.</AlertDescription>
         </Alert>
       </View>
 

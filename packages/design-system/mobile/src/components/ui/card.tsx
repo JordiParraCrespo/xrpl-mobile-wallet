@@ -1,6 +1,6 @@
-import { Text, TextClassContext } from './text';
-import { cn } from '../../lib/utils';
 import { View } from 'react-native';
+import { cn } from '../../lib/utils';
+import { Text, TextClassContext } from './text';
 
 function Card({ className, ...props }: React.ComponentProps<typeof View>) {
   return (
@@ -8,7 +8,7 @@ function Card({ className, ...props }: React.ComponentProps<typeof View>) {
       <View
         className={cn(
           'bg-card border-border flex flex-col gap-6 rounded-xl border py-6 shadow-sm shadow-black/5',
-          className
+          className,
         )}
         {...props}
       />
@@ -20,10 +20,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<typeof View>) 
   return <View className={cn('flex flex-col gap-1.5 px-6', className)} {...props} />;
 }
 
-function CardTitle({
-  className,
-  ...props
-}: React.ComponentProps<typeof Text>) {
+function CardTitle({ className, ...props }: React.ComponentProps<typeof Text>) {
   return (
     <Text
       role="heading"
@@ -34,10 +31,7 @@ function CardTitle({
   );
 }
 
-function CardDescription({
-  className,
-  ...props
-}: React.ComponentProps<typeof Text>) {
+function CardDescription({ className, ...props }: React.ComponentProps<typeof Text>) {
   return <Text className={cn('text-muted-foreground text-sm', className)} {...props} />;
 }
 

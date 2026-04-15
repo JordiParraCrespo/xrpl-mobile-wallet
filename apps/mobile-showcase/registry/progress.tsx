@@ -1,8 +1,8 @@
-import { Button } from "@flama/design-system-mobile/button";
-import { Progress } from "@flama/design-system-mobile/progress";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+import { Button } from '@flama/design-system-mobile/button';
+import { Progress } from '@flama/design-system-mobile/progress';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function ProgressScreen() {
   const [value, setValue] = React.useState(30);
@@ -10,19 +10,11 @@ export default function ProgressScreen() {
   return (
     <ScrollView contentContainerClassName="p-6 gap-6">
       <View className="gap-2">
-        <Text className="text-lg font-semibold text-foreground">
-          Interactive
-        </Text>
+        <Text className="text-lg font-semibold text-foreground">Interactive</Text>
         <Progress value={value} />
-        <Text className="text-sm text-muted-foreground text-center">
-          {value}%
-        </Text>
+        <Text className="text-sm text-muted-foreground text-center">{value}%</Text>
         <View className="flex-row gap-3 justify-center">
-          <Button
-            variant="outline"
-            size="sm"
-            onPress={() => setValue((v) => Math.max(0, v - 10))}
-          >
+          <Button variant="outline" size="sm" onPress={() => setValue((v) => Math.max(0, v - 10))}>
             <Text>− 10</Text>
           </Button>
           <Button

@@ -3,18 +3,18 @@ import {
   BreadcrumbItem,
   BreadcrumbList,
   BreadcrumbPage,
-} from "@flama/design-system-web/breadcrumb";
-import { Button } from "@flama/design-system-web/button";
+} from '@flama/design-system-web/breadcrumb';
+import { Button } from '@flama/design-system-web/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@flama/design-system-web/card";
-import { Separator } from "@flama/design-system-web/separator";
-import { SidebarTrigger } from "@flama/design-system-web/sidebar";
-import { BlocksIcon, ComponentIcon, FlameIcon } from "lucide-react";
+} from '@flama/design-system-web/card';
+import { Separator } from '@flama/design-system-web/separator';
+import { SidebarTrigger } from '@flama/design-system-web/sidebar';
+import { BlocksIcon, ComponentIcon, FlameIcon } from 'lucide-react';
 
 export default function Page() {
   return (
@@ -42,8 +42,7 @@ export default function Page() {
           </div>
           <h1 className="text-3xl font-bold tracking-tight">Flama Showcase</h1>
           <p className="max-w-md text-muted-foreground">
-            Browse the design system components and pre-built blocks that power
-            the Flama platform.
+            Browse the design system components and pre-built blocks that power the Flama platform.
           </p>
         </div>
         <div className="grid w-full max-w-2xl gap-4 md:grid-cols-2">
@@ -55,8 +54,7 @@ export default function Page() {
                   <CardTitle>Components</CardTitle>
                 </div>
                 <CardDescription>
-                  Individual UI primitives — buttons, inputs, cards, badges, and
-                  more.
+                  Individual UI primitives — buttons, inputs, cards, badges, and more.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -74,8 +72,7 @@ export default function Page() {
                   <CardTitle>Blocks</CardTitle>
                 </div>
                 <CardDescription>
-                  Ready-made compositions — login forms, dashboards, and
-                  layouts.
+                  Ready-made compositions — login forms, dashboards, and layouts.
                 </CardDescription>
               </CardHeader>
               <CardContent>

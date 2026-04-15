@@ -1,7 +1,10 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { BlocksIcon, ComponentIcon, FlameIcon } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@flama/design-system-web/collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -15,40 +18,36 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
-} from "@flama/design-system-web/sidebar";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@flama/design-system-web/collapsible";
-import { ChevronRightIcon } from "lucide-react";
+} from '@flama/design-system-web/sidebar';
+import { BlocksIcon, ChevronRightIcon, ComponentIcon, FlameIcon } from 'lucide-react';
+import * as React from 'react';
 
 const nav = [
   {
-    title: "Components",
-    url: "/components",
+    title: 'Components',
+    url: '/components',
     icon: <ComponentIcon className="size-4" />,
     isActive: true,
     items: [
-      { title: "Button", url: "/components#button" },
-      { title: "Input", url: "/components#input" },
-      { title: "Card", url: "/components#card" },
-      { title: "Badge", url: "/components#badge" },
-      { title: "Alert", url: "/components#alert" },
-      { title: "Avatar", url: "/components#avatar" },
-      { title: "Checkbox", url: "/components#checkbox" },
-      { title: "Switch", url: "/components#switch" },
-      { title: "Separator", url: "/components#separator" },
-      { title: "Tabs", url: "/components#tabs" },
-      { title: "Toggle", url: "/components#toggle" },
-      { title: "Skeleton", url: "/components#skeleton" },
+      { title: 'Button', url: '/components#button' },
+      { title: 'Input', url: '/components#input' },
+      { title: 'Card', url: '/components#card' },
+      { title: 'Badge', url: '/components#badge' },
+      { title: 'Alert', url: '/components#alert' },
+      { title: 'Avatar', url: '/components#avatar' },
+      { title: 'Checkbox', url: '/components#checkbox' },
+      { title: 'Switch', url: '/components#switch' },
+      { title: 'Separator', url: '/components#separator' },
+      { title: 'Tabs', url: '/components#tabs' },
+      { title: 'Toggle', url: '/components#toggle' },
+      { title: 'Skeleton', url: '/components#skeleton' },
     ],
   },
   {
-    title: "Blocks",
-    url: "/blocks",
+    title: 'Blocks',
+    url: '/blocks',
     icon: <BlocksIcon className="size-4" />,
-    items: [{ title: "Login", url: "/blocks#login" }],
+    items: [{ title: 'Login', url: '/blocks#login' }],
   },
 ];
 
@@ -64,9 +63,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">Flama</span>
-                <span className="truncate text-xs text-muted-foreground">
-                  Showcase
-                </span>
+                <span className="truncate text-xs text-muted-foreground">Showcase</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -83,9 +80,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 className="group/collapsible"
                 render={<SidebarMenuItem />}
               >
-                <CollapsibleTrigger
-                  render={<SidebarMenuButton tooltip={item.title} />}
-                >
+                <CollapsibleTrigger render={<SidebarMenuButton tooltip={item.title} />}>
                   {item.icon}
                   <span>{item.title}</span>
                   <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90" />

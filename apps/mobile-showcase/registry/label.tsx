@@ -1,9 +1,9 @@
-import { Checkbox } from "@flama/design-system-mobile/checkbox";
-import { Input } from "@flama/design-system-mobile/input";
-import { Label } from "@flama/design-system-mobile/label";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+import { Checkbox } from '@flama/design-system-mobile/checkbox';
+import { Input } from '@flama/design-system-mobile/input';
+import { Label } from '@flama/design-system-mobile/label';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function LabelScreen() {
   const [checked, setChecked] = React.useState(false);
@@ -11,9 +11,7 @@ export default function LabelScreen() {
   return (
     <ScrollView contentContainerClassName="p-6 gap-6">
       <View className="gap-2">
-        <Text className="text-lg font-semibold text-foreground">
-          With Input
-        </Text>
+        <Text className="text-lg font-semibold text-foreground">With Input</Text>
         <View className="gap-2">
           <Label nativeID="email-label">Your email address</Label>
           <Input placeholder="Email" aria-labelledby="email-label" />
@@ -21,9 +19,7 @@ export default function LabelScreen() {
       </View>
 
       <View className="gap-2">
-        <Text className="text-lg font-semibold text-foreground">
-          With Checkbox
-        </Text>
+        <Text className="text-lg font-semibold text-foreground">With Checkbox</Text>
         <View className="flex-row items-center gap-3">
           <Checkbox checked={checked} onCheckedChange={setChecked} />
           <Label nativeID="terms-label" onPress={() => setChecked((v) => !v)}>

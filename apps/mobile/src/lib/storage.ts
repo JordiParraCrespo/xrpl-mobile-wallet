@@ -1,5 +1,5 @@
-import type { IStorageService } from "@flama/frontend";
-import * as SecureStore from "expo-secure-store";
+import type { IStorageService } from '@flama/frontend';
+import * as SecureStore from 'expo-secure-store';
 
 export class SecureStorageService implements IStorageService {
   async get(key: string): Promise<string | null> {

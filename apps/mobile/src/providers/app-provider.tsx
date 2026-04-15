@@ -1,8 +1,8 @@
-import { FlamaProvider } from "@flama/frontend/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { type ReactNode, useState } from "react";
-import "../lib/i18n";
-import { app } from "../lib/flama";
+import { FlamaProvider } from '@flama/frontend/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { type ReactNode, useState } from 'react';
+import '../lib/i18n';
+import { app } from '../lib/flama';
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -14,7 +14,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
             retry: 1,
           },
         },
-      })
+      }),
   );
 
   return (

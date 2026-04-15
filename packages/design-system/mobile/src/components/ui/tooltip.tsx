@@ -1,11 +1,11 @@
-import { NativeOnlyAnimatedView } from './native-only-animated-view';
-import { TextClassContext } from './text';
-import { cn } from '../../lib/utils';
 import * as TooltipPrimitive from '@rn-primitives/tooltip';
 import * as React from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { FadeInDown, FadeInUp, FadeOut } from 'react-native-reanimated';
 import { FullWindowOverlay as RNFullWindowOverlay } from 'react-native-screens';
+import { cn } from '../../lib/utils';
+import { NativeOnlyAnimatedView } from './native-only-animated-view';
+import { TextClassContext } from './text';
 
 const Tooltip = TooltipPrimitive.Root;
 
@@ -20,8 +20,8 @@ function TooltipContent({
   side = 'top',
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Content> & {
-    portalHost?: string;
-  }) {
+  portalHost?: string;
+}) {
   return (
     <TooltipPrimitive.Portal hostName={portalHost}>
       <FullWindowOverlay>
@@ -32,7 +32,8 @@ function TooltipContent({
                 ? FadeInDown.withInitialValues({ transform: [{ translateY: 3 }] }).duration(150)
                 : FadeInUp.withInitialValues({ transform: [{ translateY: -5 }] })
             }
-            exiting={FadeOut}>
+            exiting={FadeOut}
+          >
             <TextClassContext.Provider value="text-xs text-primary-foreground">
               <TooltipPrimitive.Content
                 sideOffset={sideOffset}
@@ -44,10 +45,10 @@ function TooltipContent({
                       side === 'bottom' && 'slide-in-from-top-2',
                       side === 'left' && 'slide-in-from-right-2',
                       side === 'right' && 'slide-in-from-left-2',
-                      side === 'top' && 'slide-in-from-bottom-2'
+                      side === 'top' && 'slide-in-from-bottom-2',
                     ),
                   }),
-                  className
+                  className,
                 )}
                 side={side}
                 {...props}

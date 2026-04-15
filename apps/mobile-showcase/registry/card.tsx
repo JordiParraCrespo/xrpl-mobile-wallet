@@ -1,4 +1,4 @@
-import { Button } from "@flama/design-system-mobile/button";
+import { Button } from '@flama/design-system-mobile/button';
 import {
   Card,
   CardContent,
@@ -6,10 +6,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@flama/design-system-mobile/card";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+} from '@flama/design-system-mobile/card';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function CardScreen() {
   return (
@@ -22,9 +22,7 @@ export default function CardScreen() {
             <CardDescription>Card Description</CardDescription>
           </CardHeader>
           <CardContent>
-            <Text className="text-sm text-foreground">
-              Card content goes here.
-            </Text>
+            <Text className="text-sm text-foreground">Card content goes here.</Text>
           </CardContent>
           <CardFooter>
             <Button size="sm">
@@ -35,9 +33,7 @@ export default function CardScreen() {
       </View>
 
       <View className="gap-2">
-        <Text className="text-lg font-semibold text-foreground">
-          Notification
-        </Text>
+        <Text className="text-lg font-semibold text-foreground">Notification</Text>
         <Card>
           <CardHeader>
             <CardTitle>Notifications</CardTitle>
@@ -45,9 +41,9 @@ export default function CardScreen() {
           </CardHeader>
           <CardContent className="gap-3">
             {[
-              "Your call has been confirmed.",
-              "You have a new message!",
-              "Your subscription is expiring.",
+              'Your call has been confirmed.',
+              'You have a new message!',
+              'Your subscription is expiring.',
             ].map((msg) => (
               <View key={msg} className="flex-row items-center gap-3">
                 <View className="size-2 rounded-full bg-primary" />

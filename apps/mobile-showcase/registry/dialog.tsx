@@ -1,4 +1,4 @@
-import { Button } from "@flama/design-system-mobile/button";
+import { Button } from '@flama/design-system-mobile/button';
 import {
   Dialog,
   DialogClose,
@@ -8,12 +8,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@flama/design-system-mobile/dialog";
-import { Input } from "@flama/design-system-mobile/input";
-import { Label } from "@flama/design-system-mobile/label";
-import { Text } from "@flama/design-system-mobile/text";
-import * as React from "react";
-import { ScrollView, View } from "react-native";
+} from '@flama/design-system-mobile/dialog';
+import { Input } from '@flama/design-system-mobile/input';
+import { Label } from '@flama/design-system-mobile/label';
+import { Text } from '@flama/design-system-mobile/text';
+import * as React from 'react';
+import { ScrollView, View } from 'react-native';
 
 export default function DialogScreen() {
   return (

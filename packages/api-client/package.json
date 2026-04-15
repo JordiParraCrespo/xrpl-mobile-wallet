@@ -2,42 +2,23 @@
   "name": "@flama/api-client",
   "version": "0.1.0",
   "private": true,
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./auth": {
-      "types": "./dist/clients/auth.client.d.ts",
-      "import": "./dist/clients/auth.client.js"
-    },
-    "./users": {
-      "types": "./dist/clients/users.client.d.ts",
-      "import": "./dist/clients/users.client.js"
-    },
-    "./models": {
-      "types": "./dist/models/index.d.ts",
-      "import": "./dist/models/index.js"
-    }
+    ".": "./src/index.ts",
+    "./models": "./src/common/index.ts",
+    "./services": "./src/data-access/api/openapi/services/index.ts"
   },
   "scripts": {
-    "generate:types": "openapi-typescript openapi.json -o src/generated/api.ts",
-    "generate:clients": "tsx scripts/generate-clients.ts",
-    "generate": "pnpm generate:types && pnpm generate:clients",
+    "generate": "openapi -i ../../apps/api/openapi.json -o src/data-access/api/openapi --exportSchemas=true --exportModels=true --useUnionTypes --postfixServices=Api && node scripts/openapi-postprocess.mjs",
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",
     "clean": "rm -rf dist",
     "lint": "biome check src/"
   },
-  "dependencies": {
-    "openapi-fetch": "^0.13.0"
-  },
   "devDependencies": {
     "@flama/config": "workspace:^",
-    "openapi-typescript": "^7.4.0",
-    "tsx": "^4.19.0",
+    "openapi-typescript-codegen": "^0.30.0",
     "typescript": "^6.0.2"
   }
 }

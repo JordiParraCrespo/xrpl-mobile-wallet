@@ -1,4 +1,4 @@
-import type { AuthProvider, Role } from "@flama/shared";
+import type { AuthProvider, Role } from '@flama/shared';
 
 export class UserEntity {
   constructor(
@@ -10,7 +10,7 @@ export class UserEntity {
     public readonly provider: AuthProvider,
     public readonly isActive: boolean,
     public readonly createdAt: Date,
-    public readonly updatedAt: Date
+    public readonly updatedAt: Date,
   ) {}
 
   get fullName(): string {
@@ -18,6 +18,6 @@ export class UserEntity {
   }
 
   get isAdmin(): boolean {
-    return this.role === "admin";
+    return this.role === 'admin';
   }
 }

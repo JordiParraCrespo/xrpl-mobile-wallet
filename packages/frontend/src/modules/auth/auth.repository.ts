@@ -1,5 +1,6 @@
-import type { AuthClient } from "@flama/api-client/auth";
-import type { LoginDto, RegisterDto, TokenPair } from "@flama/shared";
+import type { AuthResponseDto } from "@flama/api-client";
+import { AuthApi } from "@flama/api-client";
+import type { LoginDto, RegisterDto } from "@flama/shared";
 import { inject, injectable } from "inversify";
 import { TOKENS } from "../../di/tokens";
 import { AppError } from "../core/errors";
@@ -9,28 +10,27 @@ import { AuthErrors } from "./auth.errors";
 @injectable()
 export class AuthRepository {
   constructor(
-    @inject(TOKENS.AuthClient) private readonly authClient: AuthClient,
-    @inject(TOKENS.StorageService) private readonly storage: IStorageService,
+    @inject(TOKENS.StorageService) private readonly storage: IStorageService
   ) {}
 
-  async login(dto: LoginDto): Promise<TokenPair> {
-    const data = await this.authClient.login(dto);
+  async login(dto: LoginDto): Promise<AuthResponseDto> {
+    const data = await AuthApi.login(dto);
     if (!data) throw new AppError(AuthErrors.LOGIN_FAILED);
     await this.storage.set("accessToken", data.accessToken);
     await this.storage.set("refreshToken", data.refreshToken);
     return data;
   }
 
-  async register(dto: RegisterDto): Promise<TokenPair> {
-    const data = await this.authClient.register(dto);
+  async register(dto: RegisterDto): Promise<AuthResponseDto> {
+    const data = await AuthApi.register(dto);
     if (!data) throw new AppError(AuthErrors.REGISTER_FAILED);
     await this.storage.set("accessToken", data.accessToken);
     await this.storage.set("refreshToken", data.refreshToken);
     return data;
   }
 
-  async refreshToken(_refreshToken: string): Promise<TokenPair> {
-    const data = await this.authClient.refresh();
+  async refresh(): Promise<AuthResponseDto> {
+    const data = await AuthApi.refresh();
     if (!data) throw new AppError(AuthErrors.REFRESH_FAILED);
     await this.storage.set("accessToken", data.accessToken);
     await this.storage.set("refreshToken", data.refreshToken);
@@ -38,11 +38,18 @@ export class AuthRepository {
   }
 
   async forgotPassword(email: string): Promise<void> {
-    await this.authClient.forgotPassword({ email });
+    await AuthApi.forgotPassword({ email });
   }
 
   async resetPassword(token: string, password: string): Promise<void> {
-    await this.authClient.resetPassword({ token, password });
+    await AuthApi.resetPassword({ token, newPassword: password });
+  }
+
+  async changePassword(
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
+    await AuthApi.changePassword({ currentPassword, newPassword });
   }
 
   async logout(): Promise<void> {

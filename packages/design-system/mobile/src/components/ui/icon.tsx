@@ -1,8 +1,8 @@
-import { TextClassContext } from './text';
-import { cn } from '../../lib/utils';
 import type { LucideIcon, LucideProps } from 'lucide-react-native';
 import { cssInterop } from 'nativewind';
 import * as React from 'react';
+import { cn } from '../../lib/utils';
+import { TextClassContext } from './text';
 
 type IconProps = LucideProps & {
   as: LucideIcon;

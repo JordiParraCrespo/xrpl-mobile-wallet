@@ -1,11 +1,11 @@
-import { Icon } from './icon';
-import { TextClassContext } from './text';
-import { toggleVariants } from './toggle';
-import { cn } from '../../lib/utils';
 import * as ToggleGroupPrimitive from '@rn-primitives/toggle-group';
 import type { VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 import { Platform } from 'react-native';
+import { cn } from '../../lib/utils';
+import { Icon } from './icon';
+import { TextClassContext } from './text';
+import { toggleVariants } from './toggle';
 
 const ToggleGroupContext = React.createContext<VariantProps<typeof toggleVariants> | null>(null);
 
@@ -15,17 +15,17 @@ function ToggleGroup({
   size,
   children,
   ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
-  VariantProps<typeof toggleVariants>) {
+}: React.ComponentProps<typeof ToggleGroupPrimitive.Root> & VariantProps<typeof toggleVariants>) {
   return (
     <ToggleGroupPrimitive.Root
       className={cn(
         'flex flex-row items-center rounded-md shadow-none',
         Platform.select({ web: 'w-fit' }),
         variant === 'outline' && 'shadow-sm shadow-black/5',
-        className
+        className,
       )}
-      {...props}>
+      {...props}
+    >
       <ToggleGroupContext.Provider value={{ variant, size }}>
         {children}
       </ToggleGroupContext.Provider>
@@ -37,7 +37,7 @@ function useToggleGroupContext() {
   const context = React.useContext(ToggleGroupContext);
   if (context === null) {
     throw new Error(
-      'ToggleGroup compound components cannot be rendered outside the ToggleGroup component'
+      'ToggleGroup compound components cannot be rendered outside the ToggleGroup component',
     );
   }
   return context;
@@ -65,8 +65,9 @@ function ToggleGroupItem({
         'text-sm text-foreground font-medium',
         ToggleGroupPrimitive.utils.getIsSelected(value, props.value)
           ? 'text-accent-foreground'
-          : Platform.select({ web: 'group-hover:text-muted-foreground' })
-      )}>
+          : Platform.select({ web: 'group-hover:text-muted-foreground' }),
+      )}
+    >
       <ToggleGroupPrimitive.Item
         className={cn(
           toggleVariants({
@@ -83,9 +84,10 @@ function ToggleGroupItem({
           Platform.select({
             web: 'flex-1 focus:z-10 focus-visible:z-10',
           }),
-          className
+          className,
         )}
-        {...props}>
+        {...props}
+      >
         {children}
       </ToggleGroupPrimitive.Item>
     </TextClassContext.Provider>
