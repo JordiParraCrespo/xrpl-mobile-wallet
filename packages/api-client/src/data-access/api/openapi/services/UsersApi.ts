@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Function } from '../../../../common/models/Function';
+import type { UpdateUserRequest } from '../../../../common/models/UpdateUserRequest';
 import type { UserResponseDto } from '../../../../common/models/UserResponseDto';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -55,7 +55,10 @@ export class UsersApi {
    * @returns UserResponseDto
    * @throws ApiError
    */
-  public static update(id: string, requestBody: Function): CancelablePromise<UserResponseDto> {
+  public static update(
+    id: string,
+    requestBody: UpdateUserRequest,
+  ): CancelablePromise<UserResponseDto> {
     return __request(OpenAPI, {
       method: 'PATCH',
       url: '/api/v1/users/{id}',

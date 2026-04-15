@@ -1,8 +1,7 @@
 import { FlamaApp } from '@flama/frontend';
-import { env } from './env';
 import { LocalStorageService } from './storage';
 
 export const app = FlamaApp.create({
-  apiBaseUrl: env.NEXT_PUBLIC_API_URL,
-  storage: new LocalStorageService(),
+    apiBaseUrl: import.meta.env.VITE_API_URL ?? 'http://localhost:3001',
+    storage: new LocalStorageService(),
 });

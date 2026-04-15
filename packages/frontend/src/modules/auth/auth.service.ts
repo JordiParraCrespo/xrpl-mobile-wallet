@@ -1,8 +1,8 @@
-import type { LoginDto, RegisterDto } from "@flama/shared";
-import { inject, injectable } from "inversify";
-import { TOKENS } from "../../di/tokens";
-import type { AuthRepository } from "./auth.repository";
-import type { AuthStore } from "./auth.state";
+import type { LoginDto, RegisterDto } from '@flama/shared';
+import { inject, injectable } from 'inversify';
+import { TOKENS } from '../../di/tokens';
+import type { AuthRepository } from './auth.repository';
+import type { AuthStore } from './auth.state';
 
 @injectable()
 export class AuthService {
@@ -10,7 +10,7 @@ export class AuthService {
     @inject(TOKENS.AuthRepository)
     private readonly authRepository: AuthRepository,
     @inject(TOKENS.AuthStore)
-    public readonly store: AuthStore
+    public readonly store: AuthStore,
   ) {}
 
   async login(dto: LoginDto): Promise<void> {
@@ -36,10 +36,7 @@ export class AuthService {
     return this.authRepository.resetPassword(token, password);
   }
 
-  async changePassword(
-    currentPassword: string,
-    newPassword: string
-  ): Promise<void> {
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
     return this.authRepository.changePassword(currentPassword, newPassword);
   }
 

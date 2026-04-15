@@ -3,7 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AuthResponseDto } from '../../../../common/models/AuthResponseDto';
-import type { Function } from '../../../../common/models/Function';
+import type { ChangePasswordRequest } from '../../../../common/models/ChangePasswordRequest';
+import type { ForgotPasswordRequest } from '../../../../common/models/ForgotPasswordRequest';
+import type { LoginRequest } from '../../../../common/models/LoginRequest';
+import type { RegisterRequest } from '../../../../common/models/RegisterRequest';
+import type { ResetPasswordRequest } from '../../../../common/models/ResetPasswordRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -14,7 +18,7 @@ export class AuthApi {
    * @returns AuthResponseDto
    * @throws ApiError
    */
-  public static register(requestBody: Function): CancelablePromise<AuthResponseDto> {
+  public static register(requestBody: RegisterRequest): CancelablePromise<AuthResponseDto> {
     return __request(OpenAPI, {
       method: 'POST',
       url: '/api/v1/auth/register',
@@ -31,7 +35,7 @@ export class AuthApi {
    * @returns AuthResponseDto
    * @throws ApiError
    */
-  public static login(requestBody: Function): CancelablePromise<AuthResponseDto> {
+  public static login(requestBody: LoginRequest): CancelablePromise<AuthResponseDto> {
     return __request(OpenAPI, {
       method: 'POST',
       url: '/api/v1/auth/login',
@@ -73,7 +77,7 @@ export class AuthApi {
    * @returns any
    * @throws ApiError
    */
-  public static forgotPassword(requestBody: Function): CancelablePromise<any> {
+  public static forgotPassword(requestBody: ForgotPasswordRequest): CancelablePromise<any> {
     return __request(OpenAPI, {
       method: 'POST',
       url: '/api/v1/auth/forgot-password',
@@ -87,7 +91,7 @@ export class AuthApi {
    * @returns any
    * @throws ApiError
    */
-  public static resetPassword(requestBody: Function): CancelablePromise<any> {
+  public static resetPassword(requestBody: ResetPasswordRequest): CancelablePromise<any> {
     return __request(OpenAPI, {
       method: 'POST',
       url: '/api/v1/auth/reset-password',
@@ -95,6 +99,23 @@ export class AuthApi {
       mediaType: 'application/json',
       errors: {
         400: `AUTH_003: Invalid or expired reset token`,
+      },
+    });
+  }
+  /**
+   * Change password
+   * @param requestBody
+   * @returns any
+   * @throws ApiError
+   */
+  public static changePassword(requestBody: ChangePasswordRequest): CancelablePromise<any> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/api/v1/auth/change-password',
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        401: `AUTH_002: Invalid credentials`,
       },
     });
   }
