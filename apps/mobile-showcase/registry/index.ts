@@ -9,10 +9,13 @@ import ButtonScreen from "./button";
 import CardScreen from "./card";
 import CheckboxScreen from "./checkbox";
 import CollapsibleScreen from "./collapsible";
+import ContextMenuScreen from "./context-menu";
 import DialogScreen from "./dialog";
 import DropdownMenuScreen from "./dropdown-menu";
+import HoverCardScreen from "./hover-card";
 import InputScreen from "./input";
 import LabelScreen from "./label";
+import MenubarScreen from "./menubar";
 import PopoverScreen from "./popover";
 import ProgressScreen from "./progress";
 import RadioGroupScreen from "./radio-group";
@@ -38,10 +41,13 @@ export const REGISTRY: Record<string, React.ComponentType> = {
   card: CardScreen,
   checkbox: CheckboxScreen,
   collapsible: CollapsibleScreen,
+  "context-menu": ContextMenuScreen,
   dialog: DialogScreen,
   "dropdown-menu": DropdownMenuScreen,
+  "hover-card": HoverCardScreen,
   input: InputScreen,
   label: LabelScreen,
+  menubar: MenubarScreen,
   popover: PopoverScreen,
   progress: ProgressScreen,
   "radio-group": RadioGroupScreen,

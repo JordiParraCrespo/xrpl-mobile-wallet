@@ -20,11 +20,13 @@ import * as React from "react";
 import { ScrollView, View } from "react-native";
 
 export default function TabsScreen() {
+  const [tab, setTab] = React.useState("account");
+
   return (
     <ScrollView contentContainerClassName="p-6 gap-6">
       <View className="gap-2">
         <Text className="text-lg font-semibold text-foreground">Basic</Text>
-        <Tabs defaultValue="account">
+        <Tabs value={tab} onValueChange={setTab}>
           <TabsList>
             <TabsTrigger value="account">
               <Text>Account</Text>

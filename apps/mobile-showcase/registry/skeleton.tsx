@@ -9,10 +9,10 @@ export default function SkeletonScreen() {
       <View className="gap-2">
         <Text className="text-lg font-semibold text-foreground">Card</Text>
         <View className="flex-row items-center gap-4">
-          <Skeleton className="h-12 w-12 rounded-full" />
-          <View className="gap-2">
-            <Skeleton className="h-4 w-48" />
-            <Skeleton className="h-4 w-32" />
+          <Skeleton style={{ height: 48, width: 48, borderRadius: 24 }} />
+          <View className="gap-2 flex-1">
+            <Skeleton style={{ height: 16, width: "75%" }} />
+            <Skeleton style={{ height: 16, width: "50%" }} />
           </View>
         </View>
       </View>
@@ -22,15 +22,15 @@ export default function SkeletonScreen() {
           Content Block
         </Text>
         <View className="gap-3">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-3/4" />
+          <Skeleton style={{ height: 16, width: "100%" }} />
+          <Skeleton style={{ height: 16, width: "100%" }} />
+          <Skeleton style={{ height: 16, width: "75%" }} />
         </View>
       </View>
 
       <View className="gap-2">
         <Text className="text-lg font-semibold text-foreground">Image</Text>
-        <Skeleton className="h-48 w-full rounded-lg" />
+        <Skeleton style={{ height: 192, width: "100%", borderRadius: 10 }} />
       </View>
     </ScrollView>
   );

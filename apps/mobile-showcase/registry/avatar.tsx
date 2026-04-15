@@ -15,7 +15,7 @@ export default function AvatarScreen() {
           With Image
         </Text>
         <View className="flex-row gap-4 items-center">
-          <Avatar className="size-12">
+          <Avatar alt="John Doe">
             <AvatarImage
               source={{
                 uri: "https://api.dicebear.com/9.x/initials/png?seed=JD",
@@ -25,7 +25,7 @@ export default function AvatarScreen() {
               <Text>JD</Text>
             </AvatarFallback>
           </Avatar>
-          <Avatar className="size-12">
+          <Avatar alt="Adam Brown">
             <AvatarImage
               source={{
                 uri: "https://api.dicebear.com/9.x/initials/png?seed=AB",
@@ -43,17 +43,17 @@ export default function AvatarScreen() {
           Fallback Only
         </Text>
         <View className="flex-row gap-4 items-center">
-          <Avatar className="size-12">
+          <Avatar alt="Large">
             <AvatarFallback>
               <Text className="text-sm">CN</Text>
             </AvatarFallback>
           </Avatar>
-          <Avatar className="size-10">
+          <Avatar alt="Small">
             <AvatarFallback>
               <Text className="text-xs">SM</Text>
             </AvatarFallback>
           </Avatar>
-          <Avatar className="size-8">
+          <Avatar alt="Extra Small">
             <AvatarFallback>
               <Text className="text-xs">XS</Text>
             </AvatarFallback>
