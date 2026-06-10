@@ -5,7 +5,10 @@
   "main": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./action-button": "./src/components/ui/action-button.tsx",
     "./alert": "./src/components/ui/alert.tsx",
+    "./amount-text": "./src/components/ui/amount-text.tsx",
+    "./asset-icon": "./src/components/ui/asset-icon.tsx",
     "./alert-dialog": "./src/components/ui/alert-dialog.tsx",
     "./accordion": "./src/components/ui/accordion.tsx",
     "./aspect-ratio": "./src/components/ui/aspect-ratio.tsx",
@@ -22,6 +25,7 @@
     "./icon": "./src/components/ui/icon.tsx",
     "./input": "./src/components/ui/input.tsx",
     "./label": "./src/components/ui/label.tsx",
+    "./list-row": "./src/components/ui/list-row.tsx",
     "./menubar": "./src/components/ui/menubar.tsx",
     "./popover": "./src/components/ui/popover.tsx",
     "./progress": "./src/components/ui/progress.tsx",

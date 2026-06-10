@@ -18,7 +18,64 @@ const config: ExpoConfig = {
       backgroundColor: '#ffffff',
     },
   },
-  plugins: ['expo-router', 'expo-secure-store', 'expo-localization'],
+  plugins: [
+    'expo-router',
+    'expo-secure-store',
+    'expo-localization',
+    [
+      'expo-font',
+      {
+        // Drops typography: ReferoTitle (display serif, weight 400 only),
+        // Inter (body), JetBrainsMono (addresses/hashes).
+        ios: {
+          fonts: [
+            './assets/fonts/ReferoTitle-Regular.ttf',
+            './assets/fonts/Inter_400Regular.ttf',
+            './assets/fonts/Inter_500Medium.ttf',
+            './assets/fonts/Inter_600SemiBold.ttf',
+            './assets/fonts/Inter_700Bold.ttf',
+            './assets/fonts/JetBrainsMono_400Regular.ttf',
+            './assets/fonts/JetBrainsMono_500Medium.ttf',
+            './assets/fonts/JetBrainsMono_600SemiBold.ttf',
+          ],
+        },
+        android: {
+          fonts: [
+            {
+              fontFamily: 'ReferoTitle',
+              fontDefinitions: [{ path: './assets/fonts/ReferoTitle-Regular.ttf', weight: 400 }],
+            },
+            {
+              fontFamily: 'Inter',
+              fontDefinitions: [
+                { path: './assets/fonts/Inter_400Regular.ttf', weight: 400 },
+                { path: './assets/fonts/Inter_500Medium.ttf', weight: 500 },
+                { path: './assets/fonts/Inter_600SemiBold.ttf', weight: 600 },
+                { path: './assets/fonts/Inter_700Bold.ttf', weight: 700 },
+              ],
+            },
+            {
+              fontFamily: 'JetBrainsMono',
+              fontDefinitions: [
+                {
+                  path: './assets/fonts/JetBrainsMono_400Regular.ttf',
+                  weight: 400,
+                },
+                {
+                  path: './assets/fonts/JetBrainsMono_500Medium.ttf',
+                  weight: 500,
+                },
+                {
+                  path: './assets/fonts/JetBrainsMono_600SemiBold.ttf',
+                  weight: 600,
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  ],
 };
 
 export default config;
