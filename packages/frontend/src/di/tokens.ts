@@ -6,4 +6,8 @@ export const TOKENS = {
   AuthService: Symbol.for('AuthService'),
   UserRepository: Symbol.for('UserRepository'),
   UsersService: Symbol.for('UsersService'),
+  KeyringManager: Symbol.for('KeyringManager'),
+  ChainRegistry: Symbol.for('ChainRegistry'),
+  WalletStore: Symbol.for('WalletStore'),
+  WalletService: Symbol.for('WalletService'),
 } as const;

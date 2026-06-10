@@ -96,7 +96,36 @@
     "counterDescription": "Una demostración rápida de los componentes del sistema de diseño.",
     "reset": "Reiniciar",
     "signOut": "Cerrar sesión",
-    "signingOut": "Cerrando sesión..."
+    "signingOut": "Cerrando sesión...",
+    "openWallet": "Abrir cartera"
+  },
+  "wallet": {
+    "title": "Cartera",
+    "import": {
+      "title": "Importar cartera",
+      "subtitle": "Pega tu frase de recuperación de 12 o 24 palabras.",
+      "placeholder": "palabra1 palabra2 palabra3 ...",
+      "submit": "Importar",
+      "importing": "Importando...",
+      "invalid": "La frase de recuperación no es válida"
+    },
+    "accounts": {
+      "balance": "Saldo",
+      "send": "Enviar",
+      "refresh": "Actualizar",
+      "reset": "Eliminar cartera"
+    },
+    "send": {
+      "title": "Enviar {{symbol}}",
+      "destination": "Dirección de destino",
+      "amount": "Cantidad",
+      "submit": "Enviar",
+      "sending": "Enviando...",
+      "success": "Transacción confirmada",
+      "failure": "La transacción ha fallado",
+      "viewExplorer": "Ver en el explorador",
+      "invalidAddress": "La dirección de destino no es válida"
+    }
   },
   "nav": {
     "menu": "Menú",

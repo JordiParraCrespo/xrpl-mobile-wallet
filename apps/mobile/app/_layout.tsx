@@ -1,3 +1,4 @@
+import 'react-native-get-random-values';
 import '../global.css';
 import '../lib/i18n';
 import 'react-native-gesture-handler';

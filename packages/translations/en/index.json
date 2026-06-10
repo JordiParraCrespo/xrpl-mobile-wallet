@@ -96,7 +96,36 @@
     "counterDescription": "A quick demo of the design system components.",
     "reset": "Reset",
     "signOut": "Sign out",
-    "signingOut": "Signing out..."
+    "signingOut": "Signing out...",
+    "openWallet": "Open wallet"
+  },
+  "wallet": {
+    "title": "Wallet",
+    "import": {
+      "title": "Import wallet",
+      "subtitle": "Paste your 12 or 24 word recovery phrase.",
+      "placeholder": "word1 word2 word3 ...",
+      "submit": "Import",
+      "importing": "Importing...",
+      "invalid": "The recovery phrase is not valid"
+    },
+    "accounts": {
+      "balance": "Balance",
+      "send": "Send",
+      "refresh": "Refresh",
+      "reset": "Remove wallet"
+    },
+    "send": {
+      "title": "Send {{symbol}}",
+      "destination": "Destination address",
+      "amount": "Amount",
+      "submit": "Send",
+      "sending": "Sending...",
+      "success": "Transaction confirmed",
+      "failure": "Transaction failed",
+      "viewExplorer": "View in explorer",
+      "invalidAddress": "The destination address is not valid"
+    }
   },
   "nav": {
     "menu": "Menu",
