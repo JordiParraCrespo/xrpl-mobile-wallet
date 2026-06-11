@@ -401,7 +401,3 @@ confirmation, with typed errors and policy deny rules throughout.
   without changing tool code (`claudecodexrpl.md §5`).
 - **Persistence swap** = `SessionStore` / `SecureStorage` are interfaces; move
   from Postgres to Redis, or device keychain to HSM, with no logic change.
-
-```
-
-```
