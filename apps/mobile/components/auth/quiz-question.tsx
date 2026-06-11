@@ -1,6 +1,7 @@
-import { Text } from '@flama/design-system-mobile/text';
-import { cn } from '@flama/design-system-mobile/utils';
-import { Pressable, View } from 'react-native';
+import { Chip } from "@flama/design-system-mobile/chip";
+import { Text } from "@flama/design-system-mobile/text";
+import { cn } from "@flama/design-system-mobile/utils";
+import { View } from "react-native";
 
 type QuizQuestionProps = {
   /** 0-based position of the word being asked about. */
@@ -12,10 +13,16 @@ type QuizQuestionProps = {
 };
 
 /**
- * One backup-quiz question: "Word #n" plus a row of candidate words that
- * tint green / red once chosen.
+ * One backup-quiz question: "Word #n" plus a row of candidate-word chips
+ * that tint green / red once chosen.
  */
-export function QuizQuestion({ index, choices, correct, selected, onSelect }: QuizQuestionProps) {
+export function QuizQuestion({
+  index,
+  choices,
+  correct,
+  selected,
+  onSelect,
+}: QuizQuestionProps) {
   return (
     <View>
       <Text className="mb-2 text-[13px] font-semibold text-muted-foreground">
@@ -27,28 +34,29 @@ export function QuizQuestion({ index, choices, correct, selected, onSelect }: Qu
           const isCorrect = chosen && word === correct;
           const isWrong = chosen && word !== correct;
           return (
-            <Pressable
-              key={word}
-              onPress={() => onSelect(word)}
-              className={cn(
-                'h-12 flex-1 items-center justify-center rounded-xl border px-1.5',
-                isCorrect && 'border-positive bg-positive-soft',
-                isWrong && 'border-destructive bg-destructive-soft',
-                !chosen && 'border-border bg-card',
-              )}
-            >
-              <Text
-                numberOfLines={1}
+            <View key={word} className="flex-1">
+              <Chip
+                variant="outline"
+                onPress={() => onSelect(word)}
                 className={cn(
-                  'text-[15px] font-semibold',
-                  isCorrect && 'text-positive-soft-foreground',
-                  isWrong && 'text-destructive-soft-foreground',
-                  !chosen && 'text-foreground',
+                  "w-full px-1.5",
+                  isCorrect &&
+                    "border-positive bg-positive-soft active:bg-positive-soft",
+                  isWrong &&
+                    "border-destructive bg-destructive-soft active:bg-destructive-soft",
                 )}
               >
-                {word}
-              </Text>
-            </Pressable>
+                <Text
+                  numberOfLines={1}
+                  className={cn(
+                    isCorrect && "text-positive-soft-foreground",
+                    isWrong && "text-destructive-soft-foreground",
+                  )}
+                >
+                  {word}
+                </Text>
+              </Chip>
+            </View>
           );
         })}
       </View>
