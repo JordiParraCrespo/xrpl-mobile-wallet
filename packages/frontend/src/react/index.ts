@@ -13,6 +13,15 @@ export { FlamaProvider, useFlamaApp } from './context';
 export { explorerKeys, useRecentBlocks } from './explorer.queries';
 export { useAuthState, useWalletState } from './hooks';
 export {
+  type RegisterTokenInput,
+  type SendTokenInput,
+  tokensKeys,
+  useRegisterToken,
+  useSendToken,
+  useTokenBalance,
+  useTokens,
+} from './tokens.queries';
+export {
   profileQueryKey,
   useDeleteUser,
   useProfile,

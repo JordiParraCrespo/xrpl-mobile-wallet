@@ -9,6 +9,8 @@ import { createCoreModule } from '../modules/core/core.module';
 import type { IStorageService } from '../modules/core/storage.service';
 import type { ExplorerService } from '../modules/explorer';
 import { ExplorerModule } from '../modules/explorer';
+import type { TokensService } from '../modules/tokens';
+import { TokensModule } from '../modules/tokens';
 import type { UsersService } from '../modules/users';
 import { UsersModule } from '../modules/users';
 import type { WalletService } from '../modules/wallet';
@@ -42,6 +44,7 @@ export class FlamaApp {
     container.load(UsersModule);
     container.load(WalletModule);
     container.load(ExplorerModule);
+    container.load(TokensModule);
 
     // Additional modules provided by the app
     if (config.modules) {
@@ -67,5 +70,9 @@ export class FlamaApp {
 
   get explorer(): ExplorerService {
     return this.container.get(TOKENS.ExplorerService);
+  }
+
+  get tokens(): TokensService {
+    return this.container.get(TOKENS.TokensService);
   }
 }

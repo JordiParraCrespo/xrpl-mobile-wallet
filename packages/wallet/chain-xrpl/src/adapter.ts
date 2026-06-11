@@ -6,7 +6,12 @@ import {
   ChainErrors,
   formatUnits,
   type NetworkConfig,
+  parseUnits,
+  type RegisterTokenParams,
   type Signer,
+  type TokenBalance,
+  type TokenInfo,
+  type TokenTransferParams,
   type TransferParams,
   type TxResult,
 } from '@flama/chain-core';
@@ -27,9 +32,36 @@ const POLL_INTERVAL_MS = 2_000;
 const DEFAULT_RECENT_BLOCKS = 10;
 /** Seconds between the unix epoch (1970) and the XRPL/Ripple epoch (2000). */
 const RIPPLE_EPOCH_OFFSET = 946_684_800;
+/**
+ * Issued currencies on XRPL carry no on-ledger `decimals` — balances are
+ * arbitrary-precision decimal strings (up to 15 significant digits). We pin a
+ * fixed scale so token amounts share the common `bigint` base-unit shape the
+ * adapter interface uses, round-tripping through {@link parseUnits}/{@link formatUnits}.
+ */
+const XRPL_TOKEN_DECIMALS = 15;
+/**
+ * Default trustline limit when registering a token: the maximum amount the
+ * account is willing to hold. A large default avoids capping incoming
+ * transfers; callers can override it (e.g. "0" to remove the line).
+ */
+const DEFAULT_TRUST_LIMIT = '1000000000000000';
 
 const sha512half = (data: Uint8Array): Uint8Array => sha512(data).slice(0, 32);
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Human-readable name for a trustline currency. Standard 3-char ISO codes are
+ * already display-ready (no extra name); 40-char hex codes pack a longer ASCII
+ * label padded with trailing zeros, which we decode for display.
+ */
+function decodeCurrency(currency: string): string | undefined {
+  if (!/^[0-9A-Fa-f]{40}$/.test(currency)) {
+    return undefined;
+  }
+  const bytes = hexToBytes(currency);
+  const ascii = new TextDecoder().decode(bytes).replace(/\0+$/, '').trim();
+  return ascii || undefined;
+}
 
 interface AccountInfoResult {
   error?: string;
@@ -40,6 +72,28 @@ interface AccountInfoResult {
 interface LedgerCurrentResult {
   ledger_current_index: number;
   error?: string;
+}
+
+interface AccountLine {
+  /** Issuer (counterparty) classic address. */
+  account: string;
+  /** Currency code: 3-char ISO or 40-char hex. */
+  currency: string;
+  /** Holder's balance as a signed decimal string. */
+  balance: string;
+}
+
+interface AccountLinesResult {
+  error?: string;
+  error_message?: string;
+  lines?: AccountLine[];
+}
+
+/** XRPL Payment `Amount` field for an issued currency. */
+interface IouAmount {
+  currency: string;
+  issuer: string;
+  value: string;
 }
 
 interface LedgerResult {
@@ -129,8 +183,116 @@ export class XrplAdapter implements ChainAdapter {
   }
 
   async transfer(params: TransferParams, signer: Signer): Promise<TxResult> {
+    // Native XRP: `Amount` is a string count of drops.
+    return this.sendPayment(params.from, params.to, params.amount.toString(), signer);
+  }
+
+  async listTokens(address: string): Promise<TokenBalance[]> {
+    const result = await this.rpc.request<AccountLinesResult>('account_lines', {
+      account: address,
+      ledger_index: 'validated',
+    });
+    if (result.error === 'actNotFound') {
+      // Unfunded accounts hold no trustlines yet.
+      return [];
+    }
+    if (result.error || !result.lines) {
+      throw xrplRpcError(
+        result.error ?? 'account_lines failed',
+        result.error_message,
+        this.config.chainId,
+      );
+    }
+    return (
+      result.lines
+        // A holder's balance is positive; negative lines are the issuer side.
+        .filter((line) => !line.balance.startsWith('-') && line.balance !== '0')
+        .map((line) => this.toTokenBalance(line.currency, line.account, line.balance))
+    );
+  }
+
+  async getTokenBalance(address: string, token: TokenInfo): Promise<TokenBalance> {
+    const result = await this.rpc.request<AccountLinesResult>('account_lines', {
+      account: address,
+      peer: token.issuer,
+      ledger_index: 'validated',
+    });
+    const zero = this.toTokenBalance(token.symbol, token.issuer, '0');
+    if (result.error === 'actNotFound') {
+      return zero;
+    }
+    if (result.error || !result.lines) {
+      throw xrplRpcError(
+        result.error ?? 'account_lines failed',
+        result.error_message,
+        this.config.chainId,
+      );
+    }
+    const line = result.lines.find((l) => l.currency === token.symbol);
+    if (!line || line.balance.startsWith('-')) {
+      return zero;
+    }
+    return this.toTokenBalance(line.currency, line.account, line.balance);
+  }
+
+  async transferToken(params: TokenTransferParams, signer: Signer): Promise<TxResult> {
+    const amount: IouAmount = {
+      currency: params.token.symbol,
+      issuer: params.token.issuer,
+      value: formatUnits(params.amount, params.token.decimals),
+    };
+    return this.sendPayment(params.from, params.to, amount, signer);
+  }
+
+  /**
+   * Registers a token by opening (or updating) a trustline to its issuer via a
+   * TrustSet. An XRPL account must hold a trustline before it can receive an
+   * issued currency. `limit` is the maximum the account is willing to hold;
+   * passing "0" removes the line once its balance is zero.
+   */
+  async registerToken(params: RegisterTokenParams, signer: Signer): Promise<TxResult> {
+    const limit: IouAmount = {
+      currency: params.token.symbol,
+      issuer: params.token.issuer,
+      value: params.limit ?? DEFAULT_TRUST_LIMIT,
+    };
+    return this.submitTransaction(
+      { TransactionType: 'TrustSet', LimitAmount: limit },
+      params.from,
+      signer,
+    );
+  }
+
+  /**
+   * Shared Payment pipeline for native XRP and issued currencies. `amount` is a
+   * drops string for XRP or an {@link IouAmount} object for tokens.
+   */
+  private async sendPayment(
+    from: string,
+    to: string,
+    amount: string | IouAmount,
+    signer: Signer,
+  ): Promise<TxResult> {
+    return this.submitTransaction(
+      { TransactionType: 'Payment', Destination: to, Amount: amount },
+      from,
+      signer,
+    );
+  }
+
+  /**
+   * Shared submit pipeline for any single-account transaction: load the account
+   * sequence and current ledger, fill the common fields, sign through the
+   * external signer, submit, and await validation. `fields` carries the
+   * type-specific body (Payment `Amount`, TrustSet `LimitAmount`, ...).
+   */
+  private async submitTransaction(
+    fields: Record<string, unknown>,
+    from: string,
+    signer: Signer,
+  ): Promise<TxResult> {
     const accountInfo = await this.rpc.request<AccountInfoResult>('account_info', {
-      account: params.from,
+      account: from,
       ledger_index: 'current',
     });
     if (accountInfo.error || !accountInfo.account_data) {
@@ -145,12 +307,10 @@ export class XrplAdapter implements ChainAdapter {
 
     let blob: string;
     try {
-      blob = await this.signPayment(
+      blob = await this.signTransaction(
         {
-          TransactionType: 'Payment',
-          Account: params.from,
-          Destination: params.to,
-          Amount: params.amount.toString(),
+          ...fields,
+          Account: from,
           Fee: BASE_FEE_DROPS,
           Sequence: accountInfo.account_data.Sequence,
           LastLedgerSequence: lastLedgerSequence,
@@ -187,11 +347,24 @@ export class XrplAdapter implements ChainAdapter {
     return this.waitForValidation(hash, lastLedgerSequence);
   }
 
+  private toTokenBalance(currency: string, issuer: string, balance: string): TokenBalance {
+    const value = balance.startsWith('-') ? balance.slice(1) : balance;
+    const amount = parseUnits(value, XRPL_TOKEN_DECIMALS);
+    return {
+      symbol: currency,
+      issuer,
+      decimals: XRPL_TOKEN_DECIMALS,
+      name: decodeCurrency(currency),
+      amount,
+      formatted: formatUnits(amount, XRPL_TOKEN_DECIMALS),
+    };
+  }
+
   /**
    * External-signer pipeline: serialize for signing, sha512-half digest,
    * sign through the keyring Signer, then attach the DER signature.
    */
-  private async signPayment(tx: Record<string, unknown>, signer: Signer): Promise<string> {
+  private async signTransaction(tx: Record<string, unknown>, signer: Signer): Promise<string> {
     tx.SigningPubKey = bytesToHex(signer.publicKey).toUpperCase();
     const digest = sha512half(hexToBytes(encodeForSigning(tx)));
     const { signature } = await signer.signDigest(digest);

@@ -15,6 +15,10 @@ export type {
   Block,
   ChainKind,
   NetworkConfig,
+  RegisterTokenParams,
+  TokenBalance,
+  TokenInfo,
+  TokenTransferParams,
   TransferParams,
   TxResult,
 } from './types';
