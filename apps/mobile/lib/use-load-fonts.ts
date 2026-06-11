@@ -1,4 +1,4 @@
-import { useFonts } from "expo-font";
+import { useFonts } from 'expo-font';
 
 /**
  * The Drops typefaces, loaded at runtime so they're ready in Expo Go and the
@@ -11,16 +11,16 @@ import { useFonts } from "expo-font";
  */
 export const DROPS_FONTS = {
   // Refero Title — editorial display serif, weight 400 only.
-  ReferoTitle: require("../assets/fonts/ReferoTitle-Regular.ttf"),
+  ReferoTitle: require('../assets/fonts/ReferoTitle-Regular.ttf'),
   // Inter — body.
-  Inter: require("../assets/fonts/Inter_400Regular.ttf"),
-  Inter_500Medium: require("../assets/fonts/Inter_500Medium.ttf"),
-  Inter_600SemiBold: require("../assets/fonts/Inter_600SemiBold.ttf"),
-  Inter_700Bold: require("../assets/fonts/Inter_700Bold.ttf"),
+  Inter: require('../assets/fonts/Inter_400Regular.ttf'),
+  Inter_500Medium: require('../assets/fonts/Inter_500Medium.ttf'),
+  Inter_600SemiBold: require('../assets/fonts/Inter_600SemiBold.ttf'),
+  Inter_700Bold: require('../assets/fonts/Inter_700Bold.ttf'),
   // JetBrains Mono — addresses, tags, hashes.
-  JetBrainsMono: require("../assets/fonts/JetBrainsMono_400Regular.ttf"),
-  JetBrainsMono_500Medium: require("../assets/fonts/JetBrainsMono_500Medium.ttf"),
-  JetBrainsMono_600SemiBold: require("../assets/fonts/JetBrainsMono_600SemiBold.ttf"),
+  JetBrainsMono: require('../assets/fonts/JetBrainsMono_400Regular.ttf'),
+  JetBrainsMono_500Medium: require('../assets/fonts/JetBrainsMono_500Medium.ttf'),
+  JetBrainsMono_600SemiBold: require('../assets/fonts/JetBrainsMono_600SemiBold.ttf'),
 } as const;
 
 export type UseLoadFontsResult = {

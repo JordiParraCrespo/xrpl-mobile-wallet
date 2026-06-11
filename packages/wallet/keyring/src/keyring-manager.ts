@@ -1,18 +1,22 @@
-import type { ChainKind, Signer } from '@flama/chain-core';
-import { bytesToHex, randomBytes } from '@noble/hashes/utils';
-import { HDKey } from '@scure/bip32';
-import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from '@scure/bip39';
-import { wordlist } from '@scure/bip39/wordlists/english';
-import { derivationPath } from './derivation';
+import type { ChainKind, Signer } from "@flama/chain-core";
+import { bytesToHex, randomBytes } from "@noble/hashes/utils";
+import { HDKey } from "@scure/bip32";
+import {
+  generateMnemonic,
+  mnemonicToSeedSync,
+  validateMnemonic,
+} from "@scure/bip39";
+import { wordlist } from "@scure/bip39/wordlists/english";
+import { derivationPath } from "./derivation";
 import {
   InvalidMnemonicError,
   KeyringLockedError,
   UnsupportedChainError,
   VaultCorruptedError,
   WalletNotFoundError,
-} from './errors';
-import { Secp256k1Signer } from './signer';
-import type { SecureStorage } from './storage';
+} from "./errors";
+import { Secp256k1Signer } from "./signer";
+import type { SecureStorage } from "./storage";
 import {
   createEnvelope,
   DEFAULT_KDF_PARAMS,
@@ -28,15 +32,15 @@ import {
   type VaultData,
   type VaultEnvelope,
   type VaultWallet,
-} from './vault';
+} from "./vault";
 import {
   createFamilySeedSigner,
   InvalidFamilySeedError,
   isValidFamilySeed,
-} from './xrpl/family-seed';
-import { secretNumbersToFamilySeed } from './xrpl/secret-numbers';
+} from "./xrpl/family-seed";
+import { secretNumbersToFamilySeed } from "./xrpl/secret-numbers";
 
-export type WalletType = 'hd' | 'xrpl-seed';
+export type WalletType = "hd" | "xrpl-seed";
 
 export interface WalletMeta {
   id: string;
@@ -54,12 +58,12 @@ export interface CreateWalletOptions {
 
 interface LegacyVault {
   version: 1;
-  wallets: { id: string; name: string; type: 'hd'; mnemonic: string }[];
+  wallets: { id: string; name: string; type: "hd"; mnemonic: string }[];
 }
 
 const CHAINS_BY_TYPE: Record<WalletType, ChainKind[]> = {
-  hd: ['xrpl', 'evm'],
-  'xrpl-seed': ['xrpl'],
+  hd: ["xrpl", "evm"],
+  "xrpl-seed": ["xrpl"],
 };
 
 /**
@@ -99,7 +103,7 @@ export class KeyringManager {
    */
   async initialize(passcode: string): Promise<void> {
     if (await this.isInitialized()) {
-      throw new Error('Keyring is already initialized');
+      throw new Error("Keyring is already initialized");
     }
     const wallets: VaultWallet[] = [];
     const legacyRaw = await this.storage.get(LEGACY_VAULT_STORAGE_KEY);
@@ -107,16 +111,16 @@ export class KeyringManager {
       let legacy: LegacyVault;
       try {
         legacy = JSON.parse(legacyRaw) as LegacyVault;
-        if (!Array.isArray(legacy.wallets)) throw new Error('missing wallets');
+        if (!Array.isArray(legacy.wallets)) throw new Error("missing wallets");
       } catch {
-        throw new VaultCorruptedError('Legacy vault is corrupted');
+        throw new VaultCorruptedError("Legacy vault is corrupted");
       }
       const now = Date.now();
       for (const wallet of legacy.wallets) {
         wallets.push({
           id: wallet.id,
           name: wallet.name,
-          type: 'hd',
+          type: "hd",
           mnemonic: wallet.mnemonic,
           backedUp: true,
           createdAt: now,
@@ -199,24 +203,43 @@ export class KeyringManager {
     await this.persist();
   }
 
+  /**
+   * Generates a fresh BIP-39 recovery phrase. Nothing is persisted — call
+   * {@link importMnemonic} once the user has backed it up.
+   */
+  generateMnemonic(wordCount: 12 | 24 = 12): string {
+    return generateMnemonic(wordlist, wordCount === 24 ? 256 : 128);
+  }
+
   /** Generates a fresh mnemonic (12 words by default) and makes it active. */
   async createWallet(options?: CreateWalletOptions): Promise<WalletMeta> {
     this.unlocked();
-    const mnemonic = generateMnemonic(wordlist, options?.words === 24 ? 256 : 128);
-    return this.addWallet({ type: 'hd', mnemonic, backedUp: false }, options?.name);
+    const mnemonic = generateMnemonic(
+      wordlist,
+      options?.words === 24 ? 256 : 128,
+    );
+    return this.addWallet(
+      { type: "hd", mnemonic, backedUp: false },
+      options?.name,
+    );
   }
 
   /** Imports a BIP-39 mnemonic and makes it active. */
   async importMnemonic(mnemonic: string, name?: string): Promise<WalletMeta> {
     const { data } = this.unlocked();
-    const normalized = mnemonic.trim().toLowerCase().split(/\s+/).join(' ');
+    const normalized = mnemonic.trim().toLowerCase().split(/\s+/).join(" ");
     if (!validateMnemonic(normalized, wordlist)) {
       throw new InvalidMnemonicError();
     }
-    if (data.wallets.some((w) => w.type === 'hd' && w.mnemonic === normalized)) {
-      throw new Error('A wallet with this mnemonic already exists');
+    if (
+      data.wallets.some((w) => w.type === "hd" && w.mnemonic === normalized)
+    ) {
+      throw new Error("A wallet with this mnemonic already exists");
     }
-    return this.addWallet({ type: 'hd', mnemonic: normalized, backedUp: true }, name);
+    return this.addWallet(
+      { type: "hd", mnemonic: normalized, backedUp: true },
+      name,
+    );
   }
 
   /** Imports an XRPL family seed (secp256k1 or `sEd…` ed25519) and makes it active. */
@@ -226,14 +249,22 @@ export class KeyringManager {
     if (!isValidFamilySeed(normalized)) {
       throw new InvalidFamilySeedError();
     }
-    if (data.wallets.some((w) => w.type === 'xrpl-seed' && w.seed === normalized)) {
-      throw new Error('A wallet with this family seed already exists');
+    if (
+      data.wallets.some((w) => w.type === "xrpl-seed" && w.seed === normalized)
+    ) {
+      throw new Error("A wallet with this family seed already exists");
     }
-    return this.addWallet({ type: 'xrpl-seed', seed: normalized, backedUp: true }, name);
+    return this.addWallet(
+      { type: "xrpl-seed", seed: normalized, backedUp: true },
+      name,
+    );
   }
 
   /** Imports Xaman secret numbers, stored as the family seed they encode. */
-  async importSecretNumbers(rows: string[], name?: string): Promise<WalletMeta> {
+  async importSecretNumbers(
+    rows: string[],
+    name?: string,
+  ): Promise<WalletMeta> {
     this.unlocked();
     return this.importFamilySeed(secretNumbersToFamilySeed(rows), name);
   }
@@ -262,8 +293,8 @@ export class KeyringManager {
   /** HD wallets only — `UnsupportedChainError` for family-seed wallets. */
   exportMnemonic(walletId: string): string {
     const wallet = this.findWallet(walletId);
-    if (wallet.type !== 'hd') {
-      throw new UnsupportedChainError('Wallet has no mnemonic to export');
+    if (wallet.type !== "hd") {
+      throw new UnsupportedChainError("Wallet has no mnemonic to export");
     }
     return wallet.mnemonic;
   }
@@ -271,8 +302,8 @@ export class KeyringManager {
   /** Family-seed wallets only — `UnsupportedChainError` for HD wallets. */
   exportFamilySeed(walletId: string): string {
     const wallet = this.findWallet(walletId);
-    if (wallet.type !== 'xrpl-seed') {
-      throw new UnsupportedChainError('Wallet has no family seed to export');
+    if (wallet.type !== "xrpl-seed") {
+      throw new UnsupportedChainError("Wallet has no family seed to export");
     }
     return wallet.seed;
   }
@@ -283,9 +314,11 @@ export class KeyringManager {
    */
   getSigner(walletId: string, kind: ChainKind, accountIndex = 0): Signer {
     const wallet = this.findWallet(walletId);
-    if (wallet.type === 'xrpl-seed') {
-      if (kind !== 'xrpl') {
-        throw new UnsupportedChainError(`Family seed wallets cannot sign for "${kind}"`);
+    if (wallet.type === "xrpl-seed") {
+      if (kind !== "xrpl") {
+        throw new UnsupportedChainError(
+          `Family seed wallets cannot sign for "${kind}"`,
+        );
       }
       return createFamilySeedSigner(wallet.seed);
     }
@@ -324,7 +357,7 @@ export class KeyringManager {
   private async loadEnvelope(): Promise<VaultEnvelope> {
     const raw = await this.storage.get(VAULT_STORAGE_KEY);
     if (!raw) {
-      throw new Error('Keyring is not initialized');
+      throw new Error("Keyring is not initialized");
     }
     return parseEnvelope(raw);
   }
@@ -339,8 +372,8 @@ export class KeyringManager {
 
   private async addWallet(
     secret:
-      | { type: 'hd'; mnemonic: string; backedUp: boolean }
-      | { type: 'xrpl-seed'; seed: string; backedUp: boolean },
+      | { type: "hd"; mnemonic: string; backedUp: boolean }
+      | { type: "xrpl-seed"; seed: string; backedUp: boolean },
     name?: string,
   ): Promise<WalletMeta> {
     const { data } = this.unlocked();

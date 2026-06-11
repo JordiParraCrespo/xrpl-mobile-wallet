@@ -16,13 +16,16 @@ export { walletKeys } from './query-keys';
 
 /** Loads the vault from secure storage on app start. */
 export function useWalletRestore(
-  options?: Omit<UseQueryOptions<void, Error>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<null, Error>, 'queryKey' | 'queryFn'>,
 ) {
   const app = useFlamaApp();
 
   return useQuery({
     queryKey: walletKeys.restore,
-    queryFn: () => app.wallet.restore(),
+    queryFn: async () => {
+      await app.wallet.restore();
+      return null;
+    },
     retry: false,
     staleTime: Infinity,
     ...options,
