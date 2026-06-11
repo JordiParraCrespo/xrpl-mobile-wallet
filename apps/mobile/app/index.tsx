@@ -1,8 +1,7 @@
-import { useAuthState } from "@flama/frontend/react";
 import { Redirect } from "expo-router";
 import { Routes } from "../lib/routes";
 
 export default function Index() {
-  const { isAuthenticated } = useAuthState();
-  return <Redirect href={isAuthenticated ? Routes.App : Routes.AuthLogin} />;
+  // The Drops onboarding Welcome screen is the app's front door.
+  return <Redirect href={Routes.Onboarding} />;
 }
