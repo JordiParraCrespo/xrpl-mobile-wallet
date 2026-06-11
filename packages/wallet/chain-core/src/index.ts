@@ -20,6 +20,7 @@ export type {
   TokenInfo,
   TokenTransferParams,
   TransferParams,
+  TxContext,
   TxResult,
 } from './types';
 export { formatUnits, parseUnits } from './units';

@@ -13,6 +13,7 @@ import {
   type TokenInfo,
   type TokenTransferParams,
   type TransferParams,
+  type TxContext,
   type TxResult,
 } from '@flama/chain-core';
 import { secp256k1 } from '@noble/curves/secp256k1';
@@ -76,7 +77,16 @@ function decodeCurrency(currency: string): string | undefined {
 interface AccountInfoResult {
   error?: string;
   error_message?: string;
-  account_data?: { Balance: string; Sequence: number };
+  account_data?: { Balance: string; Sequence: number; OwnerCount?: number };
+}
+
+interface ServerInfoResult {
+  info?: {
+    validated_ledger?: {
+      reserve_base_xrp: number;
+      reserve_inc_xrp: number;
+    };
+  };
 }
 
 interface LedgerCurrentResult {
@@ -315,18 +325,27 @@ export class XrplAdapter implements ChainAdapter {
     const ledger = await this.rpc.request<LedgerCurrentResult>('ledger_current');
     const lastLedgerSequence = ledger.ledger_current_index + LEDGER_BUFFER;
 
+    const tx = {
+      ...fields,
+      Account: from,
+      Fee: BASE_FEE_DROPS,
+      Sequence: accountInfo.account_data.Sequence,
+      LastLedgerSequence: lastLedgerSequence,
+    };
+    return this.signAndSubmit(tx, signer);
+  }
+
+  /**
+   * Signs an already-built transaction (Account, Fee, Sequence and
+   * LastLedgerSequence already set), submits it, and awaits validation. This is
+   * the signing half of the prepare → sign → submit flow used by the agent and
+   * the on-device wallet, so the exact transaction the user approved is the one
+   * that gets signed.
+   */
+  async signAndSubmit(tx: Record<string, unknown>, signer: Signer): Promise<TxResult> {
     let blob: string;
     try {
-      blob = await this.signTransaction(
-        {
-          ...fields,
-          Account: from,
-          Fee: BASE_FEE_DROPS,
-          Sequence: accountInfo.account_data.Sequence,
-          LastLedgerSequence: lastLedgerSequence,
-        },
-        signer,
-      );
+      blob = await this.signTransaction({ ...tx }, signer);
     } catch (cause) {
       throw new ChainError(ChainErrors.SIGNING_FAILED, {
         chainId: this.config.chainId,
@@ -354,7 +373,47 @@ export class XrplAdapter implements ChainAdapter {
         explorerUrl: this.explorerUrl(hash),
       };
     }
+    const lastLedgerSequence = Number(tx.LastLedgerSequence ?? 0);
     return this.waitForValidation(hash, lastLedgerSequence);
+  }
+
+  /**
+   * Assembles the read-only chain state needed to build and validate a
+   * transaction (sequence, current ledger, balance, reserve, fee). The
+   * transaction layer turns this into a canonical tx; nothing here signs.
+   */
+  async buildContext(account: string): Promise<TxContext> {
+    const info = await this.rpc.request<AccountInfoResult>('account_info', {
+      account,
+      ledger_index: 'current',
+    });
+    if (info.error || !info.account_data) {
+      throw xrplRpcError(
+        info.error ?? 'account_info failed',
+        info.error_message,
+        this.config.chainId,
+      );
+    }
+    const ledger = await this.rpc.request<LedgerCurrentResult>('ledger_current');
+    return {
+      account,
+      sequence: info.account_data.Sequence,
+      ledgerIndex: ledger.ledger_current_index,
+      balanceDrops: BigInt(info.account_data.Balance),
+      reserveDrops: await this.reserveDrops(info.account_data.OwnerCount ?? 0),
+      feeDrops: BigInt(BASE_FEE_DROPS),
+    };
+  }
+
+  /** Current reserve requirement in drops: base + per-owned-object increment. */
+  private async reserveDrops(ownerCount: number): Promise<bigint> {
+    const server = await this.rpc.request<ServerInfoResult>('server_info');
+    const ledger = server.info?.validated_ledger;
+    const toDrops = (xrp: number) => BigInt(Math.round(xrp * 1_000_000));
+    // Fall back to current testnet defaults if server_info omits the figures.
+    const base = ledger ? toDrops(ledger.reserve_base_xrp) : 1_000_000n;
+    const inc = ledger ? toDrops(ledger.reserve_inc_xrp) : 200_000n;
+    return base + inc * BigInt(ownerCount);
   }
 
   async requestFaucet(address: string): Promise<void> {

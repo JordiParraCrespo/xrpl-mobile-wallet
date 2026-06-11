@@ -104,3 +104,23 @@ export interface Block {
   /** Number of transactions included in the block. */
   transactionCount: number;
 }
+
+/**
+ * Read-only chain state needed to build and validate a transaction before
+ * signing. An adapter assembles this once (see `XrplAdapter.buildContext`) and
+ * hands it to the transaction layer, which builds the canonical tx from it.
+ */
+export interface TxContext {
+  /** The sender's address. */
+  account: string;
+  /** Current account sequence / nonce. */
+  sequence: number;
+  /** Current ledger index / block height; used to bound transaction validity. */
+  ledgerIndex: number;
+  /** Spendable native balance, in base units (drops, wei). */
+  balanceDrops: bigint;
+  /** Reserve that must remain untouched, in base units. */
+  reserveDrops: bigint;
+  /** Network fee to apply, in base units. */
+  feeDrops: bigint;
+}
