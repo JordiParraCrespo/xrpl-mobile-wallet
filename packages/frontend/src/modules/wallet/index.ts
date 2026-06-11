@@ -4,6 +4,7 @@ export { WalletService } from './wallet.service';
 export {
   createWalletStore,
   type WalletAccount,
+  type WalletInfo,
   type WalletState,
   type WalletStore,
 } from './wallet.state';
