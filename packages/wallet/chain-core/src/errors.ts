@@ -55,6 +55,10 @@ export const ChainErrors = {
     code: 'CHAIN_009',
     message: 'Could not sign the transaction',
   },
+  SELF_PAYMENT: {
+    code: 'CHAIN_010',
+    message: 'The destination is the same as the sender',
+  },
   UNKNOWN: {
     code: 'CHAIN_999',
     message: 'An unexpected chain error occurred',
