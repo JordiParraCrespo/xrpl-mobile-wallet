@@ -21,7 +21,7 @@ const amountTextVariants = cva(
         sm: "text-sm leading-[18px]",
         md: "text-base leading-5",
         lg: "text-2xl leading-7",
-        xl: "text-[48px] leading-[48px] tracking-[-0.8px]",
+        xl: "text-[48px] leading-[52px] tracking-[-0.8px]",
       },
     },
     defaultVariants: {

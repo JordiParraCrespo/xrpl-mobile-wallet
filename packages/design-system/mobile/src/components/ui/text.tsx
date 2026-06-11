@@ -18,16 +18,18 @@ const textVariants = cva(
     variants: {
       variant: {
         default: "",
+        // Display leadings carry ~8% headroom over the CSS spec: the serif's
+        // ascenders overshoot the em box and RN clips glyphs to the line box.
         display: cn(
-          "font-display text-[53px] font-normal leading-[56px] tracking-[-0.8px]",
+          "font-display text-[53px] font-normal leading-[58px] tracking-[-0.8px]",
           Platform.select({ web: "scroll-m-20 text-balance" }),
         ),
         "display-xl": cn(
-          "font-display text-[72px] font-normal leading-[72px] tracking-[-1.2px]",
+          "font-display text-[72px] font-normal leading-[78px] tracking-[-1.2px]",
           Platform.select({ web: "scroll-m-20 text-balance" }),
         ),
         balance:
-          "font-display tabular-nums text-[56px] font-normal leading-[56px] tracking-[-0.8px]",
+          "font-display tabular-nums text-[56px] font-normal leading-[60px] tracking-[-0.8px]",
         h1: cn(
           "font-display text-center text-[40px] font-normal leading-[43px] tracking-[-0.6px]",
           Platform.select({ web: "scroll-m-20 text-balance" }),

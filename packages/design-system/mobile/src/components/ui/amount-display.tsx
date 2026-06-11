@@ -32,7 +32,7 @@ function AmountDisplay({
           {symbol}
         </Text>
       ) : null}
-      <Text className="text-foreground font-display text-[56px] font-normal leading-none tracking-[-1px] tabular-nums">
+      <Text className="text-foreground font-display text-[56px] font-normal leading-[60px] tracking-[-1px] tabular-nums">
         {value}
       </Text>
       {showCursor ? (
