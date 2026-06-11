@@ -136,5 +136,117 @@
     "label": "Idioma",
     "en": "English",
     "es": "Español"
+  },
+  "onboarding": {
+    "common": {
+      "continue": "Continuar",
+      "importing": "Importando…",
+      "paste": "Pegar",
+      "words12": "12 palabras",
+      "words24": "24 palabras",
+      "xrplOnly": "Solo XRP Ledger"
+    },
+    "welcome": {
+      "create": "Crear una cartera nueva",
+      "import": "Importar una cartera existente",
+      "legal": "Al continuar aceptas los Términos y la Política de privacidad."
+    },
+    "secureIntro": {
+      "title": "Haz una copia de tu nueva cartera",
+      "subtitle": "Estás a punto de crear una frase de recuperación. Tres cosas que debes saber antes.",
+      "cta": "Crear frase de recuperación",
+      "points": {
+        "masterKey": {
+          "title": "Es tu llave maestra",
+          "description": "Una frase de recuperación de 12 palabras es la única forma de restaurar esta cartera, en todas las cadenas XRPL."
+        },
+        "private": {
+          "title": "Mantenla en privado",
+          "description": "Cualquiera que la vea puede mover tus fondos. Drops nunca te la pedirá."
+        },
+        "offline": {
+          "title": "Guárdala sin conexión",
+          "description": "Escríbela en papel. No hagas capturas ni la guardes en la nube."
+        }
+      }
+    },
+    "revealPhrase": {
+      "title": "Tu frase de recuperación",
+      "subtitle": "Escribe estas palabras en orden y guárdalas en un lugar seguro.",
+      "tapToReveal": "Toca para revelar",
+      "warning": "Nunca hagas capturas ni compartas estas palabras. El soporte de Drops nunca te las pedirá.",
+      "ctaSaved": "He guardado mi frase",
+      "ctaReveal": "Revela para continuar"
+    },
+    "import": {
+      "title": "Importa tu cartera",
+      "subtitle": "Elige cómo quieres restaurar el acceso. Tus claves nunca salen de este dispositivo.",
+      "helper": "¿Cuál tengo yo?",
+      "gotIt": "Entendido",
+      "allNetworks": "Todas las redes",
+      "methods": {
+        "phrase": {
+          "title": "Frase de recuperación",
+          "description": "12 o 24 palabras",
+          "help": "Una lista de 12 o 24 palabras corrientes. La copia de seguridad estándar de la mayoría de carteras: funciona en todas las redes."
+        },
+        "seed": {
+          "title": "Semilla familiar",
+          "description": "Empieza por s o sEd",
+          "help": "Una sola cadena que empieza por s o sEd. El secreto clásico de XRPL, solo para XRP Ledger."
+        },
+        "secret": {
+          "title": "Números secretos",
+          "description": "8 grupos de 6 dígitos",
+          "help": "Ocho filas de seis dígitos, como las usa Xaman. Solo XRP Ledger."
+        }
+      }
+    },
+    "importPhrase": {
+      "title": "Introduce tu frase de recuperación",
+      "subtitle": "Escribe o pega tus palabras en orden. Al pegar se rellenan todos los campos a la vez.",
+      "ctaProgress": "{{filled}} de {{total}} palabras",
+      "errorInvalid": "Esto no parece una frase válida. Revisa las palabras marcadas y su orden.",
+      "errorImport": "No se ha podido importar la frase. Revisa las palabras y su orden e inténtalo de nuevo.",
+      "securityNote": "Se guarda cifrada en este dispositivo. Tu frase nunca sale de él."
+    },
+    "importSeed": {
+      "title": "Introduce tu semilla familiar",
+      "subtitle": "Tu semilla secreta empieza por s o sEd. Solo restaura tu cuenta de XRP Ledger.",
+      "show": "Mostrar semilla",
+      "hide": "Ocultar semilla",
+      "errorInvalid": "Esta no es una semilla familiar válida. Debe empezar por s o sEd y contener solo caracteres base58.",
+      "errorImport": "No se ha podido importar la semilla. Compruébala e inténtalo de nuevo.",
+      "securityNote": "Se guarda cifrada en este dispositivo. Tu semilla nunca sale de él."
+    },
+    "importSecretNumbers": {
+      "title": "Introduce tus números secretos",
+      "subtitle": "Ocho filas de seis dígitos, como aparecen en tu copia. Cada fila se comprueba sola mientras escribes.",
+      "errorInvalid": "Una o más filas no cuadran. Una fila en rojo significa que hay un dígito mal: revísala contra tu copia.",
+      "errorImport": "No se han podido importar los números. Revísalos contra tu copia e inténtalo de nuevo.",
+      "securityNote": "Cada fila lleva su propia suma de comprobación, así que las erratas se detectan al instante. Nada sale de este dispositivo."
+    },
+    "success": {
+      "title": "Todo listo",
+      "subtitlePhrase": "Tu frase de recuperación desbloquea la misma identidad en todas las cadenas XRPL.",
+      "subtitleXrpl": "Tu cuenta de XRP Ledger está lista.",
+      "networks_one": "{{count}} red",
+      "networks_other": "{{count}} redes",
+      "footnotePhrase": "Ambas direcciones derivan de la misma frase de recuperación: una identidad, todas las cadenas.",
+      "footnoteXrpl": "La sidechain XRPL EVM no está disponible para este método de importación. Importa una frase de recuperación para añadirla.",
+      "defaultWalletName": "Cuenta 1",
+      "cta": "Abrir mi cartera"
+    },
+    "backupQuiz": {
+      "title": "Confirma tu copia de seguridad",
+      "subtitle": "Toca la palabra correcta de cada posición para demostrar que has guardado tu frase.",
+      "wordLabel": "Palabra n.º {{position}}",
+      "ctaSelect": "Selecciona cada palabra",
+      "ctaConfirm": "Confirmar y terminar",
+      "ctaPending": "Creando cartera…",
+      "errorWrongWord": "Esa no es la palabra correcta para esa posición. Revisa tu copia escrita e inténtalo de nuevo.",
+      "errorImport": "Algo ha ido mal al crear tu cartera. Inténtalo de nuevo.",
+      "reassurance": "Ya casi está. Confirmar demuestra que tu frase está bien anotada."
+    }
   }
 }

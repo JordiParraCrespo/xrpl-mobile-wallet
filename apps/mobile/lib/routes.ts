@@ -1,4 +1,4 @@
-import type { Href } from "expo-router";
+import type { Href } from 'expo-router';
 
 /**
  * Every app route path, in one place. Use these instead of hand-written
@@ -8,52 +8,46 @@ import type { Href } from "expo-router";
  * `[param]` template here; use the `buildRoute` helpers below to fill them in.
  */
 export enum Routes {
-  // App (Flama demo + wallet)
-  App = "/(app)",
-  Wallet = "/(app)/wallet",
-  WalletImport = "/(app)/wallet/import",
-  WalletSend = "/(app)/wallet/send",
-
-  // Drops shell
-  Root = "/(drops)",
+  /** The wallet-status gate: routes to onboarding, unlock, or home. */
+  Root = '/',
 
   // Vault gate (initialized but locked)
-  Unlock = "/(drops)/unlock",
+  Unlock = '/unlock',
 
   // Onboarding (pre-wallet flow)
-  Onboarding = "/(drops)/onboarding",
-  OnboardingSecureIntro = "/(drops)/onboarding/secure-intro",
-  OnboardingRevealPhrase = "/(drops)/onboarding/reveal-phrase",
-  OnboardingBackupQuiz = "/(drops)/onboarding/backup-quiz",
-  OnboardingImport = "/(drops)/onboarding/import",
-  OnboardingImportPhrase = "/(drops)/onboarding/import-phrase",
-  OnboardingImportSeed = "/(drops)/onboarding/import-seed",
-  OnboardingImportSecretNumbers = "/(drops)/onboarding/import-secret-numbers",
-  OnboardingSuccess = "/(drops)/onboarding/success",
+  Onboarding = '/onboarding',
+  OnboardingSecureIntro = '/onboarding/secure-intro',
+  OnboardingRevealPhrase = '/onboarding/reveal-phrase',
+  OnboardingBackupQuiz = '/onboarding/backup-quiz',
+  OnboardingImport = '/onboarding/import',
+  OnboardingImportPhrase = '/onboarding/import-phrase',
+  OnboardingImportSeed = '/onboarding/import-seed',
+  OnboardingImportSecretNumbers = '/onboarding/import-secret-numbers',
+  OnboardingSuccess = '/onboarding/success',
 
   // Hub (tabs)
-  Home = "/(drops)/(tabs)/home",
-  Market = "/(drops)/(tabs)/market",
-  Payments = "/(drops)/(tabs)/payments",
-  DropPoints = "/(drops)/(tabs)/droppoints",
+  Home = '/(tabs)/home',
+  Market = '/(tabs)/market',
+  Payments = '/(tabs)/payments',
+  DropPoints = '/(tabs)/droppoints',
 
   // Full-screen pushes (cover the tab bar)
-  Profile = "/(drops)/profile",
-  Chat = "/(drops)/chat",
-  ChatSession = "/(drops)/chat/[session]",
-  PaymentChat = "/(drops)/payment/[contact]",
+  Profile = '/profile',
+  Chat = '/chat',
+  ChatSession = '/chat/[session]',
+  PaymentChat = '/payment/[contact]',
 
   // Modals
-  AddMoney = "/(drops)/flows/add-money",
-  Receive = "/(drops)/flows/receive",
-  Swap = "/(drops)/flows/swap",
-  Send = "/(drops)/flows/send",
-  AddRecipient = "/(drops)/add-recipient",
-  Transaction = "/(drops)/transaction/[id]",
+  AddMoney = '/flows/add-money',
+  Receive = '/flows/receive',
+  Swap = '/flows/swap',
+  Send = '/flows/send',
+  AddRecipient = '/add-recipient',
+  Transaction = '/transaction/[id]',
 }
 
 /** Which identity a successful onboarding restored (phrase = all chains). */
-export type OnboardingVia = "phrase" | "xrpl";
+export type OnboardingVia = 'phrase' | 'xrpl';
 
 /** Builders for routes that take params, returning an Expo Router `Href`. */
 export const buildRoute = {
@@ -72,9 +66,5 @@ export const buildRoute = {
   onboardingSuccess: (via: OnboardingVia): Href => ({
     pathname: Routes.OnboardingSuccess,
     params: { via },
-  }),
-  walletSend: (chainId: string | number): Href => ({
-    pathname: Routes.WalletSend,
-    params: { chainId },
   }),
 } as const;
