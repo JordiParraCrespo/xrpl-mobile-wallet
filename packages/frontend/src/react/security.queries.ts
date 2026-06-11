@@ -16,13 +16,16 @@ export const securityKeys = {
 };
 
 export function useSecurityRestore(
-  options?: Omit<UseQueryOptions<void, Error>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<null, Error>, 'queryKey' | 'queryFn'>,
 ) {
   const app = useFlamaApp();
 
   return useQuery({
     queryKey: securityKeys.restore,
-    queryFn: () => app.security.restore(),
+    queryFn: async () => {
+      await app.security.restore();
+      return null;
+    },
     retry: false,
     staleTime: Infinity,
     ...options,

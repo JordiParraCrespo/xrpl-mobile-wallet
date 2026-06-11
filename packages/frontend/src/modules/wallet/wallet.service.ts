@@ -4,13 +4,17 @@ import {
   type ChainRegistry,
   parseUnits,
   type TxResult,
-} from '@flama/chain-core';
-import type { CreateWalletOptions, KeyringManager, WalletMeta } from '@flama/wallet-keyring';
-import { inject, injectable } from 'inversify';
-import { TOKENS } from '../../di/tokens';
-import { AppError, type ErrorDefinition } from '../core/errors';
-import { WalletErrors } from './wallet.errors';
-import type { WalletAccount, WalletInfo, WalletStore } from './wallet.state';
+} from "@flama/chain-core";
+import type {
+  CreateWalletOptions,
+  KeyringManager,
+  WalletMeta,
+} from "@flama/wallet-keyring";
+import { inject, injectable } from "inversify";
+import { TOKENS } from "../../di/tokens";
+import { AppError, type ErrorDefinition } from "../core/errors";
+import { WalletErrors } from "./wallet.errors";
+import type { WalletAccount, WalletInfo, WalletStore } from "./wallet.state";
 
 /**
  * Keyring failures mapped by error NAME, never `instanceof` — the keyring
@@ -59,14 +63,19 @@ export class WalletService {
   /** Loads the vault state from secure storage and derives chain accounts. */
   async restore(): Promise<void> {
     if (!(await this.keyring.isInitialized())) {
-      this.setEmptyState('no_wallet');
+      this.setEmptyState("no_wallet");
       return;
     }
     if (!this.keyring.isUnlocked) {
-      this.setEmptyState('locked');
+      this.setEmptyState("locked");
       return;
     }
     this.syncFromKeyring();
+  }
+
+  /** Generates a fresh recovery phrase. Persists nothing until {@link importMnemonic}. */
+  generateMnemonic(wordCount: 12 | 24 = 12): string {
+    return this.keyring.generateMnemonic(wordCount);
   }
 
   async createWallet(options?: CreateWalletOptions): Promise<WalletInfo> {
@@ -76,19 +85,28 @@ export class WalletService {
   }
 
   async importMnemonic(mnemonic: string, name?: string): Promise<WalletInfo> {
-    const meta = await this.wrap(() => this.keyring.importMnemonic(mnemonic, name));
+    const meta = await this.wrap(() =>
+      this.keyring.importMnemonic(mnemonic, name),
+    );
     this.syncFromKeyring();
     return toWalletInfo(meta);
   }
 
   async importFamilySeed(seed: string, name?: string): Promise<WalletInfo> {
-    const meta = await this.wrap(() => this.keyring.importFamilySeed(seed, name));
+    const meta = await this.wrap(() =>
+      this.keyring.importFamilySeed(seed, name),
+    );
     this.syncFromKeyring();
     return toWalletInfo(meta);
   }
 
-  async importSecretNumbers(rows: string[], name?: string): Promise<WalletInfo> {
-    const meta = await this.wrap(() => this.keyring.importSecretNumbers(rows, name));
+  async importSecretNumbers(
+    rows: string[],
+    name?: string,
+  ): Promise<WalletInfo> {
+    const meta = await this.wrap(() =>
+      this.keyring.importSecretNumbers(rows, name),
+    );
     this.syncFromKeyring();
     return toWalletInfo(meta);
   }
@@ -136,7 +154,9 @@ export class WalletService {
     if (!adapter.isValidAddress(to)) {
       throw new AppError(WalletErrors.INVALID_ADDRESS);
     }
-    const signer = this.wrapSync(() => this.keyring.getSigner(wallet.id, adapter.config.kind));
+    const signer = this.wrapSync(() =>
+      this.keyring.getSigner(wallet.id, adapter.config.kind),
+    );
     return adapter.transfer(
       {
         from: account.address,
@@ -158,7 +178,7 @@ export class WalletService {
 
   async reset(): Promise<void> {
     await this.wrap(() => this.keyring.reset());
-    this.setEmptyState('no_wallet');
+    this.setEmptyState("no_wallet");
   }
 
   /** Rebuilds the store from the keyring: wallet list + accounts for the active wallet. */
@@ -167,7 +187,7 @@ export class WalletService {
     const active = this.keyring.getActiveWallet();
     if (!active) {
       this.store.setState({
-        status: 'no_wallet',
+        status: "no_wallet",
         wallets,
         activeWalletId: null,
         accounts: [],
@@ -178,7 +198,9 @@ export class WalletService {
       .list()
       .filter((adapter) => active.chains.includes(adapter.config.kind))
       .map((adapter) => {
-        const signer = this.wrapSync(() => this.keyring.getSigner(active.id, adapter.config.kind));
+        const signer = this.wrapSync(() =>
+          this.keyring.getSigner(active.id, adapter.config.kind),
+        );
         return {
           chainId: adapter.config.chainId,
           kind: adapter.config.kind,
@@ -188,14 +210,14 @@ export class WalletService {
         };
       });
     this.store.setState({
-      status: 'ready',
+      status: "ready",
       wallets,
       activeWalletId: active.id,
       accounts,
     });
   }
 
-  private setEmptyState(status: 'no_wallet' | 'locked'): void {
+  private setEmptyState(status: "no_wallet" | "locked"): void {
     this.store.setState({
       status,
       wallets: [],
@@ -213,7 +235,7 @@ export class WalletService {
   }
 
   private requireActiveWallet(): WalletMeta {
-    if (this.store.getState().status === 'locked') {
+    if (this.store.getState().status === "locked") {
       throw new AppError(WalletErrors.WALLET_LOCKED);
     }
     const wallet = this.keyring.getActiveWallet();
@@ -234,7 +256,9 @@ export class WalletService {
     if (!wallet.chains.includes(adapter.config.kind)) {
       throw new AppError(WalletErrors.UNSUPPORTED_CHAIN);
     }
-    const account = this.store.getState().accounts.find((a) => a.chainId === chainId);
+    const account = this.store
+      .getState()
+      .accounts.find((a) => a.chainId === chainId);
     if (!account) {
       throw new AppError(WalletErrors.UNKNOWN_CHAIN);
     }
