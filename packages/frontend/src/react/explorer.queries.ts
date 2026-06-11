@@ -3,13 +3,9 @@
 import type { AccountTxPage, AccountTxQuery, Block } from '@flama/chain-core';
 import { type UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { useFlamaApp } from './context';
+import { explorerKeys } from './query-keys';
 
-export const explorerKeys = {
-  all: ['explorer'] as const,
-  blocks: (chainId: string) => ['explorer', 'blocks', chainId] as const,
-  accountTx: (chainId: string, address: string) =>
-    ['explorer', 'accountTx', chainId, address] as const,
-};
+export { explorerKeys } from './query-keys';
 
 export function useRecentBlocks(
   chainId: string,
@@ -35,7 +31,7 @@ export function useAccountTransactions(
   const app = useFlamaApp();
 
   return useQuery({
-    queryKey: explorerKeys.accountTx(chainId, address ?? ''),
+    queryKey: explorerKeys.accountTx(chainId, address ?? '', query),
     // `enabled` keeps this from running until `address` is defined.
     queryFn: () => app.explorer.getAccountTransactions(chainId, address ?? '', query),
     enabled: !!address,
