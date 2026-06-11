@@ -11,15 +11,20 @@ export {
 export { ChainRegistry } from './registry';
 export type { SignatureResult, Signer, SignerCurve } from './signer';
 export type {
+  AccountTxPage,
+  AccountTxQuery,
   Balance,
   Block,
   ChainKind,
+  LedgerTransaction,
+  LedgerTxKind,
   NetworkConfig,
   RegisterTokenParams,
   TokenBalance,
   TokenInfo,
   TokenTransferParams,
   TransferParams,
+  TxDirection,
   TxResult,
 } from './types';
 export { formatUnits, parseUnits } from './units';

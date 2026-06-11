@@ -6,6 +6,7 @@ export const XRPL_EVM_TESTNET: NetworkConfig = {
   name: 'XRPL EVM Testnet',
   rpcUrl: 'https://rpc.testnet.xrplevm.org',
   explorerUrl: 'https://explorer.testnet.xrplevm.org',
+  explorerApiUrl: 'https://explorer.testnet.xrplevm.org/api',
   nativeCurrency: { symbol: 'XRP', decimals: 18 },
 };
 
@@ -15,5 +16,6 @@ export const XRPL_EVM_MAINNET: NetworkConfig = {
   name: 'XRPL EVM',
   rpcUrl: 'https://rpc.xrplevm.org',
   explorerUrl: 'https://explorer.xrplevm.org',
+  explorerApiUrl: 'https://explorer.xrplevm.org/api',
   nativeCurrency: { symbol: 'XRP', decimals: 18 },
 };

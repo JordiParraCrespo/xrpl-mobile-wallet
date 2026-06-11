@@ -111,6 +111,22 @@ export function useDisableBiometrics(
   });
 }
 
+export function useSetAutoLockTimeout(
+  options?: Omit<UseMutationOptions<void, Error, number>, 'mutationFn'>,
+) {
+  const app = useFlamaApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (ms: number) => app.security.setAutoLockTimeout(ms),
+    onSuccess: (...args) => {
+      queryClient.invalidateQueries({ queryKey: securityKeys.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+}
+
 export function useWipeWallet(options?: Omit<UseMutationOptions<void, Error, void>, 'mutationFn'>) {
   const app = useFlamaApp();
   const queryClient = useQueryClient();

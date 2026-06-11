@@ -12,6 +12,10 @@ const PASSCODE_PATTERN = /^\d{6}$/;
 
 const BIOMETRIC_KEY_STORAGE_KEY = 'flama.security.biometric-key';
 const ATTEMPTS_STORAGE_KEY = 'flama.security.attempts';
+const AUTO_LOCK_STORAGE_KEY = 'flama.security.autolock';
+
+/** Default inactivity timeout used when no value is persisted. */
+const DEFAULT_AUTO_LOCK_MS = 60_000;
 
 /** Number of failed attempts at which a lockout is first applied. */
 const LOCKOUT_THRESHOLD = 5;
@@ -42,6 +46,8 @@ function isInvalidPasscodeError(error: unknown): boolean {
 
 @injectable()
 export class SecurityService {
+  #autoLockTimer: ReturnType<typeof setTimeout> | null = null;
+
   constructor(
     @inject(TOKENS.KeyringManager)
     private readonly keyring: KeyringManager,
@@ -55,18 +61,21 @@ export class SecurityService {
 
   /** Loads persisted security state and resolves the current lock status. */
   async restore(): Promise<void> {
-    const [biometricsAvailable, biometricKey, attempts, initialized] = await Promise.all([
-      this.biometrics.isAvailable(),
-      this.storage.get(BIOMETRIC_KEY_STORAGE_KEY),
-      this.readPersistedAttempts(),
-      this.keyring.isInitialized(),
-    ]);
+    const [biometricsAvailable, biometricKey, attempts, autoLockMs, initialized] =
+      await Promise.all([
+        this.biometrics.isAvailable(),
+        this.storage.get(BIOMETRIC_KEY_STORAGE_KEY),
+        this.readPersistedAttempts(),
+        this.readPersistedAutoLockMs(),
+        this.keyring.isInitialized(),
+      ]);
     this.store.setState({
       status: !initialized ? 'uninitialized' : this.keyring.isUnlocked ? 'unlocked' : 'locked',
       biometricsAvailable,
       biometricsEnabled: biometricKey !== null,
       failedAttempts: attempts.failedAttempts,
       lockoutUntil: attempts.lockoutUntil,
+      autoLockMs,
     });
   }
 
@@ -78,6 +87,7 @@ export class SecurityService {
     }
     await this.keyring.initialize(passcode);
     this.store.setState({ status: 'unlocked' });
+    this.touch();
   }
 
   /**
@@ -98,6 +108,7 @@ export class SecurityService {
     }
     await this.clearAttempts();
     this.store.setState({ status: 'unlocked' });
+    this.touch();
   }
 
   /** Unlocks the vault with the biometric-protected vault key. */
@@ -125,11 +136,46 @@ export class SecurityService {
     }
     await this.clearAttempts();
     this.store.setState({ status: 'unlocked' });
+    this.touch();
   }
 
   lock(): void {
+    this.clearAutoLock();
     this.keyring.lock();
     this.store.setState({ status: 'locked' });
+  }
+
+  /**
+   * Registers user activity. While unlocked with auto-lock enabled
+   * (`autoLockMs > 0`), this (re)arms the inactivity timer. A no-op otherwise.
+   */
+  touch(): void {
+    if (this.store.getState().status !== 'unlocked') {
+      return;
+    }
+    if (this.store.getState().autoLockMs <= 0) {
+      return;
+    }
+    this.scheduleAutoLock();
+  }
+
+  /**
+   * Sets the inactivity auto-lock timeout in ms (`0` disables it), persists it
+   * and reschedules the active timer when currently unlocked.
+   */
+  async setAutoLockTimeout(ms: number): Promise<void> {
+    if (!Number.isFinite(ms) || ms < 0) {
+      throw new AppError(SecurityErrors.INVALID_AUTO_LOCK);
+    }
+    await this.storage.set(AUTO_LOCK_STORAGE_KEY, String(ms));
+    this.store.setState({ autoLockMs: ms });
+    if (this.store.getState().status === 'unlocked') {
+      if (ms > 0) {
+        this.scheduleAutoLock();
+      } else {
+        this.clearAutoLock();
+      }
+    }
   }
 
   /**
@@ -173,6 +219,7 @@ export class SecurityService {
    * Device biometric availability is preserved (it is a hardware property).
    */
   async wipe(): Promise<void> {
+    this.clearAutoLock();
     await this.keyring.reset();
     await this.storage.remove(BIOMETRIC_KEY_STORAGE_KEY);
     await this.storage.remove(ATTEMPTS_STORAGE_KEY);
@@ -182,6 +229,35 @@ export class SecurityService {
       failedAttempts: 0,
       lockoutUntil: null,
     });
+  }
+
+  /** (Re)starts the inactivity timer that locks the wallet when it fires. */
+  private scheduleAutoLock(): void {
+    this.clearAutoLock();
+    const ms = this.store.getState().autoLockMs;
+    this.#autoLockTimer = setTimeout(() => {
+      this.#autoLockTimer = null;
+      this.lock();
+    }, ms);
+  }
+
+  /** Cancels any pending inactivity timer. Safe to call when none is set. */
+  private clearAutoLock(): void {
+    if (this.#autoLockTimer !== null) {
+      clearTimeout(this.#autoLockTimer);
+      this.#autoLockTimer = null;
+    }
+  }
+
+  private async readPersistedAutoLockMs(): Promise<number> {
+    const raw = await this.storage.get(AUTO_LOCK_STORAGE_KEY);
+    if (raw !== null) {
+      const parsed = Number.parseInt(raw, 10);
+      if (Number.isFinite(parsed) && parsed >= 0) {
+        return parsed;
+      }
+    }
+    return DEFAULT_AUTO_LOCK_MS;
   }
 
   private assertPasscodeFormat(passcode: string): void {

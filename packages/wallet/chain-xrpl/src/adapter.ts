@@ -1,10 +1,14 @@
 import {
+  type AccountTxPage,
+  type AccountTxQuery,
   type Balance,
   type Block,
   type ChainAdapter,
   ChainError,
   ChainErrors,
   formatUnits,
+  type LedgerTransaction,
+  type LedgerTxKind,
   type NetworkConfig,
   parseUnits,
   type RegisterTokenParams,
@@ -13,6 +17,7 @@ import {
   type TokenInfo,
   type TokenTransferParams,
   type TransferParams,
+  type TxDirection,
   type TxResult,
 } from '@flama/chain-core';
 import { secp256k1 } from '@noble/curves/secp256k1';
@@ -30,6 +35,9 @@ const BASE_FEE_DROPS = '12';
 const LEDGER_BUFFER = 20;
 const POLL_INTERVAL_MS = 2_000;
 const DEFAULT_RECENT_BLOCKS = 10;
+/** Default and maximum page size for {@link XrplAdapter.getAccountTransactions}. */
+const DEFAULT_TX_LIMIT = 20;
+const MAX_TX_LIMIT = 100;
 /** Seconds between the unix epoch (1970) and the XRPL/Ripple epoch (2000). */
 const RIPPLE_EPOCH_OFFSET = 946_684_800;
 /**
@@ -131,6 +139,44 @@ interface TxLookupResult {
   meta?: { TransactionResult?: string };
 }
 
+/** The opaque {@link AccountTxQuery.cursor} decodes to an XRPL ledger marker. */
+interface AccountTxMarker {
+  ledger: number;
+  seq: number;
+}
+
+/** A single Payment/TrustSet body as returned inside an `account_tx` entry. */
+interface AccountTxBody {
+  hash?: string;
+  TransactionType?: string;
+  Account?: string;
+  Destination?: string;
+  Amount?: string | IouAmount;
+  Fee?: string;
+  date?: number;
+}
+
+interface AccountTxEntry {
+  /** Older rippled nests the tx under `tx`; newer builds use `tx_json`. */
+  tx?: AccountTxBody;
+  tx_json?: AccountTxBody;
+  /** `tx_json` builds surface the hash and date as siblings of `tx_json`. */
+  hash?: string;
+  date?: number;
+  meta?: {
+    TransactionResult?: string;
+    delivered_amount?: string | IouAmount;
+  };
+  validated?: boolean;
+}
+
+interface AccountTxResult {
+  error?: string;
+  error_message?: string;
+  transactions?: AccountTxEntry[];
+  marker?: AccountTxMarker;
+}
+
 export class XrplAdapter implements ChainAdapter {
   private readonly rpc: XrplRpcClient;
 
@@ -190,6 +236,43 @@ export class XrplAdapter implements ChainAdapter {
         ),
     );
     return [latest, ...older].map((result) => this.toBlock(result));
+  }
+
+  /**
+   * Account history via the XRPL `account_tx` method. Returns newest-first
+   * (`forward: false`) and paginates through the ledger `marker`, which we
+   * serialize into the opaque {@link AccountTxQuery.cursor}.
+   */
+  async getAccountTransactions(address: string, query?: AccountTxQuery): Promise<AccountTxPage> {
+    const limit = Math.min(MAX_TX_LIMIT, Math.max(1, Math.floor(query?.limit ?? DEFAULT_TX_LIMIT)));
+    const params: Record<string, unknown> = {
+      account: address,
+      ledger_index_min: -1,
+      ledger_index_max: -1,
+      binary: false,
+      forward: false,
+      limit,
+    };
+    if (query?.cursor) {
+      params.marker = JSON.parse(query.cursor) as AccountTxMarker;
+    }
+
+    const result = await this.rpc.request<AccountTxResult>('account_tx', params);
+    if (result.error === 'actNotFound') {
+      // Unfunded accounts have no history yet.
+      return { transactions: [] };
+    }
+    if (result.error) {
+      throw xrplRpcError(result.error, result.error_message, this.config.chainId);
+    }
+
+    const transactions = (result.transactions ?? [])
+      .map((entry) => this.toLedgerTransaction(entry, address))
+      .filter((tx): tx is LedgerTransaction => tx !== undefined);
+    return {
+      transactions,
+      nextCursor: result.marker ? JSON.stringify(result.marker) : undefined,
+    };
   }
 
   async transfer(params: TransferParams, signer: Signer): Promise<TxResult> {
@@ -466,6 +549,81 @@ export class XrplAdapter implements ChainAdapter {
         };
       }
     }
+  }
+
+  /**
+   * Maps a single `account_tx` entry to the normalized {@link LedgerTransaction}.
+   * Returns undefined for entries with no usable transaction body so the caller
+   * can filter them out.
+   */
+  private toLedgerTransaction(
+    entry: AccountTxEntry,
+    address: string,
+  ): LedgerTransaction | undefined {
+    // Older rippled returns `tx`; newer builds nest the body under `tx_json`
+    // and surface hash/date as siblings.
+    const tx = entry.tx ?? entry.tx_json;
+    const hash = tx?.hash ?? entry.hash;
+    if (!tx || !hash) {
+      return undefined;
+    }
+    const date = tx.date ?? entry.date ?? 0;
+    const result = entry.meta?.TransactionResult;
+    const nativeSymbol = this.config.nativeCurrency.symbol;
+
+    let kind: LedgerTxKind;
+    if (tx.TransactionType === 'Payment') {
+      // A string `Amount` is drops (native); an object is an issued currency.
+      kind = typeof tx.Amount === 'string' ? 'payment' : 'token-payment';
+    } else if (tx.TransactionType === 'TrustSet') {
+      kind = 'trustset';
+    } else {
+      kind = 'other';
+    }
+
+    let direction: TxDirection;
+    if (tx.Account === address && tx.Destination === address) {
+      direction = 'self';
+    } else if (tx.Account === address) {
+      direction = 'out';
+    } else {
+      direction = 'in';
+    }
+
+    let amount = 0n;
+    let symbol = nativeSymbol;
+    if (kind === 'payment') {
+      // Prefer the actually delivered amount (partial payments deliver less).
+      const delivered = entry.meta?.delivered_amount;
+      const drops = typeof delivered === 'string' ? delivered : (tx.Amount as string);
+      amount = BigInt(drops);
+    } else if (kind === 'token-payment') {
+      const iou = (
+        typeof entry.meta?.delivered_amount === 'object' ? entry.meta.delivered_amount : tx.Amount
+      ) as IouAmount;
+      symbol = iou.currency;
+      amount = parseUnits(iou.value, XRPL_TOKEN_DECIMALS);
+    }
+
+    let counterparty: string | undefined;
+    if (direction === 'out') {
+      counterparty = tx.Destination;
+    } else if (direction === 'in') {
+      counterparty = tx.Account;
+    }
+
+    return {
+      hash,
+      timestamp: date + RIPPLE_EPOCH_OFFSET,
+      kind,
+      direction,
+      success: result === 'tesSUCCESS',
+      amount,
+      symbol,
+      counterparty,
+      fee: tx.Fee !== undefined ? BigInt(tx.Fee) : undefined,
+      explorerUrl: this.explorerUrl(hash),
+    };
   }
 
   private toBlock(result: LedgerResult): Block {

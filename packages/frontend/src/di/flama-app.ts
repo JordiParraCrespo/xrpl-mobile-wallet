@@ -9,6 +9,8 @@ import { createCoreModule } from '../modules/core/core.module';
 import type { IStorageService } from '../modules/core/storage.service';
 import type { ExplorerService } from '../modules/explorer';
 import { ExplorerModule } from '../modules/explorer';
+import type { IPriceProvider, PricesService } from '../modules/prices';
+import { createPricesModule } from '../modules/prices';
 import type { IBiometricProvider, SecurityService } from '../modules/security';
 import { createSecurityModule } from '../modules/security';
 import type { TokensService } from '../modules/tokens';
@@ -29,6 +31,11 @@ export interface FlamaAppConfig {
    * security module for biometric unlock. Omit to disable biometrics.
    */
   biometricProvider?: IBiometricProvider;
+  /**
+   * Fiat exchange-rate source for the prices module. Omit to use the built-in
+   * CoinGecko provider.
+   */
+  priceProvider?: IPriceProvider;
   /** Chain adapters for the wallet. Defaults to XRPL + XRPL EVM testnets. */
   chains?: ChainAdapter[];
   modules?: ContainerModule[];
@@ -52,6 +59,7 @@ export class FlamaApp {
     container.load(WalletModule);
     container.load(ExplorerModule);
     container.load(TokensModule);
+    container.load(createPricesModule(config.priceProvider));
     container.load(createSecurityModule(config.biometricProvider));
 
     // Additional modules provided by the app
@@ -82,6 +90,10 @@ export class FlamaApp {
 
   get tokens(): TokensService {
     return this.container.get(TOKENS.TokensService);
+  }
+
+  get prices(): PricesService {
+    return this.container.get(TOKENS.PricesService);
   }
 
   get security(): SecurityService {

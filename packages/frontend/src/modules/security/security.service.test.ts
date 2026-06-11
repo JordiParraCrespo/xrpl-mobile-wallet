@@ -461,4 +461,89 @@ describe('SecurityService', () => {
       expect(store.getState().status).toBe('unlocked');
     });
   });
+
+  describe('auto-lock', () => {
+    const AUTO_LOCK_STORAGE_KEY = 'flama.security.autolock';
+
+    beforeEach(async () => {
+      await service.setupPasscode(PASSCODE);
+      service.lock();
+    });
+
+    it('auto-locks the wallet once the inactivity timeout elapses', async () => {
+      await service.unlock(PASSCODE);
+      expect(store.getState().status).toBe('unlocked');
+
+      await vi.advanceTimersByTimeAsync(60_000);
+
+      expect(store.getState().status).toBe('locked');
+      expect(keyring.isUnlocked).toBe(false);
+    });
+
+    it('touch() resets the inactivity countdown', async () => {
+      await service.unlock(PASSCODE);
+
+      await vi.advanceTimersByTimeAsync(50_000);
+      service.touch();
+      await vi.advanceTimersByTimeAsync(50_000);
+      expect(store.getState().status).toBe('unlocked');
+
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(store.getState().status).toBe('locked');
+    });
+
+    it('setAutoLockTimeout(0) disables auto-lock', async () => {
+      await service.setAutoLockTimeout(0);
+      await service.unlock(PASSCODE);
+
+      await vi.advanceTimersByTimeAsync(60 * 60_000);
+
+      expect(store.getState().status).toBe('unlocked');
+    });
+
+    it('persists the timeout and restore() reads it back', async () => {
+      await service.setAutoLockTimeout(120_000);
+      expect(storage.data.get(AUTO_LOCK_STORAGE_KEY)).toBe('120000');
+
+      const fresh = createSecurityStore();
+      const restored = new SecurityService(
+        keyring as unknown as KeyringManager,
+        storage,
+        biometrics,
+        fresh,
+      );
+      await restored.restore();
+      expect(fresh.getState().autoLockMs).toBe(120_000);
+    });
+
+    it('restore() falls back to the default timeout when none is persisted', async () => {
+      await service.restore();
+      expect(store.getState().autoLockMs).toBe(60_000);
+    });
+
+    it('rejects a negative timeout with INVALID_AUTO_LOCK', async () => {
+      await expectAppError(service.setAutoLockTimeout(-1), SecurityErrors.INVALID_AUTO_LOCK.code);
+    });
+
+    it('reschedules the timer when the timeout changes while unlocked', async () => {
+      await service.unlock(PASSCODE);
+      await service.setAutoLockTimeout(10_000);
+
+      await vi.advanceTimersByTimeAsync(10_000);
+
+      expect(store.getState().status).toBe('locked');
+    });
+
+    it('a manual lock() clears the pending auto-lock timer', async () => {
+      await service.unlock(PASSCODE);
+      service.lock();
+      expect(store.getState().status).toBe('locked');
+
+      const lockSpy = vi.spyOn(keyring, 'lock');
+      await vi.advanceTimersByTimeAsync(60_000);
+
+      expect(lockSpy).not.toHaveBeenCalled();
+      expect(store.getState().status).toBe('locked');
+    });
+  });
 });
