@@ -1,14 +1,19 @@
+import * as React from "react";
 import { Platform, TextInput } from "react-native";
 import { cn } from "../../lib/utils";
 
 function Input({
   className,
+  onFocus,
+  onBlur,
   ...props
 }: React.ComponentProps<typeof TextInput>) {
+  const [focused, setFocused] = React.useState(false);
   return (
     <TextInput
       className={cn(
         "dark:bg-input/30 border-border bg-card text-foreground flex h-[52px] w-full min-w-0 flex-row items-center rounded-md border px-3.5 py-1 text-base leading-5 shadow-none",
+        focused && "border-ring",
         props.editable === false &&
           cn(
             "opacity-50",
@@ -26,6 +31,14 @@ function Input({
         }),
         className,
       )}
+      onFocus={(e) => {
+        setFocused(true);
+        onFocus?.(e);
+      }}
+      onBlur={(e) => {
+        setFocused(false);
+        onBlur?.(e);
+      }}
       {...props}
     />
   );

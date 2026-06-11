@@ -6,6 +6,7 @@ module.exports = {
   content: [
     "./app/**/*.{ts,tsx}",
     "./lib/**/*.{ts,tsx}",
+    "./registry/**/*.{ts,tsx}",
     "../../packages/design-system/mobile/src/**/*.{ts,tsx}",
   ],
   presets: [require("nativewind/preset")],
@@ -28,6 +29,36 @@ module.exports = {
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
+          soft: "hsl(var(--destructive-soft))",
+          "soft-foreground": "hsl(var(--destructive-soft-foreground))",
+        },
+        brand: {
+          DEFAULT: "hsl(var(--brand))",
+          foreground: "hsl(var(--brand-foreground))",
+          soft: "hsl(var(--brand-soft))",
+          "soft-foreground": "hsl(var(--brand-soft-foreground))",
+        },
+        positive: {
+          DEFAULT: "hsl(var(--positive))",
+          foreground: "hsl(var(--positive-foreground))",
+          soft: "hsl(var(--positive-soft))",
+          "soft-foreground": "hsl(var(--positive-soft-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+          soft: "hsl(var(--warning-soft))",
+          "soft-foreground": "hsl(var(--warning-soft-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+          soft: "hsl(var(--info-soft))",
+          "soft-foreground": "hsl(var(--info-soft-foreground))",
+        },
+        inverse: {
+          DEFAULT: "hsl(var(--inverse))",
+          foreground: "hsl(var(--inverse-foreground))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
@@ -46,10 +77,13 @@ module.exports = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      // Drops shape language: inputs 12, cards 20, sheets 24, pills full.
       borderRadius: {
-        lg: 10,
-        md: 8,
-        sm: 6,
+        sm: 10,
+        md: 12,
+        lg: 16,
+        xl: 20,
+        "2xl": 24,
       },
       borderWidth: {
         hairline: hairlineWidth(),

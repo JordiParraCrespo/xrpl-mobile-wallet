@@ -2,49 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Drops design tokens.
+ * Light, flat, near-achromatic ink ramp with ONE chromatic accent
+ * (electric indigo-violet, reserved for the money-action, focus and
+ * selection) plus a disciplined semantic set for money movement:
+ * positive (incoming), destructive (outgoing/failed), warning
+ * (pending), info. Surfaces are white with hairline borders — depth
+ * comes from color, scale and whitespace, not shadows.
+ */
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    --foreground: 220 13% 9%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 220 13% 9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 63%;
-    --radius: 0.625rem;
+    --popover-foreground: 220 13% 9%;
+    --primary: 220 13% 9%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 14.3% 93.1%;
+    --secondary-foreground: 220 13% 9%;
+    --muted: 240 10% 96.1%;
+    --muted-foreground: 210 9.3% 46.3%;
+    --accent: 240 14.3% 93.1%;
+    --accent-foreground: 220 13% 9%;
+    --destructive: 0 73.8% 53.5%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-soft: 0 81% 95.9%;
+    --destructive-soft-foreground: 0 65.4% 47.6%;
+    --border: 228 9.8% 90%;
+    --input: 228 9.8% 90%;
+    --ring: 250 69.6% 56.1%;
+    --radius: 1.25rem;
+    --brand: 250 69.6% 56.1%;
+    --brand-foreground: 0 0% 100%;
+    --brand-soft: 245 86.7% 97.1%;
+    --brand-soft-foreground: 250 57% 46.5%;
+    --positive: 162 82.2% 39.6%;
+    --positive-foreground: 0 0% 100%;
+    --positive-soft: 155 51.5% 93.5%;
+    --positive-soft-foreground: 162 88.4% 30.4%;
+    --warning: 39 100% 48%;
+    --warning-foreground: 0 0% 100%;
+    --warning-soft: 37 100% 94.3%;
+    --warning-soft-foreground: 34 91.7% 47.5%;
+    --info: 217 89.9% 61%;
+    --info-foreground: 0 0% 100%;
+    --info-soft: 215 100% 95.3%;
+    --info-soft-foreground: 218 74.1% 53.1%;
+    --inverse: 220 13% 9%;
+    --inverse-foreground: 0 0% 100%;
   }
 
   .dark:root {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 70.9% 59.4%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 300 0% 45%;
+    --background: 220 16.7% 7.1%;
+    --foreground: 240 10% 96.1%;
+    --card: 220 13% 9%;
+    --card-foreground: 240 10% 96.1%;
+    --popover: 220 13% 9%;
+    --popover-foreground: 240 10% 96.1%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 220 13% 9%;
+    --secondary: 218 11.4% 13.7%;
+    --secondary-foreground: 240 10% 96.1%;
+    --muted: 218 11.4% 13.7%;
+    --muted-foreground: 208 8.1% 58.6%;
+    --accent: 218 11.4% 13.7%;
+    --accent-foreground: 240 10% 96.1%;
+    --destructive: 358 85.1% 60.4%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-soft: 0 50% 14%;
+    --destructive-soft-foreground: 358 85% 78%;
+    --border: 218 11.4% 13.7%;
+    --input: 218 11.4% 13.7%;
+    --ring: 249 80.6% 71.8%;
+    --brand: 249 77.5% 63.3%;
+    --brand-foreground: 0 0% 100%;
+    --brand-soft: 250 40% 17%;
+    --brand-soft-foreground: 248 85.5% 89.2%;
+    --positive: 162 82.2% 39.6%;
+    --positive-foreground: 0 0% 100%;
+    --positive-soft: 162 60% 11%;
+    --positive-soft-foreground: 155 52% 78%;
+    --warning: 39 100% 48%;
+    --warning-foreground: 0 0% 100%;
+    --warning-soft: 39 70% 12%;
+    --warning-soft-foreground: 37 95% 75%;
+    --info: 217 89.9% 61%;
+    --info-foreground: 0 0% 100%;
+    --info-soft: 217 60% 14%;
+    --info-soft-foreground: 215 90% 80%;
+    --inverse: 0 0% 100%;
+    --inverse-foreground: 220 13% 9%;
   }
 }

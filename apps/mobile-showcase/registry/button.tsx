@@ -1,7 +1,10 @@
-import { Button } from '@flama/design-system-mobile/button';
-import { Text } from '@flama/design-system-mobile/text';
-import * as React from 'react';
-import { ScrollView, View } from 'react-native';
+import { Button } from "@flama/design-system-mobile/button";
+import { Icon } from "@flama/design-system-mobile/icon";
+import { Text } from "@flama/design-system-mobile/text";
+import { ArrowUpRight } from "lucide-react-native";
+import * as React from "react";
+import { ScrollView, View } from "react-native";
+import { HeroSurface } from "../lib/hero-surface";
 
 export default function ButtonScreen() {
   return (
@@ -9,49 +12,77 @@ export default function ButtonScreen() {
       <View className="gap-2">
         <Text className="text-lg font-semibold text-foreground">Variants</Text>
         <View className="gap-3">
-          <Button variant="default">
-            <Text>Default</Text>
+          <Button>
+            <Text>Continue</Text>
           </Button>
-          <Button variant="destructive">
-            <Text>Destructive</Text>
-          </Button>
-          <Button variant="outline">
-            <Text>Outline</Text>
+          <Button variant="brand">
+            <Icon
+              as={ArrowUpRight}
+              size={17}
+              className="text-brand-foreground"
+            />
+            <Text>Send</Text>
           </Button>
           <Button variant="secondary">
-            <Text>Secondary</Text>
+            <Text>Maybe later</Text>
+          </Button>
+          <Button variant="outline">
+            <Text>Learn more</Text>
           </Button>
           <Button variant="ghost">
             <Text>Ghost</Text>
           </Button>
+          <Button variant="destructive">
+            <Text>Remove wallet</Text>
+          </Button>
           <Button variant="link">
-            <Text>Link</Text>
+            <Text>View on explorer</Text>
           </Button>
         </View>
+      </View>
+
+      <View className="gap-2">
+        <Text className="text-lg font-semibold text-foreground">
+          Glass · on dark
+        </Text>
+        <HeroSurface>
+          <Button variant="glass">
+            <Text>Skip</Text>
+          </Button>
+          <Button variant="glass" size="lg" className="w-full">
+            <Text>I already have a wallet</Text>
+          </Button>
+        </HeroSurface>
       </View>
 
       <View className="gap-2">
         <Text className="text-lg font-semibold text-foreground">Sizes</Text>
         <View className="gap-3 items-start">
-          <Button size="sm">
-            <Text>Small</Text>
+          <Button size="sm" variant="secondary">
+            <Text>Small · 36</Text>
           </Button>
-          <Button size="default">
-            <Text>Default</Text>
+          <Button size="default" variant="secondary">
+            <Text>Default · 44</Text>
           </Button>
-          <Button size="lg">
-            <Text>Large</Text>
-          </Button>
-          <Button size="icon">
-            <Text>+</Text>
+          <Button size="lg" variant="secondary">
+            <Text>Large · 52</Text>
           </Button>
         </View>
       </View>
 
       <View className="gap-2">
+        <Text className="text-lg font-semibold text-foreground">
+          Full width · money action
+        </Text>
+        <Button variant="brand" size="lg" className="w-full">
+          <Text>Add money securely</Text>
+        </Button>
+      </View>
+
+      <View className="gap-2">
         <Text className="text-lg font-semibold text-foreground">Disabled</Text>
         <Button disabled>
-          <Text>Disabled</Text>
+          <Text>Insufficient balance</Text>
         </Button>
       </View>
     </ScrollView>
