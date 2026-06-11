@@ -18,24 +18,27 @@ const textVariants = cva(
     variants: {
       variant: {
         default: "",
-        // Display leadings carry ~8% headroom over the CSS spec: the serif's
-        // ascenders overshoot the em box and RN clips glyphs to the line box.
+        // Refero's metrics span 1.44em (ascent 1105 / descent -335 per 1000
+        // upm). iOS bottom-anchors the baseline in a capped line box at
+        // lineHeight - descent, so glyph tops need leading >= (glyphTop +
+        // 0.335) x size: >=1.15em for lowercase ascenders (0.815em), >=1.21em
+        // for the currency "$" (0.875em). Anything tighter shears the tops.
         display: cn(
-          "font-display text-[53px] font-normal leading-[58px] tracking-[-0.8px]",
+          "font-display text-[53px] font-normal leading-[62px] tracking-[-0.8px]",
           Platform.select({ web: "scroll-m-20 text-balance" }),
         ),
         "display-xl": cn(
-          "font-display text-[72px] font-normal leading-[78px] tracking-[-1.2px]",
+          "font-display text-[72px] font-normal leading-[84px] tracking-[-1.2px]",
           Platform.select({ web: "scroll-m-20 text-balance" }),
         ),
         balance:
-          "font-display tabular-nums text-[56px] font-normal leading-[60px] tracking-[-0.8px]",
+          "font-display tabular-nums text-[56px] font-normal leading-[70px] tracking-[-0.8px]",
         h1: cn(
-          "font-display text-center text-[40px] font-normal leading-[43px] tracking-[-0.6px]",
+          "font-display text-center text-[40px] font-normal leading-[47px] tracking-[-0.6px]",
           Platform.select({ web: "scroll-m-20 text-balance" }),
         ),
         h2: cn(
-          "font-display text-[32px] font-normal leading-[37px] tracking-[-0.4px]",
+          "font-display text-[32px] font-normal leading-[38px] tracking-[-0.4px]",
           Platform.select({ web: "scroll-m-20 first:mt-0" }),
         ),
         h3: cn(

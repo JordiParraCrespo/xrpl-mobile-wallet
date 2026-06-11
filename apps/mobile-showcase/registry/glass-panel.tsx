@@ -16,7 +16,7 @@ export default function GlassPanelScreen() {
             <Text className="text-xs font-semibold tracking-wide text-white/70">
               AVAILABLE BALANCE
             </Text>
-            <Text className="mt-1 font-display text-[48px] font-normal leading-[52px] tracking-[-0.8px] text-white tabular-nums">
+            <Text className="mt-1 font-display text-[48px] font-normal leading-[60px] tracking-[-0.8px] text-white tabular-nums">
               $942.76
             </Text>
             <Text className="mt-1 font-mono text-xs text-white/60">

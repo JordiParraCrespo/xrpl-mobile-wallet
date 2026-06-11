@@ -21,7 +21,9 @@ const amountTextVariants = cva(
         sm: "text-sm leading-[18px]",
         md: "text-base leading-5",
         lg: "text-2xl leading-7",
-        xl: "text-[48px] leading-[52px] tracking-[-0.8px]",
+        // Serif digits top out at 0.791em and iOS reserves 0.335em descent
+        // below the baseline, so xl needs >=1.13em leading (see text.tsx).
+        xl: "text-[48px] leading-[56px] tracking-[-0.8px]",
       },
     },
     defaultVariants: {

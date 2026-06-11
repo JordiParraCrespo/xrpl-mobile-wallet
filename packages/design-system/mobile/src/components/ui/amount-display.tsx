@@ -32,7 +32,9 @@ function AmountDisplay({
           {symbol}
         </Text>
       ) : null}
-      <Text className="text-foreground font-display text-[56px] font-normal leading-[60px] tracking-[-1px] tabular-nums">
+      {/* Serif digits need >=1.13em leading on iOS or the tops clip
+          (glyph top 0.791em + 0.335em metric descent — see text.tsx). */}
+      <Text className="text-foreground font-display text-[56px] font-normal leading-[64px] tracking-[-1px] tabular-nums">
         {value}
       </Text>
       {showCursor ? (
