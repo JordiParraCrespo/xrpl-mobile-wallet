@@ -1,14 +1,26 @@
 import type { Href } from "expo-router";
 
 /**
- * Every Drops route path, in one place. Use these instead of hand-written
+ * Every app route path, in one place. Use these instead of hand-written
  * strings so the route graph is refactor-safe and discoverable.
  *
- * Values mirror the file tree under `app/(drops)/`. Dynamic routes keep their
+ * Values mirror the file tree under `app/`. Dynamic routes keep their
  * `[param]` template here; use the `buildRoute` helpers below to fill them in.
  */
 export enum Routes {
-  // Shell
+  // Auth
+  AuthLogin = "/(auth)/login",
+  AuthRegister = "/(auth)/register",
+  AuthForgotPassword = "/(auth)/forgot-password",
+  AuthResetPassword = "/(auth)/reset-password",
+
+  // App (Flama demo + wallet)
+  App = "/(app)",
+  Wallet = "/(app)/wallet",
+  WalletImport = "/(app)/wallet/import",
+  WalletSend = "/(app)/wallet/send",
+
+  // Drops shell
   Root = "/(drops)",
 
   // Onboarding (pre-wallet flow)
@@ -63,5 +75,9 @@ export const buildRoute = {
   onboardingSuccess: (via: OnboardingVia): Href => ({
     pathname: Routes.OnboardingSuccess,
     params: { via },
+  }),
+  walletSend: (chainId: string | number): Href => ({
+    pathname: Routes.WalletSend,
+    params: { chainId },
   }),
 } as const;

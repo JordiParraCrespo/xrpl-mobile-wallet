@@ -25,6 +25,7 @@ import * as React from "react";
 import { View } from "react-native";
 import { app } from "../lib/flama";
 import { queryClient } from "../lib/query";
+import { Routes } from "../lib/routes";
 import { NAV_THEME } from "../lib/theme";
 import { useLoadFonts } from "../lib/use-load-fonts";
 
@@ -75,9 +76,9 @@ function AuthGate() {
     const inAuthGroup = segments[0] === "(auth)";
 
     if (!isAuthenticated && !inAuthGroup) {
-      router.replace("/(auth)/login");
+      router.replace(Routes.AuthLogin);
     } else if (isAuthenticated && inAuthGroup) {
-      router.replace("/(app)");
+      router.replace(Routes.App);
     }
   }, [isAuthenticated, isLoading, segments, router]);
 

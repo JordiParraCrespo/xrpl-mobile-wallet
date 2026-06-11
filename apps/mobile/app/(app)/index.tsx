@@ -22,7 +22,7 @@ export default function HomeScreen() {
 
   const logout = useLogout({
     onSuccess: () => {
-      router.replace("/(auth)/login");
+      router.replace(Routes.AuthLogin);
     },
   });
 
@@ -64,7 +64,7 @@ export default function HomeScreen() {
         </CardContent>
       </Card>
 
-      <Button onPress={() => router.push("/(app)/wallet")}>
+      <Button onPress={() => router.push(Routes.Wallet)}>
         <Text>{t("home.openWallet")}</Text>
       </Button>
 
