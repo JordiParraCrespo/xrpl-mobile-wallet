@@ -73,11 +73,14 @@ function AuthGate() {
     // Session restored — fonts are already in, so drop the splash.
     SplashScreen.hideAsync();
 
-    const inAuthGroup = segments[0] === "(auth)";
+    const group = segments[0];
 
-    if (!isAuthenticated && !inAuthGroup) {
+    // The Drops wallet flow ((drops)) and the entry route are the front door —
+    // self-custody onboarding, no email login required. Only the Flama demo
+    // area ((app)) requires an authenticated session.
+    if (!isAuthenticated && group === "(app)") {
       router.replace(Routes.AuthLogin);
-    } else if (isAuthenticated && inAuthGroup) {
+    } else if (isAuthenticated && group === "(auth)") {
       router.replace(Routes.App);
     }
   }, [isAuthenticated, isLoading, segments, router]);
