@@ -1,12 +1,12 @@
-import { Button } from '@flama/design-system-mobile/button';
-import { Icon } from '@flama/design-system-mobile/icon';
-import { ScreenHeader } from '@flama/design-system-mobile/screen-header';
-import { Text } from '@flama/design-system-mobile/text';
-import { useRouter } from 'expo-router';
-import type { LucideIcon } from 'lucide-react-native';
-import type * as React from 'react';
-import { ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Button } from "@flama/design-system-mobile/button";
+import { Icon } from "@flama/design-system-mobile/icon";
+import { ScreenHeader } from "@flama/design-system-mobile/screen-header";
+import { Text } from "@flama/design-system-mobile/text";
+import { useRouter } from "expo-router";
+import type { LucideIcon } from "lucide-react-native";
+import type * as React from "react";
+import { ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type OnboardingStepScreenProps = {
   /** 1-based position in the create-wallet flow's step dots. */
@@ -15,6 +15,8 @@ type OnboardingStepScreenProps = {
   subtitle: string;
   /** Optional hero icon rendered in a brand-tinted disc above the title. */
   icon?: LucideIcon;
+  /** Optional badge rendered beside the title (e.g. chain compatibility). */
+  titleBadge?: React.ReactNode;
   /** The single footer call-to-action. */
   cta: { label: string; onPress: () => void; disabled?: boolean };
   children?: React.ReactNode;
@@ -29,6 +31,7 @@ export function OnboardingStepScreen({
   title,
   subtitle,
   icon,
+  titleBadge,
   cta,
   children,
 }: OnboardingStepScreenProps) {
@@ -48,10 +51,15 @@ export function OnboardingStepScreen({
           </View>
         ) : null}
 
-        <Text className="font-display text-[30px] leading-[34px] tracking-[-0.5px] text-foreground">
-          {title}
+        <View className="flex-row flex-wrap items-center gap-2.5">
+          <Text className="font-display text-[30px] leading-[34px] tracking-[-0.5px] text-foreground">
+            {title}
+          </Text>
+          {titleBadge}
+        </View>
+        <Text className="mt-2.5 text-[15px] leading-6 text-muted-foreground">
+          {subtitle}
         </Text>
-        <Text className="mt-2.5 text-[15px] leading-6 text-muted-foreground">{subtitle}</Text>
 
         {children}
       </ScrollView>
