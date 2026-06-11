@@ -1,4 +1,5 @@
 import { Redirect } from "expo-router";
+import { Routes } from "../../../lib/routes";
 
 /**
  * Dewy is presented as a tab, but pressing it opens the full-screen assistant
@@ -6,5 +7,5 @@ import { Redirect } from "expo-router";
  * the route valid if it is ever reached directly.
  */
 export default function DewyTab() {
-  return <Redirect href="/(drops)/chat" />;
+  return <Redirect href={Routes.Chat} />;
 }

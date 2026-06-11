@@ -13,6 +13,11 @@ file as a build TODO. Fill them in one at a time, composing the real UI from
 It lives in its own route group, separate from the placeholder `(app)` demo
 screens. Entry point: the "Open Drops wallet (design)" button on `(app)/index`.
 
+Route paths are centralized in the **`Routes` enum** (`apps/mobile/lib/routes.ts`)
+— navigate with `Routes.Home` etc. rather than raw strings. Parameterized routes
+(`payment/[contact]`, `transaction/[id]`, `chat/[session]`, the onboarding
+success `via`) have `buildRoute.*` helpers that return a typed `Href`.
+
 ## Route tree
 
 ```

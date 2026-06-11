@@ -7,6 +7,7 @@ import {
   Users,
 } from "lucide-react-native";
 import { useColorScheme } from "nativewind";
+import { Routes } from "../../../lib/routes";
 
 // Indigo brand accent for the active tab; muted ink for idle (see Drops DS).
 const BRAND = { light: "hsl(250 69.6% 56.1%)", dark: "hsl(249 77.5% 63.3%)" };
@@ -83,7 +84,7 @@ export default function TabsLayout() {
           tabPress: (e) => {
             // Dewy opens the full assistant, not a tab page.
             e.preventDefault();
-            router.push("/(drops)/chat");
+            router.push(Routes.Chat);
           },
         }}
       />

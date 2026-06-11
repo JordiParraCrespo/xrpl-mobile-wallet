@@ -1,4 +1,5 @@
 import { ScreenStub } from "../../../components/drops/screen-stub";
+import { buildRoute, Routes } from "../../../lib/routes";
 
 export default function PaymentsListScreen() {
   return (
@@ -10,16 +11,13 @@ export default function PaymentsListScreen() {
       showBack={false}
       links={[
         // Sub-screens live at the root so they cover the tab bar (full screen).
-        { label: "Add recipient", href: "/(drops)/add-recipient" },
+        { label: "Add recipient", href: Routes.AddRecipient },
         {
           label: "Open chat with Maria",
-          href: {
-            pathname: "/(drops)/payment/[contact]",
-            params: { contact: "maria" },
-          },
+          href: buildRoute.paymentChat("maria"),
           variant: "secondary",
         },
-        { label: "Profile", href: "/(drops)/profile", variant: "outline" },
+        { label: "Profile", href: Routes.Profile, variant: "outline" },
       ]}
     />
   );

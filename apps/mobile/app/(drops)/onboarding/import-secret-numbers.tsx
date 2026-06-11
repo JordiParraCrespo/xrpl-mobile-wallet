@@ -1,4 +1,5 @@
 import { ScreenStub } from "../../../components/drops/screen-stub";
+import { buildRoute } from "../../../lib/routes";
 
 export default function ImportSecretNumbersScreen() {
   return (
@@ -8,13 +9,7 @@ export default function ImportSecretNumbersScreen() {
       blurb="The Xaman eight-row number grid. Each row is validated with its own checksum. Restores the XRP Ledger only."
       design="onboarding/screens-input.jsx (Secret numbers entry)"
       links={[
-        {
-          label: "Restore wallet",
-          href: {
-            pathname: "/(drops)/onboarding/success",
-            params: { via: "xrpl" },
-          },
-        },
+        { label: "Restore wallet", href: buildRoute.onboardingSuccess("xrpl") },
       ]}
     />
   );

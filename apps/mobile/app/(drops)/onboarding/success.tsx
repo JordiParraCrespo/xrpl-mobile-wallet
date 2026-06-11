@@ -1,5 +1,6 @@
 import { useLocalSearchParams } from "expo-router";
 import { ScreenStub } from "../../../components/drops/screen-stub";
+import { Routes } from "../../../lib/routes";
 
 export default function OnboardingSuccessScreen() {
   // `via=phrase` restores every chain (r… + 0x…); `via=xrpl` is XRP Ledger only (r…).
@@ -15,9 +16,7 @@ export default function OnboardingSuccessScreen() {
       title="Your wallet is ready"
       blurb={blurb}
       design="onboarding/screens-immersive.jsx (Success)"
-      links={[
-        { label: "Open wallet", href: "/(drops)/(tabs)/home", replace: true },
-      ]}
+      links={[{ label: "Open wallet", href: Routes.Home, replace: true }]}
     />
   );
 }

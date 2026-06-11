@@ -1,4 +1,5 @@
 import { ScreenStub } from "../../../components/drops/screen-stub";
+import { Routes } from "../../../lib/routes";
 
 export default function HomeScreen() {
   return (
@@ -9,15 +10,11 @@ export default function HomeScreen() {
       design="home.html · home/home-app.jsx (+ home-parts.jsx, home-parts2.jsx)"
       showBack={false}
       links={[
-        { label: "Add money", href: "/(drops)/flows/add-money" },
-        {
-          label: "Receive",
-          href: "/(drops)/flows/receive",
-          variant: "secondary",
-        },
-        { label: "Swap", href: "/(drops)/flows/swap", variant: "secondary" },
-        { label: "Profile", href: "/(drops)/profile", variant: "outline" },
-        { label: "Ask Dewy", href: "/(drops)/chat", variant: "outline" },
+        { label: "Add money", href: Routes.AddMoney },
+        { label: "Receive", href: Routes.Receive, variant: "secondary" },
+        { label: "Swap", href: Routes.Swap, variant: "secondary" },
+        { label: "Profile", href: Routes.Profile, variant: "outline" },
+        { label: "Ask Dewy", href: Routes.Chat, variant: "outline" },
       ]}
     />
   );

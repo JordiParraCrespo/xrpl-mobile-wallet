@@ -1,4 +1,5 @@
 import { ScreenStub } from "../../../components/drops/screen-stub";
+import { buildRoute } from "../../../lib/routes";
 
 export default function ChatScreen() {
   return (
@@ -10,10 +11,7 @@ export default function ChatScreen() {
       links={[
         {
           label: "Open a past session",
-          href: {
-            pathname: "/(drops)/chat/[session]",
-            params: { session: "today-1" },
-          },
+          href: buildRoute.chatSession("today-1"),
           variant: "secondary",
         },
       ]}

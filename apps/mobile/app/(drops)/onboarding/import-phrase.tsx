@@ -1,4 +1,5 @@
 import { ScreenStub } from "../../../components/drops/screen-stub";
+import { buildRoute } from "../../../lib/routes";
 
 export default function ImportPhraseScreen() {
   return (
@@ -10,10 +11,7 @@ export default function ImportPhraseScreen() {
       links={[
         {
           label: "Restore wallet",
-          href: {
-            pathname: "/(drops)/onboarding/success",
-            params: { via: "phrase" },
-          },
+          href: buildRoute.onboardingSuccess("phrase"),
         },
       ]}
     />

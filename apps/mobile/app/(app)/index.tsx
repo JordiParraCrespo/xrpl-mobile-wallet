@@ -13,6 +13,7 @@ import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { ScrollView, View } from "react-native";
 import { LanguageSwitcher } from "../../components/language-switcher";
+import { Routes } from "../../lib/routes";
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -68,7 +69,7 @@ export default function HomeScreen() {
       </Button>
 
       {/* Entry to the Drops design shell (routing skeleton — see app/(drops)/README.md). */}
-      <Button variant="secondary" onPress={() => router.push("/(drops)")}>
+      <Button variant="secondary" onPress={() => router.push(Routes.Root)}>
         <Text>Open Drops wallet (design)</Text>
       </Button>
 
