@@ -53,6 +53,10 @@ export default function HomeScreen() {
         </CardContent>
       </Card>
 
+      <Button onPress={() => router.push('/(app)/wallet')}>
+        <Text>{t('home.openWallet')}</Text>
+      </Button>
+
       <LanguageSwitcher />
 
       <Button variant="destructive" onPress={() => logout.mutate()} disabled={logout.isPending}>

@@ -3,3 +3,4 @@ packages:
   - "packages/*"
   - "packages/backend/*"
   - "packages/design-system/*"
+  - "packages/wallet/*"

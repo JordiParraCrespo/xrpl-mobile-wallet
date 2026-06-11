@@ -1,0 +1,33 @@
+{
+  "name": "@flama/wallet-keyring",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "clean": "rm -rf dist",
+    "lint": "biome check src/",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@flama/chain-core": "workspace:*",
+    "@noble/curves": "^1.9.0",
+    "@scure/bip32": "^1.7.0",
+    "@scure/bip39": "^1.6.0"
+  },
+  "devDependencies": {
+    "@flama/config": "workspace:^",
+    "typescript": "^6.0.2",
+    "vitest": "^3.0.0"
+  }
+}
