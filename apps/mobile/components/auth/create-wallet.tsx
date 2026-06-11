@@ -1,5 +1,5 @@
-import { useFlamaApp } from "@flama/frontend/react";
-import * as React from "react";
+import { useFlamaApp } from '@flama/frontend/react';
+import * as React from 'react';
 
 export type WordCount = 12 | 24;
 
@@ -21,18 +21,14 @@ const CreateWalletContext = React.createContext<CreateWalletValue | null>(null);
  * secure storage by the keyring once `importMnemonic` commits it, after which
  * `reset()` clears it here.
  */
-export function CreateWalletProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function CreateWalletProvider({ children }: { children: React.ReactNode }) {
   const app = useFlamaApp();
   const [wordCount, setWordCount] = React.useState<WordCount>(12);
   const [words, setWords] = React.useState<string[] | null>(null);
 
   const generate = React.useCallback(
     (count: WordCount = wordCount) => {
-      setWords(app.wallet.generateMnemonic(count).split(" "));
+      setWords(app.wallet.generateMnemonic(count).split(' '));
       setWordCount(count);
     },
     [app, wordCount],
@@ -45,19 +41,13 @@ export function CreateWalletProvider({
     [words, wordCount, generate, reset],
   );
 
-  return (
-    <CreateWalletContext.Provider value={value}>
-      {children}
-    </CreateWalletContext.Provider>
-  );
+  return <CreateWalletContext.Provider value={value}>{children}</CreateWalletContext.Provider>;
 }
 
 export function useCreateWallet(): CreateWalletValue {
   const ctx = React.useContext(CreateWalletContext);
   if (!ctx) {
-    throw new Error(
-      "useCreateWallet must be used within a CreateWalletProvider",
-    );
+    throw new Error('useCreateWallet must be used within a CreateWalletProvider');
   }
   return ctx;
 }

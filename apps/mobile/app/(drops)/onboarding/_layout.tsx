@@ -1,5 +1,5 @@
-import { Stack } from "expo-router";
-import { CreateWalletProvider } from "../../../components/drops/create-wallet";
+import { Stack } from 'expo-router';
+import { CreateWalletProvider } from '../../../components/auth/create-wallet';
 
 /**
  * Onboarding — account entry. Nine screens across two paths plus a shared

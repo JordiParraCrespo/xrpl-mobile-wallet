@@ -1,16 +1,16 @@
-import { Button } from "@flama/design-system-mobile/button";
-import { Text } from "@flama/design-system-mobile/text";
-import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { ImageBackground, StyleSheet, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
-import { Routes } from "../../../lib/routes";
+import { Button } from '@flama/design-system-mobile/button';
+import { Text } from '@flama/design-system-mobile/text';
+import { useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { ImageBackground, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import { Routes } from '../../../lib/routes';
 
 // The immersive entry screen (onboarding/screens-immersive.jsx — Welcome, photo
 // variant): a full-bleed market photo under a cinematic veil, the Drops
 // wordmark up top, and the two account-entry choices anchored to the base.
-const INK = "#080610";
+const INK = '#080610';
 
 export default function WelcomeScreen() {
   const router = useRouter();
@@ -20,7 +20,7 @@ export default function WelcomeScreen() {
     <View className="flex-1 bg-[#0a0812]">
       <StatusBar style="light" />
       <ImageBackground
-        source={require("../../../assets/welcome-photo.png")}
+        source={require('../../../assets/welcome-photo.png')}
         resizeMode="cover"
         style={StyleSheet.absoluteFill}
       >
@@ -59,9 +59,7 @@ export default function WelcomeScreen() {
               className="w-full bg-white active:bg-white/90"
               onPress={() => router.push(Routes.OnboardingSecureIntro)}
             >
-              <Text className="text-[15px] font-semibold text-[#0a0812]">
-                Create a new wallet
-              </Text>
+              <Text className="text-[15px] font-semibold text-[#0a0812]">Create a new wallet</Text>
             </Button>
 
             <Button

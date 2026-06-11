@@ -1,5 +1,5 @@
-import { ScreenStub } from "../../../components/drops/screen-stub";
-import { buildRoute } from "../../../lib/routes";
+import { ScreenStub } from '../../../components/drops/screen-stub';
+import { buildRoute } from '../../../lib/routes';
 
 export default function ImportPhraseScreen() {
   return (
@@ -10,8 +10,8 @@ export default function ImportPhraseScreen() {
       design="onboarding/screens-input.jsx (Recovery phrase entry)"
       links={[
         {
-          label: "Restore wallet",
-          href: buildRoute.onboardingSuccess("phrase"),
+          label: 'Restore wallet',
+          href: buildRoute.onboardingSuccess('phrase'),
         },
       ]}
     />

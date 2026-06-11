@@ -1,5 +1,5 @@
-import { ScreenStub } from "../../../components/drops/screen-stub";
-import { Routes } from "../../../lib/routes";
+import { ScreenStub } from '../../../components/drops/screen-stub';
+import { Routes } from '../../../lib/routes';
 
 export default function ImportPickerScreen() {
   return (
@@ -9,16 +9,16 @@ export default function ImportPickerScreen() {
       blurb="Recovery phrase restores every XRPL chain. A family seed or secret numbers restore the XRP Ledger only."
       design="onboarding/screens-input.jsx (Import method picker)"
       links={[
-        { label: "Recovery phrase", href: Routes.OnboardingImportPhrase },
+        { label: 'Recovery phrase', href: Routes.OnboardingImportPhrase },
         {
-          label: "Family seed",
+          label: 'Family seed',
           href: Routes.OnboardingImportSeed,
-          variant: "secondary",
+          variant: 'secondary',
         },
         {
-          label: "Secret numbers",
+          label: 'Secret numbers',
           href: Routes.OnboardingImportSecretNumbers,
-          variant: "secondary",
+          variant: 'secondary',
         },
       ]}
     />
