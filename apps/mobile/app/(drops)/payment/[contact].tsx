@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from "expo-router";
-import { ScreenStub } from "../../../../components/drops/screen-stub";
+import { ScreenStub } from "../../../components/drops/screen-stub";
 
 export default function PaymentChatScreen() {
   const { contact } = useLocalSearchParams<{ contact: string }>();
@@ -15,7 +15,7 @@ export default function PaymentChatScreen() {
         {
           label: "Open a transaction",
           href: {
-            pathname: "/(drops)/(tabs)/payments/transaction/[id]",
+            pathname: "/(drops)/transaction/[id]",
             params: { id: "tx_demo" },
           },
           variant: "secondary",

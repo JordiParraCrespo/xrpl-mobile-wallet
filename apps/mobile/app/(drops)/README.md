@@ -16,7 +16,8 @@ screens. Entry point: the "Open Drops wallet (design)" button on `(app)/index`.
 ## Route tree
 
 ```
-(drops)/
+(drops)/                          ← the single root stack (the presentation layer)
+  _layout.tsx                     declares (tabs) + every screen that covers it
   index.tsx                       redirect: no wallet → onboarding, else → home
   onboarding/                     pre-wallet flow (9 screens, two paths)
     index.tsx                     Welcome
@@ -28,26 +29,48 @@ screens. Entry point: the "Open Drops wallet (design)" button on `(app)/index`.
     import-seed.tsx               │
     import-secret-numbers.tsx     ┘
     success.tsx                   shared success → home
-  (tabs)/                         signed-in hub (bottom tab bar)
+  (tabs)/                         signed-in hub — owns the tab bar
     home.tsx                      balance hero · actions · accounts · activity
     market.tsx                    prices
-    payments/                     people & activity (nested stack)
-      index.tsx                   list
-      add-recipient.tsx
-      [contact].tsx               payment chat
-      transaction/[id].tsx        transaction detail (modal)
+    payments.tsx                  people & activity (the list only)
     droppoints.tsx                rewards teaser
     dewy.tsx                      tab → opens the full assistant
-  flows/                          money actions (presented as modals)
-    add-money.tsx
-    receive.tsx
-    swap.tsx
-    send.tsx
-  profile.tsx                     account & settings
-  chat/                           Dewy assistant
+  ── cover the tab bar (declared at root, NOT inside a tab) ──
+  profile.tsx                     account & settings          (push)
+  chat/                           Dewy assistant              (push)
     index.tsx
     [session].tsx                 a past conversation
+  payment/[contact].tsx           payment chat                (push)
+  flows/                          money actions               (modal)
+    add-money.tsx · receive.tsx · swap.tsx · send.tsx
+  add-recipient.tsx               new recipient form          (modal)
+  transaction/[id].tsx            transaction detail          (modal)
 ```
+
+## Modal & navigation hierarchy
+
+The whole design works off **one root stack** (`(drops)/_layout.tsx`). The tab
+navigator is just one screen inside it; everything that must appear over the tab
+bar — full-screen pushes (profile, chat, a payment thread) and modals (money
+flows, add-recipient, transaction detail) — is a **sibling of `(tabs)` at the
+root**, never nested inside a tab.
+
+This matters because **`presentation: 'modal'` only covers siblings in the same
+navigator.** A modal declared inside the Payments tab's stack would render in
+the tab's content area with the tab bar still showing — not full screen. Hoisting
+those screens to the root stack is what lets them cover the tabs.
+
+It still composes cleanly from inside a tab: Expo Router resolves an href against
+the nearest navigator that owns it and walks up, so
+`router.push('/(drops)/flows/send')` from the Payments tab presents on the root
+stack. Modals stack on top of pushes, and modal-over-modal works (open Send from
+a payment chat), because they share the one root stack.
+
+The Payments tab is therefore a single list file (`payments.tsx`); its
+sub-screens live at the root (`payment/[contact]`, `add-recipient`,
+`transaction/[id]`). Note the segment is **`payment`** (singular) for the thread
+vs the **`payments`** tab — distinct paths, no collision between the two
+navigators.
 
 ## Why it's shaped this way
 
@@ -60,9 +83,9 @@ screens. Entry point: the "Open Drops wallet (design)" button on `(app)/index`.
 - **Money flows are modals**, so they layer above the hub and dismiss back to
   it — the design's "temporary layer" language. They are reachable from
   multiple entry points (Home actions, a payment chat's Send), so they are
-  shared routes rather than nested under any one screen.
-- **Per-entity screens use dynamic segments** (`payments/[contact]`,
-  `payments/transaction/[id]`, `chat/[session]`) so the structure scales to real
+  shared root routes rather than nested under any one screen.
+- **Per-entity screens use dynamic segments** (`payment/[contact]`,
+  `transaction/[id]`, `chat/[session]`) so the structure scales to real
   contacts, transactions and conversations.
 
 ## Not yet wired

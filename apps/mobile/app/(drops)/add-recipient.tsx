@@ -1,4 +1,4 @@
-import { ScreenStub } from "../../../../components/drops/screen-stub";
+import { ScreenStub } from "../../components/drops/screen-stub";
 
 export default function AddRecipientScreen() {
   return (

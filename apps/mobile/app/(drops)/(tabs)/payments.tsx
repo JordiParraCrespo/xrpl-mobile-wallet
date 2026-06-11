@@ -1,4 +1,4 @@
-import { ScreenStub } from "../../../../components/drops/screen-stub";
+import { ScreenStub } from "../../../components/drops/screen-stub";
 
 export default function PaymentsListScreen() {
   return (
@@ -9,14 +9,12 @@ export default function PaymentsListScreen() {
       design="payments.html · payments/payments-app.jsx"
       showBack={false}
       links={[
-        {
-          label: "Add recipient",
-          href: "/(drops)/(tabs)/payments/add-recipient",
-        },
+        // Sub-screens live at the root so they cover the tab bar (full screen).
+        { label: "Add recipient", href: "/(drops)/add-recipient" },
         {
           label: "Open chat with Maria",
           href: {
-            pathname: "/(drops)/(tabs)/payments/[contact]",
+            pathname: "/(drops)/payment/[contact]",
             params: { contact: "maria" },
           },
           variant: "secondary",
