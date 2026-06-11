@@ -8,6 +8,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import type { WalletInfo } from '../modules/wallet';
 import { useFlamaApp } from './context';
 
 export const walletKeys = {
@@ -18,27 +19,169 @@ export const walletKeys = {
 
 /** Loads the vault from secure storage on app start. */
 export function useWalletRestore(
-  options?: Omit<UseQueryOptions<void, Error>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<null, Error>, 'queryKey' | 'queryFn'>,
 ) {
   const app = useFlamaApp();
 
   return useQuery({
     queryKey: walletKeys.restore,
-    queryFn: () => app.wallet.restore(),
+    queryFn: async () => {
+      await app.wallet.restore();
+      return null;
+    },
     retry: false,
     staleTime: Infinity,
     ...options,
   });
 }
 
+export interface CreateWalletInput {
+  name?: string;
+  /** Mnemonic length for the new HD wallet. Defaults to the keyring's default. */
+  words?: 12 | 24;
+}
+
+export function useCreateWallet(
+  options?: Omit<
+    // biome-ignore lint/suspicious/noConfusingVoidType: `void` lets callers run `mutate()` with no input
+    UseMutationOptions<WalletInfo, Error, CreateWalletInput | void>,
+    'mutationFn'
+  >,
+) {
+  const app = useFlamaApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    // biome-ignore lint/suspicious/noConfusingVoidType: `void` lets callers run `mutate()` with no input
+    mutationFn: (input: CreateWalletInput | void) => app.wallet.createWallet(input ?? undefined),
+    onSuccess: (...args) => {
+      queryClient.invalidateQueries({ queryKey: walletKeys.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+}
+
 export function useImportWallet(
-  options?: Omit<UseMutationOptions<void, Error, string>, 'mutationFn'>,
+  options?: Omit<UseMutationOptions<WalletInfo, Error, string>, 'mutationFn'>,
 ) {
   const app = useFlamaApp();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (mnemonic: string) => app.wallet.importMnemonic(mnemonic),
+    onSuccess: (...args) => {
+      queryClient.invalidateQueries({ queryKey: walletKeys.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+}
+
+export interface ImportFamilySeedInput {
+  seed: string;
+  name?: string;
+}
+
+export function useImportFamilySeed(
+  options?: Omit<UseMutationOptions<WalletInfo, Error, ImportFamilySeedInput>, 'mutationFn'>,
+) {
+  const app = useFlamaApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ seed, name }: ImportFamilySeedInput) => app.wallet.importFamilySeed(seed, name),
+    onSuccess: (...args) => {
+      queryClient.invalidateQueries({ queryKey: walletKeys.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+}
+
+export interface ImportSecretNumbersInput {
+  rows: string[];
+  name?: string;
+}
+
+export function useImportSecretNumbers(
+  options?: Omit<UseMutationOptions<WalletInfo, Error, ImportSecretNumbersInput>, 'mutationFn'>,
+) {
+  const app = useFlamaApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ rows, name }: ImportSecretNumbersInput) =>
+      app.wallet.importSecretNumbers(rows, name),
+    onSuccess: (...args) => {
+      queryClient.invalidateQueries({ queryKey: walletKeys.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+}
+
+export function useSetActiveWallet(
+  options?: Omit<UseMutationOptions<void, Error, string>, 'mutationFn'>,
+) {
+  const app = useFlamaApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => app.wallet.setActiveWallet(id),
+    onSuccess: (...args) => {
+      queryClient.invalidateQueries({ queryKey: walletKeys.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+}
+
+export interface RenameWalletInput {
+  id: string;
+  name: string;
+}
+
+export function useRenameWallet(
+  options?: Omit<UseMutationOptions<void, Error, RenameWalletInput>, 'mutationFn'>,
+) {
+  const app = useFlamaApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, name }: RenameWalletInput) => app.wallet.renameWallet(id, name),
+    onSuccess: (...args) => {
+      queryClient.invalidateQueries({ queryKey: walletKeys.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+}
+
+export function useRemoveWallet(
+  options?: Omit<UseMutationOptions<void, Error, string>, 'mutationFn'>,
+) {
+  const app = useFlamaApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => app.wallet.removeWallet(id),
+    onSuccess: (...args) => {
+      queryClient.invalidateQueries({ queryKey: walletKeys.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+}
+
+export function useMarkWalletBackedUp(
+  options?: Omit<UseMutationOptions<void, Error, string>, 'mutationFn'>,
+) {
+  const app = useFlamaApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => app.wallet.markBackedUp(id),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: walletKeys.all });
       options?.onSuccess?.(...args);
@@ -79,6 +222,28 @@ export function useSendTransaction(
       app.wallet.send(chainId, to, amount),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: walletKeys.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+}
+
+export interface RequestFaucetFundsInput {
+  chainId: string;
+}
+
+export function useRequestFaucetFunds(
+  options?: Omit<UseMutationOptions<void, Error, RequestFaucetFundsInput>, 'mutationFn'>,
+) {
+  const app = useFlamaApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ chainId }: RequestFaucetFundsInput) => app.wallet.requestFaucetFunds(chainId),
+    onSuccess: (...args) => {
+      queryClient.invalidateQueries({
+        queryKey: walletKeys.balance(args[1].chainId),
+      });
       options?.onSuccess?.(...args);
     },
     ...options,

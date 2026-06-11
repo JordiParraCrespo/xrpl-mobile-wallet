@@ -136,5 +136,117 @@
     "label": "Language",
     "en": "English",
     "es": "Español"
+  },
+  "onboarding": {
+    "common": {
+      "continue": "Continue",
+      "importing": "Importing…",
+      "paste": "Paste",
+      "words12": "12 words",
+      "words24": "24 words",
+      "xrplOnly": "XRP Ledger only"
+    },
+    "welcome": {
+      "create": "Create a new wallet",
+      "import": "Import existing wallet",
+      "legal": "By continuing you agree to the Terms & Privacy Policy."
+    },
+    "secureIntro": {
+      "title": "Back up your new wallet",
+      "subtitle": "You're about to create a recovery phrase. Three things to know before you do.",
+      "cta": "Create recovery phrase",
+      "points": {
+        "masterKey": {
+          "title": "It's your master key",
+          "description": "A 12-word recovery phrase is the only way to restore this wallet — on every XRPL chain."
+        },
+        "private": {
+          "title": "Keep it private",
+          "description": "Anyone who sees it can move your funds. Drops will never ask for it."
+        },
+        "offline": {
+          "title": "Store it offline",
+          "description": "Write it down on paper. Don't screenshot it or save it to the cloud."
+        }
+      }
+    },
+    "revealPhrase": {
+      "title": "Your recovery phrase",
+      "subtitle": "Write these words down in order and keep them somewhere safe.",
+      "tapToReveal": "Tap to reveal",
+      "warning": "Never screenshot or share these words. Drops support will never ask for them.",
+      "ctaSaved": "I've saved my phrase",
+      "ctaReveal": "Reveal to continue"
+    },
+    "import": {
+      "title": "Import your wallet",
+      "subtitle": "Choose how you'd like to restore access. Your keys never leave this device.",
+      "helper": "Which one do I have?",
+      "gotIt": "Got it",
+      "allNetworks": "All networks",
+      "methods": {
+        "phrase": {
+          "title": "Recovery phrase",
+          "description": "12 or 24 words",
+          "help": "A list of 12 or 24 ordinary words. The standard backup for most wallets — works on every network."
+        },
+        "seed": {
+          "title": "Family seed",
+          "description": "Starts with s or sEd",
+          "help": "A single string beginning with s or sEd. The classic XRPL secret — XRP Ledger only."
+        },
+        "secret": {
+          "title": "Secret numbers",
+          "description": "8 groups of 6 digits",
+          "help": "Eight rows of six digits, as used by Xaman. XRP Ledger only."
+        }
+      }
+    },
+    "importPhrase": {
+      "title": "Enter your recovery phrase",
+      "subtitle": "Type or paste your words in order. Pasting fills every field at once.",
+      "ctaProgress": "{{filled}} of {{total}} words",
+      "errorInvalid": "That doesn't look like a valid phrase. Check the highlighted words and their order.",
+      "errorImport": "That phrase couldn't be imported. Check the words and their order, then try again.",
+      "securityNote": "Stored encrypted on this device. Your phrase never leaves it."
+    },
+    "importSeed": {
+      "title": "Enter your family seed",
+      "subtitle": "Your secret seed begins with s or sEd. It restores your XRP Ledger account only.",
+      "show": "Show seed",
+      "hide": "Hide seed",
+      "errorInvalid": "This isn't a valid family seed. It should start with s or sEd and contain only base58 characters.",
+      "errorImport": "That seed couldn't be imported. Double-check it and try again.",
+      "securityNote": "Stored encrypted on this device. Your seed never leaves it."
+    },
+    "importSecretNumbers": {
+      "title": "Enter your secret numbers",
+      "subtitle": "Eight rows of six digits, as shown in your backup. Each row checks itself as you type.",
+      "errorInvalid": "One or more rows don't add up. A red row means a digit is off — re-check it against your backup.",
+      "errorImport": "Those numbers couldn't be imported. Re-check them against your backup and try again.",
+      "securityNote": "Each row carries its own checksum, so typos are caught instantly. Nothing leaves this device."
+    },
+    "success": {
+      "title": "You're all set",
+      "subtitlePhrase": "Your recovery phrase unlocks the same identity on every XRPL chain.",
+      "subtitleXrpl": "Your XRP Ledger account is ready to go.",
+      "networks_one": "{{count}} network",
+      "networks_other": "{{count}} networks",
+      "footnotePhrase": "Both addresses are derived from the same recovery phrase — one identity, every chain.",
+      "footnoteXrpl": "The XRPL EVM sidechain isn't available for this import method. Import a recovery phrase to add it.",
+      "defaultWalletName": "Account 1",
+      "cta": "Open my wallet"
+    },
+    "backupQuiz": {
+      "title": "Confirm your backup",
+      "subtitle": "Tap the right word for each position to prove you've saved your phrase.",
+      "wordLabel": "Word #{{position}}",
+      "ctaSelect": "Select each word",
+      "ctaConfirm": "Confirm & finish",
+      "ctaPending": "Creating wallet…",
+      "errorWrongWord": "That's not the right word for that position. Check your written backup and try again.",
+      "errorImport": "Something went wrong creating your wallet. Please try again.",
+      "reassurance": "Almost there. Confirming proves your phrase is safely written down."
+    }
   }
 }
