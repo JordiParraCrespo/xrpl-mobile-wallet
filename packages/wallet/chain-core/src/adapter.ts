@@ -20,6 +20,11 @@ export interface ChainAdapter {
   getRecentBlocks(limit?: number): Promise<Block[]>;
   /** Builds, signs (via the external signer), submits and awaits confirmation. */
   transfer(params: TransferParams, signer: Signer): Promise<TxResult>;
+  /**
+   * Ask the network faucet to fund an address. Only available on test
+   * networks that declare a `faucetUrl` in their config.
+   */
+  requestFaucet?(address: string): Promise<void>;
   /** Non-native fungible tokens (issued currencies / ERC-20s) held by `address`. */
   listTokens(address: string): Promise<TokenBalance[]>;
   /** Balance of a single non-native token held by `address`. */

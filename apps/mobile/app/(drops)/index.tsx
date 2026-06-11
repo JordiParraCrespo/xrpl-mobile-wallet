@@ -1,7 +1,7 @@
-import { useWalletState } from "@flama/frontend/react";
-import { Redirect } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
-import { Routes } from "../../lib/routes";
+import { useWalletState } from '@flama/frontend/react';
+import { Redirect } from 'expo-router';
+import { ActivityIndicator, View } from 'react-native';
+import { Routes } from '../../lib/routes';
 
 /**
  * Entry to the Drops shell. Onboarding is the front door for a fresh wallet;
@@ -11,7 +11,7 @@ import { Routes } from "../../lib/routes";
 export default function DropsIndex() {
   const { status } = useWalletState();
 
-  if (status === "idle") {
+  if (status === 'idle') {
     return (
       <View className="flex-1 items-center justify-center bg-background">
         <ActivityIndicator size="large" />
@@ -19,8 +19,12 @@ export default function DropsIndex() {
     );
   }
 
-  if (status === "no_wallet") {
+  if (status === 'no_wallet') {
     return <Redirect href={Routes.Onboarding} />;
+  }
+
+  if (status === 'locked') {
+    return <Redirect href={Routes.Unlock} />;
   }
 
   return <Redirect href={Routes.Home} />;

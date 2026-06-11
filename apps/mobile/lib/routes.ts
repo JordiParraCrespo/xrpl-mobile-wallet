@@ -17,6 +17,9 @@ export enum Routes {
   // Drops shell
   Root = "/(drops)",
 
+  // Vault gate (initialized but locked)
+  Unlock = "/(drops)/unlock",
+
   // Onboarding (pre-wallet flow)
   Onboarding = "/(drops)/onboarding",
   OnboardingSecureIntro = "/(drops)/onboarding/secure-intro",
