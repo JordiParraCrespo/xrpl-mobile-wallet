@@ -22,7 +22,7 @@ export default function HomeScreen() {
 
   const logout = useLogout({
     onSuccess: () => {
-      router.replace(Routes.AuthLogin);
+      router.replace(Routes.Onboarding);
     },
   });
 
