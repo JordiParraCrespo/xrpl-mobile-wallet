@@ -10,6 +10,7 @@ export {
   useSocialLogin,
 } from './auth.queries';
 export { FlamaProvider, useFlamaApp } from './context';
+export { explorerKeys, useRecentBlocks } from './explorer.queries';
 export { useAuthState, useWalletState } from './hooks';
 export {
   profileQueryKey,
@@ -24,7 +25,6 @@ export {
   type SendTransactionInput,
   useChainBalance,
   useImportWallet,
-  useRecentBlocks,
   useResetWallet,
   useSendTransaction,
   useWalletRestore,

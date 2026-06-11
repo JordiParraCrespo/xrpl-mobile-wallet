@@ -1,10 +1,4 @@
-import {
-  type Balance,
-  type Block,
-  type ChainRegistry,
-  parseUnits,
-  type TxResult,
-} from '@flama/chain-core';
+import { type Balance, type ChainRegistry, parseUnits, type TxResult } from '@flama/chain-core';
 import { derivationPath, InvalidMnemonicError, type KeyringManager } from '@flama/wallet-keyring';
 import { inject, injectable } from 'inversify';
 import { TOKENS } from '../../di/tokens';
@@ -44,11 +38,6 @@ export class WalletService {
   async getBalance(chainId: string): Promise<Balance> {
     const account = this.getAccount(chainId);
     return this.chains.get(chainId).getBalance(account.address);
-  }
-
-  /** Most recently validated blocks/ledgers for a chain, newest first. */
-  async getRecentBlocks(chainId: string, limit?: number): Promise<Block[]> {
-    return this.chains.get(chainId).getRecentBlocks(limit);
   }
 
   /** Sends `amount` (human-readable decimal string) of the native asset. */

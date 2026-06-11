@@ -4,12 +4,15 @@ import { Container, type ContainerModule } from 'inversify';
 import type { AuthService } from '../modules/auth';
 import { AuthModule } from '../modules/auth';
 import type { IAuthClient } from '../modules/auth/auth.client';
+import { createChainModule } from '../modules/chain';
 import { createCoreModule } from '../modules/core/core.module';
 import type { IStorageService } from '../modules/core/storage.service';
+import type { ExplorerService } from '../modules/explorer';
+import { ExplorerModule } from '../modules/explorer';
 import type { UsersService } from '../modules/users';
 import { UsersModule } from '../modules/users';
 import type { WalletService } from '../modules/wallet';
-import { createWalletModule } from '../modules/wallet';
+import { WalletModule } from '../modules/wallet';
 import { TOKENS } from './tokens';
 
 export interface FlamaAppConfig {
@@ -31,10 +34,14 @@ export class FlamaApp {
     // Core: storage + API client
     container.load(createCoreModule(config));
 
+    // Chain infrastructure (shared registry of chain adapters)
+    container.load(createChainModule(config.chains));
+
     // Feature modules
     container.load(AuthModule);
     container.load(UsersModule);
-    container.load(createWalletModule(config.chains));
+    container.load(WalletModule);
+    container.load(ExplorerModule);
 
     // Additional modules provided by the app
     if (config.modules) {
@@ -56,5 +63,9 @@ export class FlamaApp {
 
   get wallet(): WalletService {
     return this.container.get(TOKENS.WalletService);
+  }
+
+  get explorer(): ExplorerService {
+    return this.container.get(TOKENS.ExplorerService);
   }
 }
