@@ -3,6 +3,7 @@ import * as React from "react";
 import { Pressable, View } from "react-native";
 import { cn } from "../../lib/utils";
 import { AssetIcon } from "./asset-icon";
+import { GlassBackdrop } from "./glass-panel";
 import { Icon } from "./icon";
 import { Text } from "./text";
 
@@ -36,11 +37,14 @@ function SelectorPill({
       accessibilityRole="button"
       className={cn(
         "flex-row items-center gap-2 self-start rounded-full border py-1.5 pl-1.5 pr-3.5 active:scale-[0.97]",
-        glass ? "border-white/15 bg-white/10" : "bg-card border-border",
+        glass
+          ? "overflow-hidden border-white/15 bg-white/10"
+          : "bg-card border-border",
         className,
       )}
       {...props}
     >
+      {glass ? <GlassBackdrop /> : null}
       {asset ? (
         <AssetIcon symbol={asset.symbol} color={asset.color} size={24} />
       ) : (

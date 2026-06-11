@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react-native";
 import * as React from "react";
 import { Pressable, View } from "react-native";
 import { cn } from "../../lib/utils";
+import { GlassBackdrop } from "./glass-panel";
 import { Icon } from "./icon";
 import { Text } from "./text";
 
@@ -39,12 +40,13 @@ function TabBar({
     <View
       accessibilityRole="tablist"
       className={cn(
-        "flex-row items-center gap-0.5 rounded-[30px] border p-1.5",
+        "flex-row items-center gap-0.5 overflow-hidden rounded-[30px] border p-1.5",
         glass ? "border-white/15 bg-white/10" : "bg-card/90 border-border",
         className,
       )}
       {...props}
     >
+      {glass ? <GlassBackdrop /> : null}
       {items.map((item) => {
         const active = item.key === activeKey;
         return (

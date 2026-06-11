@@ -103,6 +103,11 @@ export {
 } from './components/ui/dropdown-menu';
 export { FeatureRow } from './components/ui/feature-row';
 export {
+  GlassBackdrop,
+  GlassPanel,
+  glassPanelVariants,
+} from './components/ui/glass-panel';
+export {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,

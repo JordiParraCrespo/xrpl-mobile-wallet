@@ -3,6 +3,7 @@ import type { LucideIcon } from "lucide-react-native";
 import * as React from "react";
 import { Pressable } from "react-native";
 import { cn } from "../../lib/utils";
+import { GlassBackdrop } from "./glass-panel";
 import { Icon } from "./icon";
 import { Text, TextClassContext } from "./text";
 
@@ -17,7 +18,8 @@ const chipVariants = cva(
         outline: "border-border bg-card active:bg-muted border",
         primary: "bg-brand active:bg-brand/90",
         muted: "bg-secondary active:bg-secondary/80",
-        glass: "border border-white/15 bg-white/10 active:bg-white/15",
+        glass:
+          "overflow-hidden border border-white/15 bg-white/10 active:bg-white/15",
       },
       size: {
         sm: "h-[34px] gap-1.5 px-4",
@@ -76,6 +78,7 @@ function Chip({
         role="button"
         {...props}
       >
+        {variant === "glass" ? <GlassBackdrop /> : null}
         {icon ? <Icon as={icon} size={size === "sm" ? 15 : 17} /> : null}
         {typeof children === "string" ? <Text>{children}</Text> : children}
       </Pressable>

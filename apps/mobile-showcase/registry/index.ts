@@ -25,6 +25,7 @@ import DetailListScreen from "./detail-list";
 import DialogScreen from "./dialog";
 import DropdownMenuScreen from "./dropdown-menu";
 import FeatureRowScreen from "./feature-row";
+import GlassPanelScreen from "./glass-panel";
 import HoverCardScreen from "./hover-card";
 import IconButtonScreen from "./icon-button";
 import IconsScreen from "./icons";
@@ -90,6 +91,7 @@ export const REGISTRY: Record<string, React.ComponentType> = {
   dialog: DialogScreen,
   "dropdown-menu": DropdownMenuScreen,
   "feature-row": FeatureRowScreen,
+  "glass-panel": GlassPanelScreen,
   "hover-card": HoverCardScreen,
   "icon-button": IconButtonScreen,
   icons: IconsScreen,

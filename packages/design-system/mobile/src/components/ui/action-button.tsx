@@ -2,13 +2,13 @@ import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 import { Pressable, View } from "react-native";
 import { cn } from "../../lib/utils";
+import { GlassBackdrop } from "./glass-panel";
 import { Text } from "./text";
 
 // ActionButton — circular icon button with a label beneath: the
-// "Send / Receive / More" cluster on the balance hero. `glass` is a
-// translucent white fill for use over the brand gradient (pair the
-// surface with expo-blur for the full frosted effect); `soft` sits on
-// light surfaces; `brand` is the emphasized money-action.
+// "Send / Receive / More" cluster on the balance hero. `glass` is the
+// frosted circle used over the brand gradient (real backdrop blur);
+// `soft` sits on light surfaces; `brand` is the emphasized money-action.
 const actionButtonCircleVariants = cva(
   "h-14 w-14 items-center justify-center rounded-full group-active:scale-[0.97]",
   {
@@ -16,7 +16,7 @@ const actionButtonCircleVariants = cva(
       variant: {
         soft: "bg-secondary",
         brand: "bg-brand",
-        glass: "border border-white/25 bg-white/20",
+        glass: "overflow-hidden border border-white/25 bg-white/20",
       },
     },
     defaultVariants: {
@@ -64,7 +64,10 @@ function ActionButton({
       role="button"
       {...props}
     >
-      <View className={actionButtonCircleVariants({ variant })}>{icon}</View>
+      <View className={actionButtonCircleVariants({ variant })}>
+        {variant === "glass" ? <GlassBackdrop /> : null}
+        {icon}
+      </View>
       <Text className={actionButtonLabelVariants({ variant })}>{label}</Text>
     </Pressable>
   );

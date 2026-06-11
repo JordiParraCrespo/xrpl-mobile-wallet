@@ -3,6 +3,7 @@ import { Text } from "@flama/design-system-mobile/text";
 import { Landmark, Wallet } from "lucide-react-native";
 import * as React from "react";
 import { ScrollView, View } from "react-native";
+import { HeroSurface } from "../lib/hero-surface";
 
 export default function SelectorPillScreen() {
   return (
@@ -44,7 +45,7 @@ export default function SelectorPillScreen() {
         <Text className="text-lg font-semibold text-foreground">
           Glass · over dark flow surface
         </Text>
-        <View className="gap-3 rounded-xl bg-[#0b0b0f] p-5">
+        <HeroSurface>
           <View className="flex-row flex-wrap gap-3">
             <SelectorPill
               glass
@@ -59,7 +60,7 @@ export default function SelectorPillScreen() {
               onPress={() => {}}
             />
           </View>
-        </View>
+        </HeroSurface>
       </View>
     </ScrollView>
   );

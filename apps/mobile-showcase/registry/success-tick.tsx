@@ -3,6 +3,7 @@ import { SuccessTick } from "@flama/design-system-mobile/success-tick";
 import { Text } from "@flama/design-system-mobile/text";
 import * as React from "react";
 import { ScrollView, View } from "react-native";
+import { HeroSurface } from "../lib/hero-surface";
 
 export default function SuccessTickScreen() {
   const [replayKey, setReplayKey] = React.useState(0);
@@ -20,9 +21,9 @@ export default function SuccessTickScreen() {
         <Text className="text-lg font-semibold text-foreground">
           Glass (dark / gradient surfaces)
         </Text>
-        <View className="items-center gap-4 rounded-xl bg-[#0b0b0f] p-5">
+        <HeroSurface>
           <SuccessTick key={`g-${replayKey}`} variant="glass" />
-        </View>
+        </HeroSurface>
       </View>
 
       <View className="gap-2">

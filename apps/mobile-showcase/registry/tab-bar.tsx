@@ -9,6 +9,7 @@ import {
 } from "lucide-react-native";
 import * as React from "react";
 import { ScrollView, View } from "react-native";
+import { HeroSurface } from "../lib/hero-surface";
 
 const ITEMS: TabBarItem[] = [
   { key: "home", label: "Home", icon: House },
@@ -53,15 +54,16 @@ export default function TabBarScreen() {
         <Text className="text-lg font-semibold text-foreground">
           Glass · over dark surface
         </Text>
-        <View className="rounded-xl bg-[#0b0b0f] p-5">
+        <HeroSurface>
           <TabBar
+            className="w-full"
             glass
             items={ITEMS}
             activeKey={glassActive}
             onChange={setGlassActive}
             accessory={<AssistantAccessory />}
           />
-        </View>
+        </HeroSurface>
       </View>
     </ScrollView>
   );

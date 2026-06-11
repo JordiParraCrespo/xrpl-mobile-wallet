@@ -9,6 +9,7 @@ import {
 } from "lucide-react-native";
 import * as React from "react";
 import { ScrollView, View } from "react-native";
+import { HeroSurface } from "../lib/hero-surface";
 
 export default function ActionButtonScreen() {
   return (
@@ -49,8 +50,8 @@ export default function ActionButtonScreen() {
         <Text className="text-lg font-semibold text-foreground">
           Glass · over the hero
         </Text>
-        <View className="rounded-xl bg-[#0b0b0f] p-5">
-          <View className="flex-row justify-between px-2.5">
+        <HeroSurface>
+          <View className="w-full flex-row justify-between px-2.5">
             <ActionButton
               variant="brand"
               label="Add money"
@@ -72,7 +73,7 @@ export default function ActionButtonScreen() {
               icon={<Icon as={Ellipsis} className="size-5 text-white" />}
             />
           </View>
-        </View>
+        </HeroSurface>
       </View>
 
       <View className="gap-2">

@@ -11,6 +11,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { cn } from "../../lib/utils";
+import { GlassBackdrop } from "./glass-panel";
 import { Icon } from "./icon";
 
 // SuccessTick — animated confirmation tick. The circle pops in
@@ -80,6 +81,7 @@ function SuccessTick({
       style={[{ width: size, height: size }, circleStyle]}
       {...props}
     >
+      {variant === "glass" ? <GlassBackdrop /> : null}
       <Animated.View style={checkStyle}>
         <Icon
           as={Check}

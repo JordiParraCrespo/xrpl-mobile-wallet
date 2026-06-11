@@ -18,6 +18,7 @@ export const SECTIONS: { title: string; items: ComponentEntry[] }[] = [
       { slug: "badge", name: "Badge" },
       { slug: "chip", name: "Chip" },
       { slug: "card", name: "Card" },
+      { slug: "glass-panel", name: "Glass Panel" },
       { slug: "callout", name: "Callout" },
       { slug: "toast", name: "Toast" },
       { slug: "text", name: "Text" },
