@@ -66,6 +66,37 @@ Detailed rules for the backend are in `.claude/rules/` (scoped to `apps/api` and
 - TanStack Query for server state
 - Platform-specific implementations injected via DI container
 
+#### Module architecture
+
+Each domain lives in its own module under `src/modules/<name>/`, following a
+consistent layout:
+
+```
+src/modules/<name>/
+├── <name>.service.ts   # @injectable() business logic, deps via @inject(TOKENS.*)
+├── <name>.module.ts    # ContainerModule binding tokens (or a createXModule(cfg) factory)
+├── <name>.state.ts     # Zustand vanilla store (only if the module holds client state)
+├── <name>.errors.ts    # AppError catalog for the module (only if it raises errors)
+└── index.ts            # Barrel export
+```
+
+Rules:
+
+- **One domain per module.** Keep responsibilities separated — a service must
+  not reach into another domain's concern. Recent blocks / ledger data belong
+  to the **`explorer`** module, NOT `wallet`; the wallet module is strictly
+  about accounts, balances, and sending payments.
+- **Shared chain infrastructure lives in the `chain` module.** The
+  `ChainRegistry` (set of `ChainAdapter`s) is bound there via `createChainModule`
+  and injected by any feature module that needs chains (`wallet`, `explorer`).
+  Do not re-bind it inside a feature module.
+- New tokens go in `src/di/tokens.ts`; new modules are loaded in
+  `src/di/flama-app.ts` and exposed via a getter on `FlamaApp`.
+- React Query hooks go in `src/react/<name>.queries.ts`, one file per module,
+  with a `<name>Keys` query-key factory. Re-export from `src/react/index.ts`.
+- DI-injected classes use explicit `@inject(TOKENS.*)`, so their type imports
+  may be `import type` (the token, not the type, resolves the dependency).
+
 ### Web (apps/web)
 
 - Next.js with `output: "standalone"` for Docker
@@ -131,4 +162,5 @@ pnpm changeset          # Create a changeset for versioning
 - New translations go in `packages/translations/{locale}/index.json`
 - New design tokens go in `packages/design-system/src/tokens/`
 - Frontend business logic goes in `packages/frontend`, not in app components
+- Frontend code goes in the module that owns the domain (see "Module architecture"); chain/ledger data belongs to `explorer`, not `wallet`
 - Keep pluggable service pattern: abstract class → concrete implementations → factory in module

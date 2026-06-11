@@ -1,6 +1,8 @@
 import {
   type Balance,
+  type Block,
   type ChainAdapter,
+  ChainErrors,
   formatUnits,
   type NetworkConfig,
   type Signer,
@@ -23,6 +25,9 @@ import {
   toHex,
 } from 'viem';
 import { publicKeyToAddress, toAccount } from 'viem/accounts';
+import { mapEvmError } from './errors';
+
+const DEFAULT_RECENT_BLOCKS = 10;
 
 export class EvmAdapter implements ChainAdapter {
   private readonly chain: Chain;
@@ -56,15 +61,41 @@ export class EvmAdapter implements ChainAdapter {
 
   async getBalance(address: string): Promise<Balance> {
     const { symbol, decimals } = this.config.nativeCurrency;
-    const amount = await this.publicClient.getBalance({
-      address: address as Address,
-    });
-    return {
-      symbol,
-      decimals,
-      amount,
-      formatted: formatUnits(amount, decimals),
-    };
+    try {
+      const amount = await this.publicClient.getBalance({
+        address: address as Address,
+      });
+      return {
+        symbol,
+        decimals,
+        amount,
+        formatted: formatUnits(amount, decimals),
+      };
+    } catch (error) {
+      throw mapEvmError(error, this.config.chainId);
+    }
+  }
+
+  async getRecentBlocks(limit = DEFAULT_RECENT_BLOCKS): Promise<Block[]> {
+    const count = BigInt(Math.max(1, Math.floor(limit)));
+    try {
+      const latest = await this.publicClient.getBlockNumber();
+      const heights: bigint[] = [];
+      for (let i = 0n; i < count && latest - i >= 0n; i++) {
+        heights.push(latest - i);
+      }
+      const blocks = await Promise.all(
+        heights.map((blockNumber) => this.publicClient.getBlock({ blockNumber })),
+      );
+      return blocks.map((block) => ({
+        height: Number(block.number),
+        hash: block.hash ?? '',
+        timestamp: Number(block.timestamp),
+        transactionCount: block.transactions.length,
+      }));
+    } catch (error) {
+      throw mapEvmError(error, this.config.chainId);
+    }
   }
 
   async transfer(params: TransferParams, signer: Signer): Promise<TxResult> {
@@ -73,18 +104,25 @@ export class EvmAdapter implements ChainAdapter {
       chain: this.chain,
       transport: http(),
     });
-    const hash = await walletClient.sendTransaction({
-      to: params.to as Address,
-      value: params.amount,
-    });
+    let hash: `0x${string}`;
+    try {
+      hash = await walletClient.sendTransaction({
+        to: params.to as Address,
+        value: params.amount,
+      });
+    } catch (error) {
+      throw mapEvmError(error, this.config.chainId);
+    }
     const explorerUrl = this.config.explorerUrl
       ? `${this.config.explorerUrl}/tx/${hash}`
       : undefined;
     const receipt = await this.publicClient.waitForTransactionReceipt({ hash });
+    const success = receipt.status === 'success';
     return {
       hash,
-      success: receipt.status === 'success',
-      error: receipt.status === 'success' ? undefined : 'Transaction reverted',
+      success,
+      error: success ? undefined : 'Transaction reverted',
+      code: success ? undefined : ChainErrors.TRANSACTION_FAILED.code,
       explorerUrl,
     };
   }
