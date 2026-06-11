@@ -50,6 +50,16 @@ const sha512half = (data: Uint8Array): Uint8Array => sha512(data).slice(0, 32);
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
+ * XRPL public key encoding: secp256k1 keys are the 33-byte compressed key as
+ * hex; ed25519 keys (32 raw bytes) get the 0xED prefix that pads them to the
+ * same 33-byte format.
+ */
+function toXrplPublicKeyHex(publicKey: Uint8Array): string {
+  const hex = bytesToHex(publicKey).toUpperCase();
+  return publicKey.length === 32 ? `ED${hex}` : hex;
+}
+
+/**
  * Human-readable name for a trustline currency. Standard 3-char ISO codes are
  * already display-ready (no extra name); 40-char hex codes pack a longer ASCII
  * label padded with trailing zeros, which we decode for display.
@@ -129,7 +139,7 @@ export class XrplAdapter implements ChainAdapter {
   }
 
   deriveAddress(publicKey: Uint8Array): string {
-    return deriveAddress(bytesToHex(publicKey));
+    return deriveAddress(toXrplPublicKeyHex(publicKey));
   }
 
   isValidAddress(address: string): boolean {
@@ -347,6 +357,39 @@ export class XrplAdapter implements ChainAdapter {
     return this.waitForValidation(hash, lastLedgerSequence);
   }
 
+  async requestFaucet(address: string): Promise<void> {
+    const { faucetUrl, chainId } = this.config;
+    if (!faucetUrl) {
+      throw new ChainError(ChainErrors.RPC, {
+        chainId,
+        detail: `No faucet configured for ${this.config.name}`,
+      });
+    }
+    let response: Response;
+    try {
+      response = await fetch(faucetUrl, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ destination: address }),
+      });
+    } catch (cause) {
+      throw new ChainError(ChainErrors.NETWORK, {
+        chainId,
+        detail: 'Faucet request failed',
+        cause,
+      });
+    }
+    if (!response.ok) {
+      throw new ChainError(ChainErrors.RPC, {
+        chainId,
+        detail: `Faucet HTTP ${response.status}`,
+      });
+    }
+  }
+
   private toTokenBalance(currency: string, issuer: string, balance: string): TokenBalance {
     const value = balance.startsWith('-') ? balance.slice(1) : balance;
     const amount = parseUnits(value, XRPL_TOKEN_DECIMALS);
@@ -361,14 +404,31 @@ export class XrplAdapter implements ChainAdapter {
   }
 
   /**
-   * External-signer pipeline: serialize for signing, sha512-half digest,
-   * sign through the keyring Signer, then attach the DER signature.
+   * External-signer pipeline: serialize for signing, sign through the keyring
+   * Signer, then attach the signature.
+   *
+   * The two XRPL signing schemes split the work differently (matching
+   * ripple-keypairs): secp256k1 signs the sha512-half digest of the signing
+   * payload and encodes the signature as DER, while ed25519 signs the full
+   * prefix-included payload bytes directly (no pre-hash) and uses the raw
+   * 64-byte signature.
    */
   private async signTransaction(tx: Record<string, unknown>, signer: Signer): Promise<string> {
-    tx.SigningPubKey = bytesToHex(signer.publicKey).toUpperCase();
-    const digest = sha512half(hexToBytes(encodeForSigning(tx)));
-    const { signature } = await signer.signDigest(digest);
-    tx.TxnSignature = secp256k1.Signature.fromCompact(signature).toDERHex().toUpperCase();
+    tx.SigningPubKey = toXrplPublicKeyHex(signer.publicKey);
+    const payload = hexToBytes(encodeForSigning(tx));
+    if (signer.curve === 'ed25519') {
+      if (!signer.signMessage) {
+        throw new ChainError(ChainErrors.SIGNING_FAILED, {
+          chainId: this.config.chainId,
+          detail: 'ed25519 signer does not implement signMessage',
+        });
+      }
+      const { signature } = await signer.signMessage(payload);
+      tx.TxnSignature = bytesToHex(signature).toUpperCase();
+    } else {
+      const { signature } = await signer.signDigest(sha512half(payload));
+      tx.TxnSignature = secp256k1.Signature.fromCompact(signature).toDERHex().toUpperCase();
+    }
     return encode(tx);
   }
 

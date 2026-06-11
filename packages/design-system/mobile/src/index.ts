@@ -31,6 +31,7 @@ export { AssetIcon } from './components/ui/asset-icon';
 export { AssistantAvatar } from './components/ui/assistant-avatar';
 export { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar';
 export { Badge, badgeTextVariants, badgeVariants } from './components/ui/badge';
+export { BottomSheet } from './components/ui/bottom-sheet';
 export {
   Button,
   buttonTextVariants,
@@ -141,6 +142,7 @@ export {
   MenubarTrigger,
 } from './components/ui/menubar';
 export { MnemonicGrid, MnemonicWord } from './components/ui/mnemonic-grid';
+export { MnemonicInput } from './components/ui/mnemonic-input';
 export { NotificationRow } from './components/ui/notification-row';
 export {
   Popover,
@@ -151,6 +153,7 @@ export { PriceChange } from './components/ui/price-change';
 export { Progress } from './components/ui/progress';
 export { RadioGroup, RadioGroupItem } from './components/ui/radio-group';
 export { ScreenHeader } from './components/ui/screen-header';
+export { SecretNumbersInput } from './components/ui/secret-numbers-input';
 export { SegmentedControl } from './components/ui/segmented-control';
 export type { Option } from './components/ui/select';
 export {

@@ -5,12 +5,12 @@ import {
   type TokenBalance,
   type TokenInfo,
   type TxResult,
-} from '@flama/chain-core';
-import { derivationPath, type KeyringManager } from '@flama/wallet-keyring';
-import { inject, injectable } from 'inversify';
-import { TOKENS } from '../../di/tokens';
-import { AppError } from '../core/errors';
-import { TokensErrors } from './tokens.errors';
+} from "@flama/chain-core";
+import type { KeyringManager } from "@flama/wallet-keyring";
+import { inject, injectable } from "inversify";
+import { TOKENS } from "../../di/tokens";
+import { AppError } from "../core/errors";
+import { TokensErrors } from "./tokens.errors";
 
 /**
  * Non-native fungible tokens held by the wallet account: XRPL issued
@@ -45,7 +45,11 @@ export class TokensService {
    * willing to hold. Chains that need no registration raise
    * `REGISTRATION_NOT_SUPPORTED`.
    */
-  async register(chainId: string, token: TokenInfo, limit?: string): Promise<TxResult> {
+  async register(
+    chainId: string,
+    token: TokenInfo,
+    limit?: string,
+  ): Promise<TxResult> {
     const { adapter, address, signer } = this.account(chainId);
     if (!adapter.registerToken) {
       throw new AppError(TokensErrors.REGISTRATION_NOT_SUPPORTED);
@@ -54,7 +58,12 @@ export class TokensService {
   }
 
   /** Sends `amount` (human-readable decimal string) of a non-native token. */
-  async send(chainId: string, to: string, token: TokenInfo, amount: string): Promise<TxResult> {
+  async send(
+    chainId: string,
+    to: string,
+    token: TokenInfo,
+    amount: string,
+  ): Promise<TxResult> {
     const { adapter, address, signer } = this.account(chainId);
     if (!adapter.isValidAddress(to)) {
       throw new AppError(TokensErrors.INVALID_ADDRESS);
@@ -73,11 +82,11 @@ export class TokensService {
   /** Resolves the adapter, derived account address and signer for a chain. */
   private account(chainId: string) {
     const adapter = this.adapterFor(chainId);
-    const wallet = this.keyring.getWallets()[0];
+    const wallet = this.keyring.getActiveWallet();
     if (!wallet) {
       throw new AppError(TokensErrors.NOT_INITIALIZED);
     }
-    const signer = this.keyring.getSigner(wallet.id, derivationPath(adapter.config.kind, 0));
+    const signer = this.keyring.getSigner(wallet.id, adapter.config.kind, 0);
     return {
       adapter,
       address: adapter.deriveAddress(signer.publicKey),
@@ -86,7 +95,9 @@ export class TokensService {
   }
 
   private adapterFor(chainId: string): ChainAdapter {
-    const adapter = this.chains.list().find((a) => a.config.chainId === chainId);
+    const adapter = this.chains
+      .list()
+      .find((a) => a.config.chainId === chainId);
     if (!adapter) {
       throw new AppError(TokensErrors.UNKNOWN_CHAIN);
     }
