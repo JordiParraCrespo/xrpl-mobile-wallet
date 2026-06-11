@@ -20,7 +20,7 @@
     "generate:openapi": "pnpm --filter @flama/api generate:openapi",
     "generate:api-client": "pnpm generate:openapi && pnpm --filter @flama/api-client generate",
     "demo:payment": "turbo run build --filter=@flama/chain-xrpl --filter=@flama/wallet-xrpl-tx --filter=@flama/wallet-keyring && tsx scripts/payment-demo.ts",
-    "demo:agent": "turbo run build --filter=@flama/wallet-agent && tsx scripts/agent-demo.ts",
+    "demo:agent": "turbo run build --filter=@flama/wallet-agent && tsx --env-file-if-exists=.env scripts/agent-demo.ts",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "changeset publish"
