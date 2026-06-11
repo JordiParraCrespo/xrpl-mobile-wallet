@@ -19,6 +19,8 @@
     "docker:prod": "docker compose -f docker/docker-compose.prod.yml up -d",
     "generate:openapi": "pnpm --filter @flama/api generate:openapi",
     "generate:api-client": "pnpm generate:openapi && pnpm --filter @flama/api-client generate",
+    "demo:payment": "turbo run build --filter=@flama/chain-xrpl --filter=@flama/wallet-xrpl-tx --filter=@flama/wallet-keyring && tsx scripts/payment-demo.ts",
+    "demo:agent": "turbo run build --filter=@flama/wallet-agent && tsx scripts/agent-demo.ts",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "changeset publish"
@@ -28,6 +30,11 @@
     "@changesets/cli": "^2.27.0",
     "@commitlint/cli": "^19.0.0",
     "@commitlint/config-conventional": "^19.0.0",
+    "@flama/chain-xrpl": "workspace:*",
+    "@flama/wallet-agent": "workspace:*",
+    "@flama/wallet-keyring": "workspace:*",
+    "@flama/wallet-xrpl-tx": "workspace:*",
+    "tsx": "^4.21.0",
     "turbo": "^2.9.6",
     "typescript": "^6.0.2"
   },

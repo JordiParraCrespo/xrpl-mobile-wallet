@@ -1,11 +1,23 @@
-import { ChainError, ChainErrors, formatUnits, parseUnits } from '@flama/chain-core';
+import { formatUnits, parseUnits, type TxContext } from '@flama/chain-core';
 import { type PaymentInput, paymentInputSchema, XRP_DECIMALS } from '@flama/shared';
 import { isValidClassicAddress } from 'ripple-address-codec';
 import { encodeMemo } from './memo';
-import { type RiskLevel, type TxContext, type TxSummary, XrplTransaction } from './transaction';
+import {
+  type RiskLevel,
+  type TxSummary,
+  type ValidationIssue,
+  XrplTransaction,
+} from './transaction';
 
 /** Ledgers added to the current index to set LastLedgerSequence (~1 min). */
 const LEDGER_BUFFER = 20;
+
+/** Stable codes for the domain issues a payment can raise. */
+export const PaymentIssue = {
+  INVALID_DESTINATION: 'invalid_destination',
+  SELF_PAYMENT: 'self_payment',
+  INSUFFICIENT_FUNDS: 'insufficient_funds',
+} as const;
 
 /**
  * Configurable fields of a native XRP payment. New optional fields (invoice id,
@@ -27,20 +39,34 @@ export class PaymentTransaction extends XrplTransaction<PaymentParams> {
     return 'high';
   }
 
-  validate(params: PaymentParams, ctx: TxContext): void {
+  validate(params: PaymentParams, ctx: TxContext): ValidationIssue[] {
+    const issues: ValidationIssue[] = [];
     // Authoritative checksum check (the schema only verified the shape).
     if (!isValidClassicAddress(params.destination)) {
-      throw new ChainError(ChainErrors.INVALID_TRANSACTION, {
-        detail: 'Invalid destination address',
+      issues.push({
+        code: PaymentIssue.INVALID_DESTINATION,
+        field: 'destination',
+        message: 'The destination is not a valid XRPL address',
       });
+      // Without a valid address the remaining checks are not meaningful.
+      return issues;
     }
     if (params.destination === ctx.account) {
-      throw new ChainError(ChainErrors.SELF_PAYMENT);
+      issues.push({
+        code: PaymentIssue.SELF_PAYMENT,
+        field: 'destination',
+        message: 'The destination is the same as the sender',
+      });
     }
     const spendable = ctx.balanceDrops - ctx.reserveDrops;
     if (spendable < this.amountDrops(params) + ctx.feeDrops) {
-      throw new ChainError(ChainErrors.INSUFFICIENT_FUNDS);
+      issues.push({
+        code: PaymentIssue.INSUFFICIENT_FUNDS,
+        field: 'amount',
+        message: 'The amount plus fee exceeds the spendable balance after reserve',
+      });
     }
+    return issues;
   }
 
   build(params: PaymentParams, ctx: TxContext): Record<string, unknown> {

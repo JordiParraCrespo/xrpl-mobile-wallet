@@ -1,24 +1,7 @@
+import type { TxContext } from '@flama/chain-core';
 import type { z } from 'zod';
 
-/**
- * Read-only view of the chain state a transaction needs to validate and build
- * itself. The caller (an adapter on the device, or the agent's read client on
- * the backend) fetches these once and hands them to `prepare`.
- */
-export interface TxContext {
-  /** The sender's classic r-address. */
-  account: string;
-  /** Current account sequence. */
-  sequence: number;
-  /** Current validated ledger index ("block"); used for LastLedgerSequence. */
-  ledgerIndex: number;
-  /** Account's spendable balance, in drops. */
-  balanceDrops: bigint;
-  /** Base + owner reserve that must remain, in drops. */
-  reserveDrops: bigint;
-  /** Network fee to apply, in drops. */
-  feeDrops: bigint;
-}
+export type { TxContext };
 
 export interface TxSummaryLine {
   label: string;
@@ -41,6 +24,23 @@ export interface TxSummary {
 /** Coarse risk used to classify a transaction for the approval pipeline. */
 export type RiskLevel = 'read' | 'low' | 'high';
 
+/**
+ * A single validation problem. Plain data — not a thrown error — so callers can
+ * test, branch on `code`, and surface `message`/`field` without try/catch. The
+ * agent returns these to the model so it can self-correct.
+ */
+export interface ValidationIssue {
+  /** Stable, machine-branchable code (e.g. "insufficient_funds"). */
+  code: string;
+  /** Human-readable explanation. */
+  message: string;
+  /** The offending input field, when the issue maps to one. */
+  field?: string;
+}
+
+/** Issue code attached to every schema (shape/format) failure. */
+export const SCHEMA_ISSUE_CODE = 'invalid_input';
+
 /** The fully-formed, unsigned canonical tx plus everything callers need. */
 export interface PreparedTransaction<TParams> {
   params: TParams;
@@ -51,12 +51,20 @@ export interface PreparedTransaction<TParams> {
 }
 
 /**
+ * Result of preparing a transaction: either a ready-to-sign transaction, or the
+ * list of issues that blocked it. No exceptions are thrown for invalid input.
+ */
+export type PrepareResult<TParams> =
+  | ({ ok: true } & PreparedTransaction<TParams>)
+  | { ok: false; issues: ValidationIssue[] };
+
+/**
  * Parameter-erased view of a transaction, used by registries and the agent so
  * they can prepare any operation by type without knowing its param shape.
  */
 export interface PreparableTransaction {
   readonly type: string;
-  prepare(rawInput: unknown, ctx: TxContext): PreparedTransaction<unknown>;
+  prepare(rawInput: unknown, ctx: TxContext): PrepareResult<unknown>;
 }
 
 /**
@@ -73,24 +81,42 @@ export abstract class XrplTransaction<TParams> implements PreparableTransaction 
   /** Coarse risk for approval classification. */
   abstract risk(params: TParams): RiskLevel;
   /**
-   * Domain checks against live chain state. Throws a `ChainError` from the
-   * shared catalog when the transaction cannot proceed.
+   * Domain checks against live chain state. Returns the issues found (empty when
+   * the transaction is valid); never throws.
    */
-  abstract validate(params: TParams, ctx: TxContext): void;
+  abstract validate(params: TParams, ctx: TxContext): ValidationIssue[];
   /** Builds the canonical, unsigned tx JSON ready for serialization. */
   abstract build(params: TParams, ctx: TxContext): Record<string, unknown>;
   /** Ground-truth summary for the human approval gate. */
   abstract summarize(params: TParams, ctx: TxContext): TxSummary;
 
-  /** Parse → validate → build, returning everything callers need. */
-  prepare(rawInput: unknown, ctx: TxContext): PreparedTransaction<TParams> {
-    const params = this.schema.parse(rawInput);
-    this.validate(params, ctx);
+  /** Parse → validate → build. Returns a result; does not throw on bad input. */
+  prepare(rawInput: unknown, ctx: TxContext): PrepareResult<TParams> {
+    const parsed = this.schema.safeParse(rawInput);
+    if (!parsed.success) {
+      return { ok: false, issues: parsed.error.issues.map(toIssue) };
+    }
+    const params = parsed.data;
+    const issues = this.validate(params, ctx);
+    if (issues.length > 0) {
+      return { ok: false, issues };
+    }
     return {
+      ok: true,
       params,
       tx: this.build(params, ctx),
       summary: this.summarize(params, ctx),
       risk: this.risk(params),
     };
   }
+}
+
+/** Maps a zod issue to the package's flat {@link ValidationIssue} shape. */
+function toIssue(issue: z.ZodIssue): ValidationIssue {
+  const field = issue.path.join('.');
+  return {
+    code: SCHEMA_ISSUE_CODE,
+    message: issue.message,
+    ...(field ? { field } : {}),
+  };
 }
