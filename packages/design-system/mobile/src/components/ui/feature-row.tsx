@@ -115,7 +115,7 @@ function FeatureRow({
         <Icon
           as={ChevronRight}
           size={20}
-          className="text-muted-foreground shrink-0"
+          className="text-foreground/25 shrink-0"
         />
       ) : null}
     </Pressable>

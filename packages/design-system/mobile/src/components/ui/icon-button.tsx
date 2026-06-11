@@ -15,7 +15,7 @@ const iconButtonVariants = cva(
       variant: {
         soft: "bg-secondary active:bg-accent",
         solid: "bg-primary active:bg-black dark:active:bg-primary/90",
-        outline: "border-border active:bg-muted border bg-transparent",
+        outline: "border-foreground/25 active:bg-muted border bg-transparent",
         glass:
           "overflow-hidden border border-white/20 bg-white/15 active:bg-white/25",
       },

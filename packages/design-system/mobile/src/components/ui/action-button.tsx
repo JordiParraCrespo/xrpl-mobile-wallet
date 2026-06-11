@@ -10,7 +10,7 @@ import { Text } from "./text";
 // frosted circle used over the brand gradient (real backdrop blur);
 // `soft` sits on light surfaces; `brand` is the emphasized money-action.
 const actionButtonCircleVariants = cva(
-  "h-14 w-14 items-center justify-center rounded-full group-active:scale-[0.97]",
+  "h-11 w-11 items-center justify-center rounded-full group-active:scale-[0.97]",
   {
     variants: {
       variant: {
@@ -25,7 +25,7 @@ const actionButtonCircleVariants = cva(
   },
 );
 
-const actionButtonLabelVariants = cva("text-[13px] font-medium", {
+const actionButtonLabelVariants = cva("text-xs font-medium", {
   variants: {
     variant: {
       soft: "text-foreground",
@@ -57,7 +57,7 @@ function ActionButton({
   return (
     <Pressable
       className={cn(
-        "group items-center gap-2.5",
+        "group items-center gap-2",
         props.disabled && "opacity-45",
         className,
       )}

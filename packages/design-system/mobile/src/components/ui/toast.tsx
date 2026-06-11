@@ -18,7 +18,7 @@ function Toast({ className, icon = Check, children, ...props }: ToastProps) {
     <TextClassContext.Provider value="text-inverse-foreground text-sm font-medium">
       <View
         className={cn(
-          "bg-inverse flex-row items-center gap-2.5 self-center rounded-full px-[18px] py-3",
+          "bg-inverse flex-row items-center gap-[9px] self-center rounded-full px-[18px] py-3",
           className,
         )}
         {...props}

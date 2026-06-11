@@ -2,6 +2,7 @@ import { AddressPill } from "@flama/design-system-mobile/address-pill";
 import { Text } from "@flama/design-system-mobile/text";
 import * as React from "react";
 import { ScrollView, View } from "react-native";
+import { HeroSurface } from "../lib/hero-surface";
 
 const XRPL_ADDRESS = "rPLkM9qTb7sN3vXcF2dQ8wH4eYz1uA6x";
 const EVM_ADDRESS = "0x8F3aC2e1B9d74F6c0A5e2D1b8C7f4E3a9D6b1C2e";
@@ -32,10 +33,10 @@ export default function AddressPillScreen() {
 
       <View className="gap-2">
         <Text className="text-lg font-semibold text-foreground">On dark</Text>
-        <View className="items-center gap-4 rounded-xl bg-[#0b0b0f] p-5">
+        <HeroSurface>
           <AddressPill address={XRPL_ADDRESS} onDark onCopy={() => {}} />
           <AddressPill address={EVM_ADDRESS} onDark onCopy={() => {}} />
-        </View>
+        </HeroSurface>
       </View>
 
       <View className="gap-2">

@@ -22,26 +22,28 @@ export default function ActionButtonScreen() {
           <ActionButton
             variant="brand"
             label="Add money"
-            icon={<Icon as={Plus} className="size-5 text-brand-foreground" />}
+            icon={
+              <Icon as={Plus} size={19} className="text-brand-foreground" />
+            }
           />
           <ActionButton
             variant="soft"
             label="Receive"
             icon={
-              <Icon as={ArrowDownLeft} className="size-5 text-foreground" />
+              <Icon as={ArrowDownLeft} size={19} className="text-foreground" />
             }
           />
           <ActionButton
             variant="soft"
             label="Swap"
             icon={
-              <Icon as={ArrowLeftRight} className="size-5 text-foreground" />
+              <Icon as={ArrowLeftRight} size={19} className="text-foreground" />
             }
           />
           <ActionButton
             variant="soft"
             label="More"
-            icon={<Icon as={Ellipsis} className="size-5 text-foreground" />}
+            icon={<Icon as={Ellipsis} size={19} className="text-foreground" />}
           />
         </View>
       </View>
@@ -55,22 +57,28 @@ export default function ActionButtonScreen() {
             <ActionButton
               variant="brand"
               label="Add money"
-              icon={<Icon as={Plus} className="size-5 text-brand-foreground" />}
+              icon={
+                <Icon as={Plus} size={19} className="text-brand-foreground" />
+              }
             />
             <ActionButton
               variant="glass"
               label="Receive"
-              icon={<Icon as={ArrowDownLeft} className="size-5 text-white" />}
+              icon={
+                <Icon as={ArrowDownLeft} size={19} className="text-white" />
+              }
             />
             <ActionButton
               variant="glass"
               label="Swap"
-              icon={<Icon as={ArrowLeftRight} className="size-5 text-white" />}
+              icon={
+                <Icon as={ArrowLeftRight} size={19} className="text-white" />
+              }
             />
             <ActionButton
               variant="glass"
               label="More"
-              icon={<Icon as={Ellipsis} className="size-5 text-white" />}
+              icon={<Icon as={Ellipsis} size={19} className="text-white" />}
             />
           </View>
         </HeroSurface>
@@ -84,7 +92,7 @@ export default function ActionButtonScreen() {
             label="Swap"
             disabled
             icon={
-              <Icon as={ArrowLeftRight} className="size-5 text-foreground" />
+              <Icon as={ArrowLeftRight} size={19} className="text-foreground" />
             }
           />
         </View>

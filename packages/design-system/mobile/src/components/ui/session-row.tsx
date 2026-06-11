@@ -11,7 +11,7 @@ import { Text } from "./text";
 // timestamp. The active session sits on a card surface with a hairline
 // border; idle rows stay transparent.
 const sessionRowVariants = cva(
-  "w-full flex-row items-center gap-3 rounded-md border px-2.5 py-3",
+  "w-full flex-row items-center gap-[11px] rounded-md border px-2.5 py-[11px]",
   {
     variants: {
       active: {
@@ -54,15 +54,17 @@ function SessionRow({
       <View className="min-w-0 flex-1 gap-0.5">
         <Text
           numberOfLines={1}
-          className="text-foreground text-sm font-semibold"
+          className="text-foreground text-[14.5px] font-semibold"
         >
           {title}
         </Text>
-        <Text numberOfLines={1} className="text-muted-foreground text-[13px]">
+        <Text numberOfLines={1} className="text-muted-foreground text-[12.5px]">
           {preview}
         </Text>
       </View>
-      <Text className="text-muted-foreground shrink-0 text-[11px]">{time}</Text>
+      <Text className="text-muted-foreground shrink-0 text-[11.5px]">
+        {time}
+      </Text>
     </Pressable>
   );
 }

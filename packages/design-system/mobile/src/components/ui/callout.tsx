@@ -21,10 +21,10 @@ const calloutVariants = cva(
     variants: {
       variant: {
         neutral: "bg-muted",
-        positive: "bg-positive-soft",
-        negative: "bg-destructive-soft",
-        warning: "bg-warning-soft",
-        info: "bg-info-soft",
+        positive: "bg-positive-soft border-positive/20 border",
+        negative: "bg-destructive-soft border-destructive/20 border",
+        warning: "bg-warning-soft border-warning/20 border",
+        info: "bg-info-soft border-info/20 border",
       },
     },
     defaultVariants: {
@@ -33,7 +33,7 @@ const calloutVariants = cva(
   },
 );
 
-const calloutTextVariants = cva("flex-1 text-[13px] leading-relaxed", {
+const calloutTextVariants = cva("flex-1 text-[13px] leading-[19px]", {
   variants: {
     variant: {
       neutral: "text-muted-foreground",

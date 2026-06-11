@@ -7,26 +7,29 @@ import { Text } from "./text";
 // sign and semantic tone (incoming = positive, outgoing = negative).
 // Set in the display serif at weight 400; the currency code is a
 // smaller, muted sans suffix.
-const amountTextVariants = cva("font-display font-normal tabular-nums", {
-  variants: {
-    tone: {
-      default: "text-foreground",
-      positive: "text-positive-soft-foreground",
-      negative: "text-destructive",
-      muted: "text-muted-foreground",
+const amountTextVariants = cva(
+  "font-display font-normal tracking-[-0.2px] tabular-nums",
+  {
+    variants: {
+      tone: {
+        default: "text-foreground",
+        positive: "text-positive-soft-foreground",
+        negative: "text-destructive",
+        muted: "text-muted-foreground",
+      },
+      size: {
+        sm: "text-sm leading-[18px]",
+        md: "text-base leading-5",
+        lg: "text-2xl leading-7",
+        xl: "text-[48px] leading-[48px] tracking-[-0.8px]",
+      },
     },
-    size: {
-      sm: "text-sm leading-[18px]",
-      md: "text-base leading-5",
-      lg: "text-2xl leading-7",
-      xl: "text-[48px] leading-[48px] tracking-[-0.8px]",
+    defaultVariants: {
+      tone: "default",
+      size: "md",
     },
   },
-  defaultVariants: {
-    tone: "default",
-    size: "md",
-  },
-});
+);
 
 const currencyTextVariants = cva("font-sans font-semibold opacity-70", {
   variants: {

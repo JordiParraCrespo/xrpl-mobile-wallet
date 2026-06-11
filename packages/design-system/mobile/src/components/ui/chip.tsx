@@ -22,7 +22,7 @@ const chipVariants = cva(
           "overflow-hidden border border-white/15 bg-white/10 active:bg-white/15",
       },
       size: {
-        sm: "h-[34px] gap-1.5 px-4",
+        sm: "h-[34px] gap-2 px-4",
         md: "h-[42px] gap-2 px-[18px]",
       },
     },
@@ -42,10 +42,14 @@ const chipTextVariants = cva("font-semibold", {
       glass: "text-white",
     },
     size: {
-      sm: "text-[13px]",
-      md: "text-sm",
+      sm: "text-[13.5px]",
+      md: "text-[14.5px]",
     },
   },
+  compoundVariants: [
+    // Filter chips (sm outline) read quieter than payment pills.
+    { variant: "outline", size: "sm", className: "text-muted-foreground" },
+  ],
   defaultVariants: {
     variant: "outline",
     size: "md",

@@ -30,8 +30,10 @@ export default function GlassPanelScreen() {
         <Text className="text-lg font-semibold text-foreground">
           Light · over light surfaces
         </Text>
-        <HeroSurface>
-          <GlassPanel variant="light" className="w-full">
+        <View className="overflow-hidden rounded-xl border border-border bg-background p-5">
+          <View className="absolute -left-8 -top-10 h-32 w-32 rounded-full bg-brand/20" />
+          <View className="absolute -bottom-10 -right-6 h-28 w-28 rounded-full bg-positive/15" />
+          <GlassPanel variant="light" tint="light" className="w-full">
             <Text className="text-sm font-semibold text-foreground">
               Neutral light glass
             </Text>
@@ -39,7 +41,7 @@ export default function GlassPanelScreen() {
               Search pills and utility surfaces over white.
             </Text>
           </GlassPanel>
-        </HeroSurface>
+        </View>
       </View>
 
       <View className="gap-2">
@@ -70,12 +72,14 @@ export default function GlassPanelScreen() {
         <HeroSurface>
           <GlassPanel padded={false} className="w-full">
             <View className="border-b border-white/10 px-4 py-3">
-              <Text className="text-sm font-semibold text-white">
+              <Text className="text-[13px] font-semibold tracking-[0.3px] text-white/70">
                 ACCOUNT 1
               </Text>
             </View>
             <View className="px-4 py-3">
-              <Text className="text-sm text-white/80">XRP Ledger</Text>
+              <Text className="text-[15px] font-semibold text-white">
+                XRP Ledger
+              </Text>
               <Text className="mt-0.5 font-mono text-xs text-white/60">
                 rPLkM9…uA6x
               </Text>

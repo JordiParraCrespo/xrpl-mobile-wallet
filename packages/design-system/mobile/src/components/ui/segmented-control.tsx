@@ -47,7 +47,7 @@ function SegmentedControl({
   return (
     <View
       className={cn(
-        "bg-secondary flex-row items-center rounded-full p-1",
+        "bg-secondary flex-row items-center gap-0.5 rounded-full p-1",
         fullWidth ? "w-full" : "self-start",
         className,
       )}

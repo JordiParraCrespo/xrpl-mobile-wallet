@@ -55,7 +55,7 @@ function Keypad({
           ))}
         </View>
       ) : null}
-      <View className="flex-row flex-wrap">
+      <View className="flex-row flex-wrap gap-y-1.5">
         {KEYS.map((key) => (
           <Pressable
             key={key}

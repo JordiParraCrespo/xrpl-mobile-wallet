@@ -2,6 +2,7 @@ import { AssistantAvatar } from "@flama/design-system-mobile/assistant-avatar";
 import { Text } from "@flama/design-system-mobile/text";
 import * as React from "react";
 import { ScrollView, View } from "react-native";
+import { HeroSurface } from "../lib/hero-surface";
 
 const DEWY = require("../assets/dewy.png");
 
@@ -22,12 +23,12 @@ export default function AssistantAvatarScreen() {
         <Text className="text-lg font-semibold text-foreground">
           With ring (dark surfaces)
         </Text>
-        <View className="items-center gap-4 rounded-xl bg-[#0b0b0f] p-5">
+        <HeroSurface>
           <View className="flex-row items-end gap-3">
             <AssistantAvatar source={DEWY} size={44} ring />
             <AssistantAvatar source={DEWY} size={56} ring />
           </View>
-        </View>
+        </HeroSurface>
       </View>
 
       <View className="gap-2">

@@ -39,7 +39,7 @@ function ImportMethodCard({
       accessibilityRole="radio"
       accessibilityState={{ selected: !!selected }}
       className={cn(
-        "w-full flex-row items-center gap-3.5 rounded-xl border p-4 active:scale-[0.97]",
+        "w-full flex-row items-center gap-3.5 rounded-xl border-[1.5px] p-4 active:scale-[0.97]",
         selected ? "bg-brand-soft border-brand" : "bg-card border-border",
         className,
       )}

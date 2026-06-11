@@ -44,9 +44,9 @@ const glassPanelVariants = cva("overflow-hidden rounded-xl border", {
   variants: {
     variant: {
       // white-glass over the gradient / dark heroes
-      "on-dark": "border-white/15 bg-white/10",
-      // neutral light-glass over light surfaces
-      light: "border-white/60 bg-white/40",
+      "on-dark": "border-white/[0.28] bg-white/[0.12]",
+      // neutral ink-tinted light-glass over light surfaces
+      light: "border-[rgba(20,22,26,0.08)] bg-[rgba(20,22,26,0.04)]",
     },
     padded: {
       true: "p-5",

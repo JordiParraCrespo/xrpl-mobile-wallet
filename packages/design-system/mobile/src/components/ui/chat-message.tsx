@@ -75,11 +75,11 @@ type ChatMessageData =
     }
   | { role?: "bot"; kind: "balance"; total: number; rows: ChatBalanceRow[] };
 
-const chatBubbleVariants = cva("rounded-2xl px-[15px] py-[11px]", {
+const chatBubbleVariants = cva("px-[15px] py-[11px]", {
   variants: {
     side: {
-      user: "max-w-[80%] self-end rounded-br-[6px] bg-brand",
-      bot: "self-start rounded-bl-[5px] bg-secondary",
+      user: "max-w-[80%] self-end rounded-[18px] rounded-br-[6px] bg-brand",
+      bot: "self-start rounded-lg rounded-bl-[5px] bg-secondary",
     },
   },
   defaultVariants: {
@@ -87,7 +87,7 @@ const chatBubbleVariants = cva("rounded-2xl px-[15px] py-[11px]", {
   },
 });
 
-const chatBubbleTextVariants = cva("text-[15px] leading-snug", {
+const chatBubbleTextVariants = cva("text-[15px] leading-[22px]", {
   variants: {
     side: {
       user: "text-brand-foreground",
@@ -144,7 +144,7 @@ function ActionFooter({
   if (status === "pending") {
     return (
       <View className="px-4 pb-3.5 pt-3">
-        <View className="flex-row gap-2">
+        <View className="flex-row gap-[9px]">
           <Pressable
             onPress={() => onAction?.(false)}
             className="border-input h-[46px] flex-1 items-center justify-center rounded-full border active:opacity-70"
@@ -155,7 +155,7 @@ function ActionFooter({
           </Pressable>
           <Pressable
             onPress={() => onAction?.(true)}
-            className="bg-brand active:bg-brand/90 h-[46px] flex-[1.4] flex-row items-center justify-center gap-1.5 rounded-full"
+            className="bg-brand active:bg-brand/90 h-[46px] flex-[1.4] flex-row items-center justify-center gap-[7px] rounded-full"
           >
             <Icon as={Check} size={17} className="text-white" />
             <Text className="text-[15px] font-semibold text-white">
@@ -171,7 +171,7 @@ function ActionFooter({
   }
   const approved = status === "approved";
   return (
-    <View className="flex-row items-center gap-2 px-4 py-3">
+    <View className="flex-row items-center gap-2 px-4 py-[13px]">
       <Icon
         as={approved ? Check : X}
         size={16}
@@ -179,7 +179,7 @@ function ActionFooter({
       />
       <Text
         className={cn(
-          "text-[13px] font-semibold",
+          "text-[13.5px] font-semibold",
           approved ? "text-positive" : "text-muted-foreground",
         )}
       >
@@ -206,7 +206,7 @@ function BotMessageBody({
         <View
           className={cn(
             chatBubbleVariants({ side: "bot" }),
-            "flex-row items-center gap-1 px-4 py-[15px]",
+            "flex-row items-center gap-1 px-4 py-3.5",
           )}
         >
           <TypingDot delay={0} />
@@ -227,10 +227,10 @@ function BotMessageBody({
     case "questions": {
       const done = !!message.answered;
       return (
-        <View className="bg-card border-border w-full rounded-2xl border p-3.5">
+        <View className="bg-card border-border w-full rounded-lg border p-3.5">
           <View className="mb-3 flex-row items-center gap-2">
             <Icon as={Sparkles} size={14} className="text-brand" />
-            <Text className="text-muted-foreground text-xs font-bold uppercase tracking-wide">
+            <Text className="text-muted-foreground text-[12.5px] font-bold uppercase tracking-wide">
               {message.title}
             </Text>
           </View>
@@ -268,8 +268,8 @@ function BotMessageBody({
 
     case "action":
       return (
-        <View className="bg-card border-border w-full overflow-hidden rounded-2xl border">
-          <View className="border-border flex-row items-center gap-2.5 border-b-hairline px-4 py-3">
+        <View className="bg-card border-border w-full overflow-hidden rounded-[18px] border">
+          <View className="border-border flex-row items-center gap-2.5 border-b-hairline px-4 py-[13px]">
             <View className="bg-brand h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px]">
               <Icon
                 as={message.actionKind === "swap" ? ArrowLeftRight : Send}
@@ -297,14 +297,14 @@ function BotMessageBody({
                     "border-border border-b-hairline",
                 )}
               >
-                <Text className="text-muted-foreground text-[13px]">
+                <Text className="text-muted-foreground text-[13.5px]">
                   {row.label}
                 </Text>
                 <View className="min-w-0 shrink items-end">
                   <Text
                     numberOfLines={1}
                     className={cn(
-                      "text-foreground text-sm font-semibold",
+                      "text-foreground text-[14.5px] font-semibold",
                       row.mono && "font-mono",
                     )}
                   >
@@ -325,12 +325,12 @@ function BotMessageBody({
 
     case "result":
       return (
-        <View className="bg-positive-soft border-positive/30 w-full rounded-2xl border p-4">
+        <View className="bg-positive-soft border-positive/30 w-full rounded-[18px] border p-4">
           <View className="flex-row items-center gap-2.5">
             <View className="bg-positive h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full">
               <Icon as={Check} size={19} className="text-white" />
             </View>
-            <Text className="text-foreground min-w-0 flex-1 text-[15px] font-semibold">
+            <Text className="text-foreground min-w-0 flex-1 text-[15.5px] font-semibold">
               {message.text}
             </Text>
           </View>
@@ -361,16 +361,16 @@ function BotMessageBody({
 
     case "error":
       return (
-        <View className="bg-destructive-soft border-destructive/30 w-full rounded-2xl border p-4">
+        <View className="bg-destructive-soft border-destructive/30 w-full rounded-[18px] border p-4">
           <View className="flex-row items-center gap-2.5">
             <View className="bg-destructive h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full">
               <Icon as={X} size={18} className="text-white" />
             </View>
-            <Text className="text-foreground min-w-0 flex-1 text-[15px] font-semibold">
+            <Text className="text-foreground min-w-0 flex-1 text-[15.5px] font-semibold">
               {message.title}
             </Text>
           </View>
-          <Text className="text-muted-foreground mt-2 text-[13px] leading-snug">
+          <Text className="text-muted-foreground mt-2 text-[13.5px] leading-snug">
             {message.text}
           </Text>
           {!message.handled ? (
@@ -379,7 +379,7 @@ function BotMessageBody({
                 onPress={() => onErrorAction?.(false)}
                 className="border-input h-11 flex-1 items-center justify-center rounded-full border active:opacity-70"
               >
-                <Text className="text-foreground text-sm font-semibold">
+                <Text className="text-foreground text-[14.5px] font-semibold">
                   Dismiss
                 </Text>
               </Pressable>
@@ -387,7 +387,7 @@ function BotMessageBody({
                 onPress={() => onErrorAction?.(true)}
                 className="bg-destructive active:bg-destructive/90 h-11 flex-[1.2] items-center justify-center rounded-full"
               >
-                <Text className="text-sm font-semibold text-white">
+                <Text className="text-[14.5px] font-semibold text-white">
                   Try again
                 </Text>
               </Pressable>
@@ -398,11 +398,11 @@ function BotMessageBody({
 
     case "balance":
       return (
-        <View className="bg-card border-border w-full rounded-2xl border p-4">
-          <Text className="text-muted-foreground text-xs font-semibold">
+        <View className="bg-card border-border w-full rounded-[18px] border p-4">
+          <Text className="text-muted-foreground text-[12.5px] font-semibold">
             Total balance
           </Text>
-          <Text className="text-foreground font-display mb-3 mt-0.5 text-3xl font-normal tracking-tight">
+          <Text className="text-foreground font-display mb-3 mt-0.5 text-3xl font-normal tracking-[-0.4px]">
             $
             {message.total.toLocaleString("en-US", {
               minimumFractionDigits: 2,
@@ -417,7 +417,7 @@ function BotMessageBody({
               <AssetIcon symbol={row.symbol} color={row.color} size={32} />
               <Text
                 numberOfLines={1}
-                className="text-foreground min-w-0 flex-1 text-sm font-semibold"
+                className="text-foreground min-w-0 flex-1 text-[14.5px] font-semibold"
               >
                 {row.name}
               </Text>

@@ -49,7 +49,7 @@ function DetailRow({
             numberOfLines={1}
             className={cn(
               "text-sm font-semibold",
-              mono && "font-mono font-medium",
+              mono && "font-mono",
               accent ? "text-brand" : "text-foreground",
             )}
           >
@@ -83,7 +83,7 @@ function DetailList({ card, className, children, ...props }: DetailListProps) {
     <View
       className={cn(
         "w-full",
-        card && "bg-card border-border rounded-xl border px-4",
+        card && "bg-card border-border rounded-xl border px-4 py-1",
         className,
       )}
       {...props}

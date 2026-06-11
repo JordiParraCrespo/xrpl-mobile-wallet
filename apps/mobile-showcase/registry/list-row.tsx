@@ -14,7 +14,7 @@ export default function ListRowScreen() {
         <Text className="text-lg font-semibold text-foreground">
           Activity · grouped card
         </Text>
-        <Card className="gap-0 px-3 py-1">
+        <Card className="gap-0 overflow-hidden p-0">
           <ListRow
             media={<InitialsAvatar name="Maria Gutiérrez" size="md" />}
             title="Maria Gutiérrez"
@@ -27,12 +27,20 @@ export default function ListRowScreen() {
             media={<InitialsAvatar name="Aerolink Travel" size="md" />}
             title="Aerolink Travel"
             subtitle="You sent"
-            value={<AmountText value={-56.4} currency="XRP" signed mono />}
+            value={
+              <AmountText
+                value={-56.4}
+                currency="XRP"
+                signed
+                mono
+                tone="default"
+              />
+            }
             meta="12 Aug"
             onPress={() => {}}
           />
           <ListRow
-            media={<AssetIcon symbol="RLUSD" size={44} />}
+            media={<AssetIcon symbol="RLUSD" size={40} />}
             title="Swap to RLUSD"
             subtitle="Swapping · Just now"
             value="100 XRP"
@@ -47,7 +55,7 @@ export default function ListRowScreen() {
           Static · no press state
         </Text>
         <ListRow
-          media={<AssetIcon symbol="XRP" size={44} />}
+          media={<AssetIcon symbol="XRP" size={40} />}
           title="XRP Ledger"
           subtitle="Main account"
           value="$744.87"

@@ -3,6 +3,7 @@ import { Toast } from "@flama/design-system-mobile/toast";
 import { Copy, WifiOff } from "lucide-react-native";
 import * as React from "react";
 import { ScrollView, View } from "react-native";
+import { HeroSurface } from "../lib/hero-surface";
 
 export default function ToastScreen() {
   return (
@@ -31,9 +32,9 @@ export default function ToastScreen() {
         <Text className="text-lg font-semibold text-foreground">
           Over content
         </Text>
-        <View className="items-center gap-4 rounded-xl bg-[#0b0b0f] p-5">
+        <HeroSurface>
           <Toast>Swapped · 100 XRP → 61.79 RLUSD</Toast>
-        </View>
+        </HeroSurface>
       </View>
     </ScrollView>
   );

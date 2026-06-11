@@ -22,10 +22,14 @@ const textVariants = cva(
           "font-display text-[53px] font-normal leading-[56px] tracking-[-0.8px]",
           Platform.select({ web: "scroll-m-20 text-balance" }),
         ),
+        "display-xl": cn(
+          "font-display text-[72px] font-normal leading-[72px] tracking-[-1.2px]",
+          Platform.select({ web: "scroll-m-20 text-balance" }),
+        ),
         balance:
           "font-display tabular-nums text-[56px] font-normal leading-[56px] tracking-[-0.8px]",
         h1: cn(
-          "font-display text-center text-[40px] font-normal leading-[44px] tracking-[-0.6px]",
+          "font-display text-center text-[40px] font-normal leading-[43px] tracking-[-0.6px]",
           Platform.select({ web: "scroll-m-20 text-balance" }),
         ),
         h2: cn(
@@ -37,7 +41,7 @@ const textVariants = cva(
           Platform.select({ web: "scroll-m-20" }),
         ),
         h4: cn(
-          "font-display text-xl font-normal leading-7",
+          "font-display text-lg font-normal leading-6 tracking-[-0.18px]",
           Platform.select({ web: "scroll-m-20" }),
         ),
         p: "mt-3 leading-7 sm:mt-6",
@@ -49,7 +53,8 @@ const textVariants = cva(
         large: "text-lg font-semibold",
         small: "text-sm font-medium leading-none",
         muted: "text-muted-foreground text-sm",
-        caption: "text-muted-foreground text-xs uppercase tracking-[1px]",
+        caption:
+          "text-muted-foreground text-xs leading-[18px] tracking-[0.1px]",
       },
     },
     defaultVariants: {

@@ -30,6 +30,9 @@ export default function TypographyScreen() {
         <Text className="text-lg font-semibold text-foreground">
           Text variants
         </Text>
+        <Specimen label='variant="display-xl"'>
+          <Text variant="display-xl">Drops</Text>
+        </Specimen>
         <Specimen label='variant="display"'>
           <Text variant="display">Drops</Text>
         </Specimen>
@@ -51,6 +54,12 @@ export default function TypographyScreen() {
         <Specimen label='variant="default"'>
           <Text>Hold, send and receive across every XRPL chain.</Text>
         </Specimen>
+        <Specimen label='variant="p"'>
+          <Text variant="p">
+            A paragraph of calm, plain-spoken interface copy that wraps onto a
+            second line to show its leading.
+          </Text>
+        </Specimen>
         <Specimen label='variant="lead"'>
           <Text variant="lead">
             Calm, plain-spoken interface copy in sentence case.
@@ -68,6 +77,11 @@ export default function TypographyScreen() {
         <Specimen label='variant="caption"'>
           <Text variant="caption">Account 1</Text>
         </Specimen>
+        <Specimen label='variant="blockquote"'>
+          <Text variant="blockquote">
+            Depth comes from color, scale and whitespace — not shadows.
+          </Text>
+        </Specimen>
         <Specimen label='variant="code"'>
           <Text variant="code">rJordn4…Kq7vZ2</Text>
         </Specimen>
@@ -81,7 +95,7 @@ export default function TypographyScreen() {
           <Text className="font-mono text-[11px] text-muted-foreground">
             font-display · Refero Title
           </Text>
-          <Text className="font-display text-5xl font-normal tracking-tight text-foreground">
+          <Text className="font-display text-[46px] font-normal tracking-[-0.8px] text-foreground">
             $942.76
           </Text>
         </View>

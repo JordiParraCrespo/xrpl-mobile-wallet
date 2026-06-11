@@ -29,7 +29,7 @@ function ListRow({
     <Pressable
       disabled={!interactive}
       className={cn(
-        "w-full flex-row items-center gap-3.5 rounded-md px-1 py-3",
+        "w-full flex-row items-center gap-3.5 rounded-md px-4 py-3.5",
         interactive && "active:bg-muted",
         className,
       )}
@@ -37,11 +37,11 @@ function ListRow({
     >
       {media ? <View className="shrink-0">{media}</View> : null}
       <View className="min-w-0 flex-1 gap-0.5">
-        <Text numberOfLines={1} className="text-base font-semibold">
+        <Text numberOfLines={1} className="text-[15px] font-semibold">
           {title}
         </Text>
         {subtitle ? (
-          <Text numberOfLines={1} className="text-muted-foreground text-sm">
+          <Text numberOfLines={1} className="text-muted-foreground text-[13px]">
             {subtitle}
           </Text>
         ) : null}
@@ -49,7 +49,7 @@ function ListRow({
       {value || meta ? (
         <View className="shrink-0 items-end gap-0.5">
           {typeof value === "string" ? (
-            <Text className="text-base font-semibold">{value}</Text>
+            <Text className="text-[15px] font-semibold">{value}</Text>
           ) : (
             value
           )}

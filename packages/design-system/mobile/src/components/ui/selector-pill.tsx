@@ -36,7 +36,7 @@ function SelectorPill({
     <Pressable
       accessibilityRole="button"
       className={cn(
-        "flex-row items-center gap-2 self-start rounded-full border py-1.5 pl-1.5 pr-3.5 active:scale-[0.97]",
+        "flex-row items-center gap-2 self-start rounded-full border py-[7px] pl-2 pr-3.5 active:scale-[0.97]",
         glass
           ? "overflow-hidden border-white/15 bg-white/10"
           : "bg-card border-border",
