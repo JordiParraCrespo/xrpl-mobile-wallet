@@ -18,7 +18,7 @@ type QuizQuestionProps = {
  */
 export function QuizQuestion({ label, choices, correct, selected, onSelect }: QuizQuestionProps) {
   return (
-    <View>
+    <View className="flex flex-col gap-2">
       <Text className="mb-2.5 text-[13px] font-semibold text-muted-foreground">{label}</Text>
       <View className="flex-row gap-2.5">
         {choices.map((word) => {
@@ -32,7 +32,7 @@ export function QuizQuestion({ label, choices, correct, selected, onSelect }: Qu
                 rounded="md"
                 onPress={() => onSelect(word)}
                 className={cn(
-                  'h-12 w-full px-1.5',
+                  'w-full px-1.5',
                   isCorrect && 'border-positive bg-positive-soft active:bg-positive-soft',
                   isWrong && 'border-destructive bg-destructive-soft active:bg-destructive-soft',
                 )}
