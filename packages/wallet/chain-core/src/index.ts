@@ -15,6 +15,7 @@ export type {
   Block,
   ChainKind,
   NetworkConfig,
+  RegisterTokenParams,
   TokenBalance,
   TokenInfo,
   TokenTransferParams,

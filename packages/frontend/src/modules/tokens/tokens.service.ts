@@ -39,6 +39,20 @@ export class TokensService {
     return adapter.getTokenBalance(address, token);
   }
 
+  /**
+   * Registers a token so the wallet account can receive it. On XRPL this opens
+   * a trustline to the issuer (TrustSet); `limit` caps how much the account is
+   * willing to hold. Chains that need no registration raise
+   * `REGISTRATION_NOT_SUPPORTED`.
+   */
+  async register(chainId: string, token: TokenInfo, limit?: string): Promise<TxResult> {
+    const { adapter, address, signer } = this.account(chainId);
+    if (!adapter.registerToken) {
+      throw new AppError(TokensErrors.REGISTRATION_NOT_SUPPORTED);
+    }
+    return adapter.registerToken({ from: address, token, limit }, signer);
+  }
+
   /** Sends `amount` (human-readable decimal string) of a non-native token. */
   async send(chainId: string, to: string, token: TokenInfo, amount: string): Promise<TxResult> {
     const { adapter, address, signer } = this.account(chainId);

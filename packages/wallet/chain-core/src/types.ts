@@ -66,6 +66,22 @@ export interface TokenTransferParams {
   amount: bigint;
 }
 
+/**
+ * Authorizes an account to hold a token. On XRPL this opens a trustline to the
+ * issuer (required before an issued currency can be received); chains that need
+ * no such step do not implement it.
+ */
+export interface RegisterTokenParams {
+  /** Account establishing the authorization. */
+  from: string;
+  token: TokenInfo;
+  /**
+   * Maximum amount the account is willing to hold, as a human-readable decimal
+   * string. Defaults to a large limit; "0" removes the authorization.
+   */
+  limit?: string;
+}
+
 export interface TxResult {
   hash: string;
   success: boolean;

@@ -3,6 +3,7 @@ import type {
   Balance,
   Block,
   NetworkConfig,
+  RegisterTokenParams,
   TokenBalance,
   TokenInfo,
   TokenTransferParams,
@@ -25,4 +26,9 @@ export interface ChainAdapter {
   getTokenBalance(address: string, token: TokenInfo): Promise<TokenBalance>;
   /** Builds, signs, submits and awaits a non-native token transfer. */
   transferToken(params: TokenTransferParams, signer: Signer): Promise<TxResult>;
+  /**
+   * Authorizes the account to hold a token (XRPL trustline via TrustSet).
+   * Optional: chains that require no on-chain registration omit it.
+   */
+  registerToken?(params: RegisterTokenParams, signer: Signer): Promise<TxResult>;
 }

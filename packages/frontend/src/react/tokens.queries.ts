@@ -71,3 +71,28 @@ export function useSendToken(
     ...options,
   });
 }
+
+export interface RegisterTokenInput {
+  chainId: string;
+  token: TokenInfo;
+  /** Max amount the account is willing to hold (human-readable). */
+  limit?: string;
+}
+
+/** Registers a token (XRPL trustline) so the account can receive it. */
+export function useRegisterToken(
+  options?: Omit<UseMutationOptions<TxResult, Error, RegisterTokenInput>, 'mutationFn'>,
+) {
+  const app = useFlamaApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ chainId, token, limit }: RegisterTokenInput) =>
+      app.tokens.register(chainId, token, limit),
+    onSuccess: (...args) => {
+      queryClient.invalidateQueries({ queryKey: tokensKeys.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+}

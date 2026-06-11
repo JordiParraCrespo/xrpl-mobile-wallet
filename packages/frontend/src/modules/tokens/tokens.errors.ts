@@ -13,4 +13,8 @@ export const TokensErrors = {
     code: 'TOKENS_CLIENT_003',
     message: 'Unknown chain',
   },
+  REGISTRATION_NOT_SUPPORTED: {
+    code: 'TOKENS_CLIENT_004',
+    message: 'This chain does not require token registration',
+  },
 } as const satisfies Record<string, ErrorDefinition>;

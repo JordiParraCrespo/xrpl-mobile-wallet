@@ -7,6 +7,7 @@ import {
   formatUnits,
   type NetworkConfig,
   parseUnits,
+  type RegisterTokenParams,
   type Signer,
   type TokenBalance,
   type TokenInfo,
@@ -38,6 +39,12 @@ const RIPPLE_EPOCH_OFFSET = 946_684_800;
  * adapter interface uses, round-tripping through {@link parseUnits}/{@link formatUnits}.
  */
 const XRPL_TOKEN_DECIMALS = 15;
+/**
+ * Default trustline limit when registering a token: the maximum amount the
+ * account is willing to hold. A large default avoids capping incoming
+ * transfers; callers can override it (e.g. "0" to remove the line).
+ */
+const DEFAULT_TRUST_LIMIT = '1000000000000000';
 
 const sha512half = (data: Uint8Array): Uint8Array => sha512(data).slice(0, 32);
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -238,14 +245,50 @@ export class XrplAdapter implements ChainAdapter {
   }
 
   /**
-   * Shared Payment pipeline for native XRP and issued currencies: load the
-   * sequence, sign through the external signer, submit, and await validation.
-   * `amount` is a drops string for XRP or an {@link IouAmount} object for tokens.
+   * Registers a token by opening (or updating) a trustline to its issuer via a
+   * TrustSet. An XRPL account must hold a trustline before it can receive an
+   * issued currency. `limit` is the maximum the account is willing to hold;
+   * passing "0" removes the line once its balance is zero.
+   */
+  async registerToken(params: RegisterTokenParams, signer: Signer): Promise<TxResult> {
+    const limit: IouAmount = {
+      currency: params.token.symbol,
+      issuer: params.token.issuer,
+      value: params.limit ?? DEFAULT_TRUST_LIMIT,
+    };
+    return this.submitTransaction(
+      { TransactionType: 'TrustSet', LimitAmount: limit },
+      params.from,
+      signer,
+    );
+  }
+
+  /**
+   * Shared Payment pipeline for native XRP and issued currencies. `amount` is a
+   * drops string for XRP or an {@link IouAmount} object for tokens.
    */
   private async sendPayment(
     from: string,
     to: string,
     amount: string | IouAmount,
+    signer: Signer,
+  ): Promise<TxResult> {
+    return this.submitTransaction(
+      { TransactionType: 'Payment', Destination: to, Amount: amount },
+      from,
+      signer,
+    );
+  }
+
+  /**
+   * Shared submit pipeline for any single-account transaction: load the account
+   * sequence and current ledger, fill the common fields, sign through the
+   * external signer, submit, and await validation. `fields` carries the
+   * type-specific body (Payment `Amount`, TrustSet `LimitAmount`, ...).
+   */
+  private async submitTransaction(
+    fields: Record<string, unknown>,
+    from: string,
     signer: Signer,
   ): Promise<TxResult> {
     const accountInfo = await this.rpc.request<AccountInfoResult>('account_info', {
@@ -264,12 +307,10 @@ export class XrplAdapter implements ChainAdapter {
 
     let blob: string;
     try {
-      blob = await this.signPayment(
+      blob = await this.signTransaction(
         {
-          TransactionType: 'Payment',
+          ...fields,
           Account: from,
-          Destination: to,
-          Amount: amount,
           Fee: BASE_FEE_DROPS,
           Sequence: accountInfo.account_data.Sequence,
           LastLedgerSequence: lastLedgerSequence,
@@ -323,7 +364,7 @@ export class XrplAdapter implements ChainAdapter {
    * External-signer pipeline: serialize for signing, sha512-half digest,
    * sign through the keyring Signer, then attach the DER signature.
    */
-  private async signPayment(tx: Record<string, unknown>, signer: Signer): Promise<string> {
+  private async signTransaction(tx: Record<string, unknown>, signer: Signer): Promise<string> {
     tx.SigningPubKey = bytesToHex(signer.publicKey).toUpperCase();
     const digest = sha512half(hexToBytes(encodeForSigning(tx)));
     const { signature } = await signer.signDigest(digest);
