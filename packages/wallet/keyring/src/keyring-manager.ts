@@ -1,17 +1,21 @@
-import type { Signer } from '@flama/chain-core';
-import { HDKey } from '@scure/bip32';
-import { mnemonicToSeedSync, validateMnemonic } from '@scure/bip39';
-import { wordlist } from '@scure/bip39/wordlists/english';
-import { InvalidMnemonicError, WalletNotFoundError } from './errors';
-import { Secp256k1Signer } from './signer';
-import type { SecureStorage } from './storage';
+import type { Signer } from "@flama/chain-core";
+import { HDKey } from "@scure/bip32";
+import {
+  generateMnemonic,
+  mnemonicToSeedSync,
+  validateMnemonic,
+} from "@scure/bip39";
+import { wordlist } from "@scure/bip39/wordlists/english";
+import { InvalidMnemonicError, WalletNotFoundError } from "./errors";
+import { Secp256k1Signer } from "./signer";
+import type { SecureStorage } from "./storage";
 
-const VAULT_KEY = 'flama.wallet.vault';
+const VAULT_KEY = "flama.wallet.vault";
 
 interface VaultWallet {
   id: string;
   name: string;
-  type: 'hd';
+  type: "hd";
   mnemonic: string;
 }
 
@@ -23,7 +27,7 @@ interface Vault {
 export interface WalletMeta {
   id: string;
   name: string;
-  type: 'hd';
+  type: "hd";
 }
 
 const emptyVault = (): Vault => ({ version: 1, wallets: [] });
@@ -57,8 +61,16 @@ export class KeyringManager {
     return this.vault.wallets.map(({ id, name, type }) => ({ id, name, type }));
   }
 
+  /**
+   * Generates a fresh BIP-39 recovery phrase. Nothing is persisted — call
+   * {@link importMnemonic} once the user has backed it up.
+   */
+  generateMnemonic(wordCount: 12 | 24 = 12): string {
+    return generateMnemonic(wordlist, wordCount === 24 ? 256 : 128);
+  }
+
   async importMnemonic(mnemonic: string, name?: string): Promise<WalletMeta> {
-    const normalized = mnemonic.trim().toLowerCase().split(/\s+/).join(' ');
+    const normalized = mnemonic.trim().toLowerCase().split(/\s+/).join(" ");
     if (!validateMnemonic(normalized, wordlist)) {
       throw new InvalidMnemonicError();
     }
@@ -66,7 +78,7 @@ export class KeyringManager {
     const wallet: VaultWallet = {
       id: `wallet-${ordinal}`,
       name: name ?? `Wallet ${ordinal}`,
-      type: 'hd',
+      type: "hd",
       mnemonic: normalized,
     };
     this.vault.wallets.push(wallet);

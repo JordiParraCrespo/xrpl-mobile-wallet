@@ -1,10 +1,19 @@
-import { type Balance, type ChainRegistry, parseUnits, type TxResult } from '@flama/chain-core';
-import { derivationPath, InvalidMnemonicError, type KeyringManager } from '@flama/wallet-keyring';
-import { inject, injectable } from 'inversify';
-import { TOKENS } from '../../di/tokens';
-import { AppError } from '../core/errors';
-import { WalletErrors } from './wallet.errors';
-import type { WalletAccount, WalletStore } from './wallet.state';
+import {
+  type Balance,
+  type ChainRegistry,
+  parseUnits,
+  type TxResult,
+} from "@flama/chain-core";
+import {
+  derivationPath,
+  InvalidMnemonicError,
+  type KeyringManager,
+} from "@flama/wallet-keyring";
+import { inject, injectable } from "inversify";
+import { TOKENS } from "../../di/tokens";
+import { AppError } from "../core/errors";
+import { WalletErrors } from "./wallet.errors";
+import type { WalletAccount, WalletStore } from "./wallet.state";
 
 @injectable()
 export class WalletService {
@@ -21,6 +30,11 @@ export class WalletService {
   async restore(): Promise<void> {
     await this.keyring.restore();
     this.refreshAccounts();
+  }
+
+  /** Generates a fresh recovery phrase. Persists nothing until {@link importMnemonic}. */
+  generateMnemonic(wordCount: 12 | 24 = 12): string {
+    return this.keyring.generateMnemonic(wordCount);
   }
 
   async importMnemonic(mnemonic: string): Promise<void> {
@@ -48,7 +62,10 @@ export class WalletService {
       throw new AppError(WalletErrors.INVALID_ADDRESS);
     }
     const wallet = this.requireWallet();
-    const signer = this.keyring.getSigner(wallet.id, derivationPath(adapter.config.kind, 0));
+    const signer = this.keyring.getSigner(
+      wallet.id,
+      derivationPath(adapter.config.kind, 0),
+    );
     return adapter.transfer(
       {
         from: account.address,
@@ -67,11 +84,14 @@ export class WalletService {
   private refreshAccounts(): void {
     const wallet = this.keyring.getWallets()[0];
     if (!wallet) {
-      this.store.setState({ status: 'no_wallet', accounts: [] });
+      this.store.setState({ status: "no_wallet", accounts: [] });
       return;
     }
     const accounts: WalletAccount[] = this.chains.list().map((adapter) => {
-      const signer = this.keyring.getSigner(wallet.id, derivationPath(adapter.config.kind, 0));
+      const signer = this.keyring.getSigner(
+        wallet.id,
+        derivationPath(adapter.config.kind, 0),
+      );
       return {
         chainId: adapter.config.chainId,
         kind: adapter.config.kind,
@@ -80,11 +100,13 @@ export class WalletService {
         address: adapter.deriveAddress(signer.publicKey),
       };
     });
-    this.store.setState({ status: 'ready', accounts });
+    this.store.setState({ status: "ready", accounts });
   }
 
   private getAccount(chainId: string): WalletAccount {
-    const account = this.store.getState().accounts.find((a) => a.chainId === chainId);
+    const account = this.store
+      .getState()
+      .accounts.find((a) => a.chainId === chainId);
     if (!account) {
       throw new AppError(WalletErrors.UNKNOWN_CHAIN);
     }
