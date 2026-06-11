@@ -8,16 +8,12 @@ import * as Clipboard from 'expo-clipboard';
 import { useRouter } from 'expo-router';
 import { ClipboardPaste } from 'lucide-react-native';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { OnboardingStepScreen } from '../../components/auth/onboarding-step-screen';
 import { buildRoute } from '../../lib/routes';
 
 type WordCount = 12 | 24;
-
-const COUNT_OPTIONS = [
-  { value: '12', label: '12 words' },
-  { value: '24', label: '24 words' },
-];
 
 const emptyWords = (count: WordCount) => Array.from({ length: count }, () => '');
 
@@ -26,6 +22,7 @@ const validateWord = (word: string): boolean | null => (word ? isValidMnemonicWo
 
 export default function ImportPhraseScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [wordCount, setWordCount] = React.useState<WordCount>(12);
   const [words, setWords] = React.useState<string[]>(() => emptyWords(12));
 
@@ -60,26 +57,29 @@ export default function ImportPhraseScreen() {
   return (
     <OnboardingStepScreen
       step={2}
-      title="Enter your recovery phrase"
-      subtitle="Type or paste your words in order. Pasting fills every field at once."
+      title={t('onboarding.importPhrase.title')}
+      subtitle={t('onboarding.importPhrase.subtitle')}
       cta={{
         label: importWallet.isPending
-          ? 'Importing…'
+          ? t('onboarding.common.importing')
           : allValid
-            ? 'Continue'
-            : `${filled} of ${wordCount} words`,
+            ? t('onboarding.common.continue')
+            : t('onboarding.importPhrase.ctaProgress', { filled, total: wordCount }),
         disabled: !allValid || importWallet.isPending,
         onPress: confirm,
       }}
     >
       <View className="mt-5 mb-4 flex-row items-center justify-between gap-3">
         <SegmentedControl
-          options={COUNT_OPTIONS}
+          options={[
+            { value: '12', label: t('onboarding.common.words12') },
+            { value: '24', label: t('onboarding.common.words24') },
+          ]}
           value={String(wordCount)}
           onValueChange={setCount}
         />
         <Chip size="sm" icon={ClipboardPaste} onPress={pasteFromClipboard}>
-          Paste
+          {t('onboarding.common.paste')}
         </Chip>
       </View>
 
@@ -89,13 +89,11 @@ export default function ImportPhraseScreen() {
         {anyInvalid || importWallet.isError ? (
           <Callout variant="negative">
             {importWallet.isError
-              ? "That phrase couldn't be imported. Check the words and their order, then try again."
-              : "That doesn't look like a valid phrase. Check the highlighted words and their order."}
+              ? t('onboarding.importPhrase.errorImport')
+              : t('onboarding.importPhrase.errorInvalid')}
           </Callout>
         ) : (
-          <Callout variant="neutral">
-            Stored encrypted on this device. Your phrase never leaves it.
-          </Callout>
+          <Callout variant="neutral">{t('onboarding.importPhrase.securityNote')}</Callout>
         )}
       </View>
     </OnboardingStepScreen>

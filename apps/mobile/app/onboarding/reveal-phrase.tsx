@@ -6,18 +6,15 @@ import { Text } from '@flama/design-system-mobile/text';
 import { useRouter } from 'expo-router';
 import { Eye } from 'lucide-react-native';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import { useCreateWallet, type WordCount } from '../../components/auth/create-wallet';
 import { OnboardingStepScreen } from '../../components/auth/onboarding-step-screen';
 import { Routes } from '../../lib/routes';
 
-const COUNT_OPTIONS = [
-  { value: '12', label: '12 words' },
-  { value: '24', label: '24 words' },
-];
-
 export default function RevealPhraseScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { words, wordCount, generate } = useCreateWallet();
   const [revealed, setRevealed] = React.useState(false);
 
@@ -36,17 +33,22 @@ export default function RevealPhraseScreen() {
   return (
     <OnboardingStepScreen
       step={2}
-      title="Your recovery phrase"
-      subtitle="Write these words down in order and keep them somewhere safe."
+      title={t('onboarding.revealPhrase.title')}
+      subtitle={t('onboarding.revealPhrase.subtitle')}
       cta={{
-        label: revealed ? "I've saved my phrase" : 'Reveal to continue',
+        label: revealed
+          ? t('onboarding.revealPhrase.ctaSaved')
+          : t('onboarding.revealPhrase.ctaReveal'),
         disabled: !revealed,
         onPress: () => router.push(Routes.OnboardingBackupQuiz),
       }}
     >
       <SegmentedControl
         className="mt-5"
-        options={COUNT_OPTIONS}
+        options={[
+          { value: '12', label: t('onboarding.common.words12') },
+          { value: '24', label: t('onboarding.common.words24') },
+        ]}
         value={String(wordCount)}
         onValueChange={setCount}
       />
@@ -62,13 +64,15 @@ export default function RevealPhraseScreen() {
             <View className="h-11 w-11 items-center justify-center rounded-full bg-foreground">
               <Icon as={Eye} size={20} className="text-background" />
             </View>
-            <Text className="text-sm font-semibold text-foreground">Tap to reveal</Text>
+            <Text className="text-sm font-semibold text-foreground">
+              {t('onboarding.revealPhrase.tapToReveal')}
+            </Text>
           </Pressable>
         ) : null}
       </View>
 
       <Callout variant="warning" className="mt-4">
-        Never screenshot or share these words. Drops support will never ask for them.
+        {t('onboarding.revealPhrase.warning')}
       </Callout>
     </OnboardingStepScreen>
   );

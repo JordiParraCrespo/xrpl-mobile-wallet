@@ -2,6 +2,7 @@ import { Button } from '@flama/design-system-mobile/button';
 import { Text } from '@flama/design-system-mobile/text';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
 import { ImageBackground, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
@@ -15,6 +16,7 @@ const INK = '#080610';
 export default function WelcomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   return (
     <View className="flex-1 bg-[#0a0812]">
@@ -59,7 +61,9 @@ export default function WelcomeScreen() {
               className="w-full bg-white active:bg-white/90"
               onPress={() => router.push(Routes.OnboardingSecureIntro)}
             >
-              <Text className="text-[15px] font-semibold text-[#0a0812]">Create a new wallet</Text>
+              <Text className="text-[15px] font-semibold text-[#0a0812]">
+                {t('onboarding.welcome.create')}
+              </Text>
             </Button>
 
             <Button
@@ -68,11 +72,11 @@ export default function WelcomeScreen() {
               className="w-full"
               onPress={() => router.push(Routes.OnboardingImport)}
             >
-              <Text>Import existing wallet</Text>
+              <Text>{t('onboarding.welcome.import')}</Text>
             </Button>
 
             <Text className="mt-1.5 text-center text-xs leading-[17px] text-white/60">
-              By continuing you agree to the Terms & Privacy Policy.
+              {t('onboarding.welcome.legal')}
             </Text>
           </View>
         </View>

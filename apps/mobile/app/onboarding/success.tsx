@@ -10,6 +10,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ArrowRight, Info, Link2 } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Routes } from '../../lib/routes';
@@ -21,11 +22,13 @@ import { Routes } from '../../lib/routes';
 export default function OnboardingSuccessScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { via } = useLocalSearchParams<{ via?: string }>();
   const { accounts, wallets, activeWalletId } = useWalletState();
 
   const phrase = via !== 'xrpl';
-  const walletName = wallets.find((w) => w.id === activeWalletId)?.name ?? 'Account 1';
+  const walletName =
+    wallets.find((w) => w.id === activeWalletId)?.name ?? t('onboarding.success.defaultWalletName');
 
   return (
     <View className="flex-1 bg-[#08060f]">
@@ -40,12 +43,10 @@ export default function OnboardingSuccessScreen() {
         <View className="items-center gap-3.5">
           <SuccessTick variant="glass" size={72} />
           <Text className="font-display text-[34px] tracking-[-0.5px] text-white">
-            You're all set
+            {t('onboarding.success.title')}
           </Text>
           <Text className="max-w-[300px] text-center text-[15.5px] leading-6 text-white/80">
-            {phrase
-              ? 'Your recovery phrase unlocks the same identity on every XRPL chain.'
-              : 'Your XRP Ledger account is ready to go.'}
+            {phrase ? t('onboarding.success.subtitlePhrase') : t('onboarding.success.subtitleXrpl')}
           </Text>
         </View>
 
@@ -56,7 +57,7 @@ export default function OnboardingSuccessScreen() {
                 {walletName.toUpperCase()}
               </Text>
               <Text className="text-xs text-white/60">
-                {accounts.length} {accounts.length === 1 ? 'network' : 'networks'}
+                {t('onboarding.success.networks', { count: accounts.length })}
               </Text>
             </View>
             {accounts.map((account) => (
@@ -82,8 +83,8 @@ export default function OnboardingSuccessScreen() {
             <Icon as={phrase ? Link2 : Info} size={15} className="mt-0.5 shrink-0 text-white/65" />
             <Text className="flex-1 text-[13px] leading-5 text-white/65">
               {phrase
-                ? 'Both addresses are derived from the same recovery phrase — one identity, every chain.'
-                : "The XRPL EVM sidechain isn't available for this import method. Import a recovery phrase to add it."}
+                ? t('onboarding.success.footnotePhrase')
+                : t('onboarding.success.footnoteXrpl')}
             </Text>
           </View>
         </View>
@@ -93,7 +94,9 @@ export default function OnboardingSuccessScreen() {
           className="w-full bg-white active:bg-white/90"
           onPress={() => router.replace(Routes.Home)}
         >
-          <Text className="text-[15px] font-semibold text-[#0a0812]">Open my wallet</Text>
+          <Text className="text-[15px] font-semibold text-[#0a0812]">
+            {t('onboarding.success.cta')}
+          </Text>
           <Icon as={ArrowRight} size={18} className="text-[#0a0812]" />
         </Button>
       </View>

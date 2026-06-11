@@ -10,6 +10,7 @@ import {
 import { useImportSecretNumbers } from '@flama/frontend/react';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { OnboardingStepScreen } from '../../components/auth/onboarding-step-screen';
 import { buildRoute } from '../../lib/routes';
@@ -22,6 +23,7 @@ const validateRow = (row: string, index: number): boolean | null => {
 
 export default function ImportSecretNumbersScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [rows, setRows] = React.useState<string[]>(() =>
     Array.from({ length: SECRET_NUMBERS_ROW_COUNT }, () => ''),
   );
@@ -41,15 +43,17 @@ export default function ImportSecretNumbersScreen() {
   return (
     <OnboardingStepScreen
       step={2}
-      title="Enter your secret numbers"
+      title={t('onboarding.importSecretNumbers.title')}
       titleBadge={
         <Badge variant="secondary">
-          <Text>XRP Ledger only</Text>
+          <Text>{t('onboarding.common.xrplOnly')}</Text>
         </Badge>
       }
-      subtitle="Eight rows of six digits, as shown in your backup. Each row checks itself as you type."
+      subtitle={t('onboarding.importSecretNumbers.subtitle')}
       cta={{
-        label: importNumbers.isPending ? 'Importing…' : 'Continue',
+        label: importNumbers.isPending
+          ? t('onboarding.common.importing')
+          : t('onboarding.common.continue'),
         disabled: !allValid || importNumbers.isPending,
         onPress: confirm,
       }}
@@ -62,14 +66,11 @@ export default function ImportSecretNumbersScreen() {
         {anyBad || importNumbers.isError ? (
           <Callout variant="negative">
             {importNumbers.isError
-              ? "Those numbers couldn't be imported. Re-check them against your backup and try again."
-              : "One or more rows don't add up. A red row means a digit is off — re-check it against your backup."}
+              ? t('onboarding.importSecretNumbers.errorImport')
+              : t('onboarding.importSecretNumbers.errorInvalid')}
           </Callout>
         ) : (
-          <Callout variant="neutral">
-            Each row carries its own checksum, so typos are caught instantly. Nothing leaves this
-            device.
-          </Callout>
+          <Callout variant="neutral">{t('onboarding.importSecretNumbers.securityNote')}</Callout>
         )}
       </View>
     </OnboardingStepScreen>

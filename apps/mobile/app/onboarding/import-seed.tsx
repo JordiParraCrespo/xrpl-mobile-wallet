@@ -10,12 +10,14 @@ import * as Clipboard from 'expo-clipboard';
 import { useRouter } from 'expo-router';
 import { CircleCheck, ClipboardPaste, Eye, EyeOff } from 'lucide-react-native';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, View } from 'react-native';
 import { OnboardingStepScreen } from '../../components/auth/onboarding-step-screen';
 import { buildRoute } from '../../lib/routes';
 
 export default function ImportSeedScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [seed, setSeed] = React.useState('');
   const [show, setShow] = React.useState(false);
 
@@ -41,15 +43,17 @@ export default function ImportSeedScreen() {
   return (
     <OnboardingStepScreen
       step={2}
-      title="Enter your family seed"
+      title={t('onboarding.importSeed.title')}
       titleBadge={
         <Badge variant="secondary">
-          <Text>XRP Ledger only</Text>
+          <Text>{t('onboarding.common.xrplOnly')}</Text>
         </Badge>
       }
-      subtitle="Your secret seed begins with s or sEd. It restores your XRP Ledger account only."
+      subtitle={t('onboarding.importSeed.subtitle')}
       cta={{
-        label: importSeed.isPending ? 'Importing…' : 'Continue',
+        label: importSeed.isPending
+          ? t('onboarding.common.importing')
+          : t('onboarding.common.continue'),
         disabled: !valid || importSeed.isPending,
         onPress: confirm,
       }}
@@ -75,7 +79,9 @@ export default function ImportSeedScreen() {
         <Pressable
           onPress={() => setShow((s) => !s)}
           accessibilityRole="button"
-          accessibilityLabel={show ? 'Hide seed' : 'Show seed'}
+          accessibilityLabel={
+            show ? t('onboarding.importSeed.hide') : t('onboarding.importSeed.show')
+          }
           className="h-9 w-9 items-center justify-center rounded-full bg-secondary active:scale-[0.97]"
         >
           <Icon as={show ? EyeOff : Eye} size={17} className="text-foreground" />
@@ -85,7 +91,7 @@ export default function ImportSeedScreen() {
       <View className="mt-3 flex-row items-center justify-between">
         <Text className="font-mono text-[12.5px] text-muted-foreground">s… · sEd…</Text>
         <Chip size="sm" icon={ClipboardPaste} onPress={pasteFromClipboard}>
-          Paste
+          {t('onboarding.common.paste')}
         </Chip>
       </View>
 
@@ -93,13 +99,11 @@ export default function ImportSeedScreen() {
         {invalid || importSeed.isError ? (
           <Callout variant="negative">
             {importSeed.isError
-              ? "That seed couldn't be imported. Double-check it and try again."
-              : "This isn't a valid family seed. It should start with s or sEd and contain only base58 characters."}
+              ? t('onboarding.importSeed.errorImport')
+              : t('onboarding.importSeed.errorInvalid')}
           </Callout>
         ) : (
-          <Callout variant="neutral">
-            Stored encrypted on this device. Your seed never leaves it.
-          </Callout>
+          <Callout variant="neutral">{t('onboarding.importSeed.securityNote')}</Callout>
         )}
       </View>
     </OnboardingStepScreen>
