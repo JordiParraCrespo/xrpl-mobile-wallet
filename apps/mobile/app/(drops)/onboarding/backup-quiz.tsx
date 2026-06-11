@@ -2,6 +2,7 @@ import { Callout } from '@flama/design-system-mobile/callout';
 import { useImportWallet } from '@flama/frontend/react';
 import { Redirect, useRouter } from 'expo-router';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { useCreateWallet } from '../../../components/auth/create-wallet';
 import { OnboardingStepScreen } from '../../../components/auth/onboarding-step-screen';
@@ -33,6 +34,7 @@ function buildQuiz(words: string[]): Question[] {
 
 export default function BackupQuizScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { words, reset } = useCreateWallet();
 
   const quiz = React.useMemo(() => (words ? buildQuiz(words) : []), [words]);
@@ -61,14 +63,14 @@ export default function BackupQuizScreen() {
   return (
     <OnboardingStepScreen
       step={3}
-      title="Confirm your backup"
-      subtitle="Tap the right word for each position to prove you've saved your phrase."
+      title={t('onboarding.backupQuiz.title')}
+      subtitle={t('onboarding.backupQuiz.subtitle')}
       cta={{
         label: importWallet.isPending
-          ? 'Creating wallet…'
+          ? t('onboarding.backupQuiz.ctaPending')
           : allCorrect
-            ? 'Confirm & finish'
-            : 'Select each word',
+            ? t('onboarding.backupQuiz.ctaConfirm')
+            : t('onboarding.backupQuiz.ctaSelect'),
         disabled: !allCorrect || importWallet.isPending,
         onPress: confirm,
       }}
@@ -77,7 +79,9 @@ export default function BackupQuizScreen() {
         {quiz.map((q) => (
           <QuizQuestion
             key={q.index}
-            index={q.index}
+            label={t('onboarding.backupQuiz.wordLabel', {
+              position: q.index + 1,
+            })}
             choices={q.choices}
             correct={q.correct}
             selected={answers[q.index]}
@@ -90,13 +94,11 @@ export default function BackupQuizScreen() {
         {anyWrong || importWallet.isError ? (
           <Callout variant="negative">
             {importWallet.isError
-              ? 'Something went wrong creating your wallet. Please try again.'
-              : "That's not the right word for that position. Check your written backup and try again."}
+              ? t('onboarding.backupQuiz.errorImport')
+              : t('onboarding.backupQuiz.errorWrongWord')}
           </Callout>
         ) : (
-          <Callout variant="neutral">
-            Almost there. Confirming proves your phrase is safely written down.
-          </Callout>
+          <Callout variant="neutral">{t('onboarding.backupQuiz.reassurance')}</Callout>
         )}
       </View>
     </OnboardingStepScreen>

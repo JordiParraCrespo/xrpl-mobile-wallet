@@ -136,5 +136,18 @@
     "label": "Language",
     "en": "English",
     "es": "Español"
+  },
+  "onboarding": {
+    "backupQuiz": {
+      "title": "Confirm your backup",
+      "subtitle": "Tap the right word for each position to prove you've saved your phrase.",
+      "wordLabel": "Word #{{position}}",
+      "ctaSelect": "Select each word",
+      "ctaConfirm": "Confirm & finish",
+      "ctaPending": "Creating wallet…",
+      "errorWrongWord": "That's not the right word for that position. Check your written backup and try again.",
+      "errorImport": "Something went wrong creating your wallet. Please try again.",
+      "reassurance": "Almost there. Confirming proves your phrase is safely written down."
+    }
   }
 }
