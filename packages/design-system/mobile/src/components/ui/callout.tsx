@@ -33,7 +33,9 @@ const calloutVariants = cva(
   },
 );
 
-const calloutTextVariants = cva("flex-1 text-[13px] leading-[19px]", {
+// Layout classes must stay out of this cva: it feeds TextClassContext,
+// which Icon also consumes — a flex-1 here stretches the icon's SVG.
+const calloutTextVariants = cva("text-[13px] leading-[19px]", {
   variants: {
     variant: {
       neutral: "text-muted-foreground",
@@ -96,7 +98,9 @@ function Callout({
           size={18}
           className={calloutIconVariants({ variant })}
         />
-        {typeof children === "string" ? <Text>{children}</Text> : children}
+        <View className="flex-1">
+          {typeof children === "string" ? <Text>{children}</Text> : children}
+        </View>
       </View>
     </TextClassContext.Provider>
   );
