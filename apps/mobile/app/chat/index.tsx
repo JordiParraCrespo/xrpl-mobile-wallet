@@ -1,11 +1,11 @@
-import { useRouter } from "expo-router";
-import { KeyboardAvoidingView, Platform, View } from "react-native";
-import { ChatComposer } from "../../components/chat/chat-composer";
-import { ChatHeader } from "../../components/chat/chat-header";
-import { ChatThread } from "../../components/chat/chat-thread";
-import { SessionsDrawer } from "../../components/chat/sessions-drawer";
-import { useChatFlow } from "../../components/chat/use-chat-flow";
-import { Routes } from "../../lib/routes";
+import { useRouter } from 'expo-router';
+import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { ChatComposer } from '../../components/chat/chat-composer';
+import { ChatHeader } from '../../components/chat/chat-header';
+import { ChatThread } from '../../components/chat/chat-thread';
+import { SessionsDrawer } from '../../components/chat/sessions-drawer';
+import { useChatFlow } from '../../components/chat/use-chat-flow';
+import { Routes } from '../../lib/routes';
 
 // Dewy — the wallet assistant (chat.html). A full-screen, tool-using chat:
 // text + user bubbles, AskUserQuestions chips, approve/decline action cards,
@@ -28,7 +28,7 @@ export default function ChatScreen() {
     <View className="bg-background flex-1">
       <KeyboardAvoidingView
         className="flex-1"
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ChatHeader
           onClose={close}
