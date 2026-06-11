@@ -10,22 +10,17 @@ import {
 
 configureReanimatedLogger({ level: ReanimatedLogLevel.warn, strict: false });
 
-import {
-  FlamaProvider,
-  useAuthState,
-  useSessionRestore,
-} from "@flama/frontend/react";
+import { FlamaProvider, useSessionRestore } from "@flama/frontend/react";
 import { ThemeProvider } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Slot, SplashScreen, useRouter, useSegments } from "expo-router";
+import { Slot, SplashScreen } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme, vars } from "nativewind";
 import * as React from "react";
 import { View } from "react-native";
 import { app } from "../lib/flama";
 import { queryClient } from "../lib/query";
-import { Routes } from "../lib/routes";
 import { NAV_THEME } from "../lib/theme";
 import { useLoadFonts } from "../lib/use-load-fonts";
 
@@ -52,7 +47,7 @@ export default function RootLayout() {
             }
           >
             <StatusBar style={isDark ? "light" : "dark"} />
-            <AuthGate />
+            <SessionGate />
             <PortalHost />
           </View>
         </ThemeProvider>
@@ -61,31 +56,15 @@ export default function RootLayout() {
   );
 }
 
-function AuthGate() {
-  const { isAuthenticated } = useAuthState();
+function SessionGate() {
+  // Drops is self-custody — there is no email login to gate on, so this just
+  // holds the splash until the (better-auth) session has restored.
   const { isLoading } = useSessionRestore();
-  const segments = useSegments();
-  const router = useRouter();
 
   React.useEffect(() => {
-    if (isLoading) return;
+    if (!isLoading) SplashScreen.hideAsync();
+  }, [isLoading]);
 
-    // Session restored — fonts are already in, so drop the splash.
-    SplashScreen.hideAsync();
-
-    const group = segments[0];
-
-    // The Drops wallet flow ((drops)) and the entry route are the front door —
-    // self-custody onboarding, no email login required. Only the Flama demo
-    // area ((app)) requires an authenticated session.
-    if (!isAuthenticated && group === "(app)") {
-      router.replace(Routes.AuthLogin);
-    } else if (isAuthenticated && group === "(auth)") {
-      router.replace(Routes.App);
-    }
-  }, [isAuthenticated, isLoading, segments, router]);
-
-  // Keep the splash up while the session restores (no spinner flash).
   if (isLoading) return null;
 
   return <Slot />;

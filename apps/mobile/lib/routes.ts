@@ -8,12 +8,6 @@ import type { Href } from "expo-router";
  * `[param]` template here; use the `buildRoute` helpers below to fill them in.
  */
 export enum Routes {
-  // Auth
-  AuthLogin = "/(auth)/login",
-  AuthRegister = "/(auth)/register",
-  AuthForgotPassword = "/(auth)/forgot-password",
-  AuthResetPassword = "/(auth)/reset-password",
-
   // App (Flama demo + wallet)
   App = "/(app)",
   Wallet = "/(app)/wallet",
