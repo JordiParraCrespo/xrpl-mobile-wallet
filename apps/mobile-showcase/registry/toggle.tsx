@@ -1,7 +1,19 @@
-import { Text } from '@flama/design-system-mobile/text';
-import { Toggle } from '@flama/design-system-mobile/toggle';
-import * as React from 'react';
-import { ScrollView, View } from 'react-native';
+import { Text } from "@flama/design-system-mobile/text";
+import { Toggle } from "@flama/design-system-mobile/toggle";
+import * as React from "react";
+import { ScrollView, View } from "react-native";
+
+type ToggleProps = React.ComponentProps<typeof Toggle>;
+
+function DemoToggle({
+  defaultPressed = false,
+  ...props
+}: Omit<ToggleProps, "pressed" | "onPressedChange"> & {
+  defaultPressed?: boolean;
+}) {
+  const [pressed, setPressed] = React.useState(defaultPressed);
+  return <Toggle pressed={pressed} onPressedChange={setPressed} {...props} />;
+}
 
 export default function ToggleScreen() {
   return (
@@ -9,53 +21,53 @@ export default function ToggleScreen() {
       <View className="gap-2">
         <Text className="text-lg font-semibold text-foreground">Default</Text>
         <View className="flex-row gap-3">
-          <Toggle>
+          <DemoToggle defaultPressed>
             <Text>B</Text>
-          </Toggle>
-          <Toggle>
+          </DemoToggle>
+          <DemoToggle>
             <Text>I</Text>
-          </Toggle>
-          <Toggle>
+          </DemoToggle>
+          <DemoToggle>
             <Text>U</Text>
-          </Toggle>
+          </DemoToggle>
         </View>
       </View>
 
       <View className="gap-2">
         <Text className="text-lg font-semibold text-foreground">Outline</Text>
         <View className="flex-row gap-3">
-          <Toggle variant="outline">
+          <DemoToggle variant="outline">
             <Text>B</Text>
-          </Toggle>
-          <Toggle variant="outline">
+          </DemoToggle>
+          <DemoToggle variant="outline">
             <Text>I</Text>
-          </Toggle>
-          <Toggle variant="outline">
+          </DemoToggle>
+          <DemoToggle variant="outline">
             <Text>U</Text>
-          </Toggle>
+          </DemoToggle>
         </View>
       </View>
 
       <View className="gap-2">
         <Text className="text-lg font-semibold text-foreground">Sizes</Text>
         <View className="flex-row gap-3 items-center">
-          <Toggle size="sm">
+          <DemoToggle size="sm">
             <Text>sm</Text>
-          </Toggle>
-          <Toggle size="default">
+          </DemoToggle>
+          <DemoToggle size="default">
             <Text>md</Text>
-          </Toggle>
-          <Toggle size="lg">
+          </DemoToggle>
+          <DemoToggle size="lg">
             <Text>lg</Text>
-          </Toggle>
+          </DemoToggle>
         </View>
       </View>
 
       <View className="gap-2">
         <Text className="text-lg font-semibold text-foreground">Disabled</Text>
-        <Toggle disabled>
+        <DemoToggle disabled>
           <Text>Disabled</Text>
-        </Toggle>
+        </DemoToggle>
       </View>
     </ScrollView>
   );

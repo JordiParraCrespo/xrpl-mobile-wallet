@@ -57,6 +57,8 @@ type AmountTextProps = Omit<React.ComponentProps<typeof View>, "children"> &
     signed?: boolean;
     tone?: "auto" | "default" | "positive" | "negative" | "muted";
     decimals?: number;
+    /** Render the amount in mono medium (list rows) instead of serif. */
+    mono?: boolean;
   };
 
 function formatAmount(value: number | string, decimals: number) {
@@ -75,6 +77,7 @@ function AmountText({
   tone = "auto",
   size,
   decimals = 2,
+  mono = false,
   className,
   ...props
 }: AmountTextProps) {
@@ -91,7 +94,12 @@ function AmountText({
   const sign = signed ? (isNegative ? "−" : "+") : "";
   return (
     <View className={cn("flex-row items-baseline gap-1", className)} {...props}>
-      <Text className={amountTextVariants({ tone: resolvedTone, size })}>
+      <Text
+        className={cn(
+          amountTextVariants({ tone: resolvedTone, size }),
+          mono && "font-mono font-medium",
+        )}
+      >
         {sign}
         {formatAmount(value, decimals)}
       </Text>
