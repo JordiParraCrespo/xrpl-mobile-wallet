@@ -1,10 +1,13 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import * as React from "react";
 import { Platform, Pressable } from "react-native";
 import { cn } from "../../lib/utils";
+import { GlassBackdrop } from "./glass-panel";
 import { TextClassContext } from "./text";
 
 // Drops buttons are pills: dark ink by default, `brand` (indigo) is
-// reserved for the money-action, `secondary` is the soft neutral pill.
+// reserved for the money-action, `secondary` is the soft neutral pill,
+// `glass` is the ghost-on-dark pill for gradient / dark heroes.
 // Surfaces are flat — no shadows; press feedback is a gentle scale.
 const buttonVariants = cva(
   cn(
@@ -31,7 +34,7 @@ const buttonVariants = cva(
           }),
         ),
         outline: cn(
-          "border-border bg-transparent active:bg-muted border",
+          "border-foreground/25 bg-transparent active:bg-muted border",
           Platform.select({
             web: "hover:bg-muted",
           }),
@@ -43,6 +46,10 @@ const buttonVariants = cva(
         ghost: cn(
           "active:bg-accent dark:active:bg-accent/50",
           Platform.select({ web: "hover:bg-accent dark:hover:bg-accent/50" }),
+        ),
+        glass: cn(
+          "overflow-hidden border border-white/45 bg-white/10 active:bg-white/20",
+          Platform.select({ web: "hover:bg-white/20" }),
         ),
         link: "",
       },
@@ -77,6 +84,7 @@ const buttonTextVariants = cva(
         ),
         secondary: "text-secondary-foreground",
         ghost: "group-active:text-accent-foreground",
+        glass: "text-white",
         link: cn(
           "text-brand group-active:underline",
           Platform.select({
@@ -98,10 +106,12 @@ const buttonTextVariants = cva(
   },
 );
 
-type ButtonProps = React.ComponentProps<typeof Pressable> &
-  VariantProps<typeof buttonVariants>;
+type ButtonProps = Omit<React.ComponentProps<typeof Pressable>, "children"> &
+  VariantProps<typeof buttonVariants> & {
+    children?: React.ReactNode;
+  };
 
-function Button({ className, variant, size, ...props }: ButtonProps) {
+function Button({ className, variant, size, children, ...props }: ButtonProps) {
   return (
     <TextClassContext.Provider value={buttonTextVariants({ variant, size })}>
       <Pressable
@@ -112,7 +122,10 @@ function Button({ className, variant, size, ...props }: ButtonProps) {
         )}
         role="button"
         {...props}
-      />
+      >
+        {variant === "glass" ? <GlassBackdrop /> : null}
+        {children}
+      </Pressable>
     </TextClassContext.Provider>
   );
 }

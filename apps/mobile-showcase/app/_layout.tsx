@@ -1,60 +1,97 @@
-import '../global.css';
-import 'react-native-gesture-handler';
-import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
+import "../global.css";
+import "react-native-gesture-handler";
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from "react-native-reanimated";
 
 configureReanimatedLogger({ level: ReanimatedLogLevel.warn, strict: false });
 
-import { ThemeProvider } from '@react-navigation/native';
-import { PortalHost } from '@rn-primitives/portal';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useColorScheme, vars } from 'nativewind';
-import * as React from 'react';
-import { Text, View } from 'react-native';
-import { NAV_THEME } from '../lib/theme';
+import { ThemeProvider } from "@react-navigation/native";
+import { PortalHost } from "@rn-primitives/portal";
+import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useColorScheme, vars } from "nativewind";
+import * as React from "react";
+import { Text, View } from "react-native";
+import { NAV_THEME } from "../lib/theme";
 
 export default function RootLayout() {
   const { colorScheme } = useColorScheme();
-  const theme = colorScheme === 'dark' ? darkVars : lightVars;
-  const isDark = colorScheme === 'dark';
+  const theme = colorScheme === "dark" ? darkVars : lightVars;
+  const isDark = colorScheme === "dark";
+
+  // Runtime loading so the Drops fonts work in Expo Go / without a
+  // rebuild. On iOS all Inter weights group under the "Inter" family
+  // (normalized name tables); dev builds also embed them natively via
+  // the expo-font config plugin, which gives Android full weight
+  // matching.
+  const [fontsLoaded] = useFonts({
+    ReferoTitle: require("../assets/fonts/ReferoTitle-Regular.ttf"),
+    Inter: require("../assets/fonts/Inter_400Regular.ttf"),
+    "Inter-Medium": require("../assets/fonts/Inter_500Medium.ttf"),
+    "Inter-SemiBold": require("../assets/fonts/Inter_600SemiBold.ttf"),
+    "Inter-Bold": require("../assets/fonts/Inter_700Bold.ttf"),
+    JetBrainsMono: require("../assets/fonts/JetBrainsMono_400Regular.ttf"),
+    "JetBrainsMono-Medium": require("../assets/fonts/JetBrainsMono_500Medium.ttf"),
+    "JetBrainsMono-SemiBold": require("../assets/fonts/JetBrainsMono_600SemiBold.ttf"),
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
-    <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+    <ThemeProvider value={NAV_THEME[colorScheme ?? "light"]}>
       <View
         style={vars(theme)}
-        className={isDark ? 'dark flex-1 bg-background' : 'flex-1 bg-background'}
+        className={
+          isDark ? "dark flex-1 bg-background" : "flex-1 bg-background"
+        }
       >
-        <StatusBar style={isDark ? 'light' : 'dark'} />
+        <StatusBar style={isDark ? "light" : "dark"} />
         <Stack
           screenOptions={{
             headerStyle: {
-              backgroundColor: isDark ? 'hsl(0 0% 3.9%)' : 'hsl(0 0% 100%)',
+              backgroundColor: isDark
+                ? "hsl(220 16.7% 7.1%)"
+                : "hsl(0 0% 100%)",
             },
-            headerTintColor: isDark ? 'hsl(0 0% 98%)' : 'hsl(0 0% 3.9%)',
+            headerTintColor: isDark ? "hsl(240 10% 96.1%)" : "hsl(220 13% 9%)",
             contentStyle: {
-              backgroundColor: isDark ? 'hsl(0 0% 3.9%)' : 'hsl(0 0% 100%)',
+              backgroundColor: isDark
+                ? "hsl(220 16.7% 7.1%)"
+                : "hsl(0 0% 100%)",
             },
             headerTitle(props) {
               const title =
-                typeof props.children === 'string'
+                typeof props.children === "string"
                   ? props.children
-                  : typeof props.children === 'number'
+                  : typeof props.children === "number"
                     ? String(props.children)
-                    : '';
+                    : "";
 
-              return <Text className="text-xl font-medium text-foreground">{title}</Text>;
+              return (
+                <Text className="font-display text-xl font-normal text-foreground">
+                  {title}
+                </Text>
+              );
             },
           }}
         >
           <Stack.Screen
             name="index"
             options={{
-              headerTitle: 'Showcase',
+              headerTitle: "Showcase",
               headerShadowVisible: false,
             }}
           />
-          <Stack.Screen name="buttons" options={{ headerTitle: 'Buttons' }} />
-          <Stack.Screen name="components/[slug]" options={{ headerTitle: 'Component' }} />
+          <Stack.Screen name="buttons" options={{ headerTitle: "Buttons" }} />
+          <Stack.Screen
+            name="components/[slug]"
+            options={{ headerTitle: "Component" }}
+          />
         </Stack>
         <PortalHost />
       </View>
@@ -62,48 +99,89 @@ export default function RootLayout() {
   );
 }
 
+// Drops design tokens — keep in sync with global.css.
 const lightVars = {
-  '--background': '0 0% 100%',
-  '--foreground': '0 0% 3.9%',
-  '--card': '0 0% 100%',
-  '--card-foreground': '0 0% 3.9%',
-  '--popover': '0 0% 100%',
-  '--popover-foreground': '0 0% 3.9%',
-  '--primary': '0 0% 9%',
-  '--primary-foreground': '0 0% 98%',
-  '--secondary': '0 0% 96.1%',
-  '--secondary-foreground': '0 0% 9%',
-  '--muted': '0 0% 96.1%',
-  '--muted-foreground': '0 0% 45.1%',
-  '--accent': '0 0% 96.1%',
-  '--accent-foreground': '0 0% 9%',
-  '--destructive': '0 84.2% 60.2%',
-  '--destructive-foreground': '0 0% 98%',
-  '--border': '0 0% 89.8%',
-  '--input': '0 0% 89.8%',
-  '--ring': '0 0% 63%',
-  '--radius': '0.625rem',
+  "--background": "0 0% 100%",
+  "--foreground": "220 13% 9%",
+  "--card": "0 0% 100%",
+  "--card-foreground": "220 13% 9%",
+  "--popover": "0 0% 100%",
+  "--popover-foreground": "220 13% 9%",
+  "--primary": "220 13% 9%",
+  "--primary-foreground": "0 0% 100%",
+  "--secondary": "240 14.3% 93.1%",
+  "--secondary-foreground": "220 13% 9%",
+  "--muted": "240 10% 96.1%",
+  "--muted-foreground": "210 9.3% 46.3%",
+  "--accent": "240 14.3% 93.1%",
+  "--accent-foreground": "220 13% 9%",
+  "--destructive": "0 73.8% 53.5%",
+  "--destructive-foreground": "0 0% 100%",
+  "--destructive-soft": "0 81% 95.9%",
+  "--destructive-soft-foreground": "0 65.4% 47.6%",
+  "--border": "228 9.8% 90%",
+  "--input": "228 9.8% 90%",
+  "--ring": "250 69.6% 56.1%",
+  "--radius": "1.25rem",
+  "--brand": "250 69.6% 56.1%",
+  "--brand-foreground": "0 0% 100%",
+  "--brand-soft": "245 86.7% 97.1%",
+  "--brand-soft-foreground": "250 57% 46.5%",
+  "--positive": "162 82.2% 39.6%",
+  "--positive-foreground": "0 0% 100%",
+  "--positive-soft": "155 51.5% 93.5%",
+  "--positive-soft-foreground": "162 88.4% 30.4%",
+  "--warning": "39 100% 48%",
+  "--warning-foreground": "0 0% 100%",
+  "--warning-soft": "37 100% 94.3%",
+  "--warning-soft-foreground": "34 91.7% 47.5%",
+  "--info": "217 89.9% 61%",
+  "--info-foreground": "0 0% 100%",
+  "--info-soft": "215 100% 95.3%",
+  "--info-soft-foreground": "218 74.1% 53.1%",
+  "--inverse": "220 13% 9%",
+  "--inverse-foreground": "0 0% 100%",
 } as const;
 
 const darkVars = {
-  '--background': '0 0% 3.9%',
-  '--foreground': '0 0% 98%',
-  '--card': '0 0% 3.9%',
-  '--card-foreground': '0 0% 98%',
-  '--popover': '0 0% 3.9%',
-  '--popover-foreground': '0 0% 98%',
-  '--primary': '0 0% 98%',
-  '--primary-foreground': '0 0% 9%',
-  '--secondary': '0 0% 14.9%',
-  '--secondary-foreground': '0 0% 98%',
-  '--muted': '0 0% 14.9%',
-  '--muted-foreground': '0 0% 63.9%',
-  '--accent': '0 0% 14.9%',
-  '--accent-foreground': '0 0% 98%',
-  '--destructive': '0 70.9% 59.4%',
-  '--destructive-foreground': '0 0% 98%',
-  '--border': '0 0% 14.9%',
-  '--input': '0 0% 14.9%',
-  '--ring': '300 0% 45%',
-  '--radius': '0.625rem',
+  "--background": "220 16.7% 7.1%",
+  "--foreground": "240 10% 96.1%",
+  "--card": "220 13% 9%",
+  "--card-foreground": "240 10% 96.1%",
+  "--popover": "220 13% 9%",
+  "--popover-foreground": "240 10% 96.1%",
+  "--primary": "0 0% 100%",
+  "--primary-foreground": "220 13% 9%",
+  "--secondary": "218 11.4% 13.7%",
+  "--secondary-foreground": "240 10% 96.1%",
+  "--muted": "218 11.4% 13.7%",
+  "--muted-foreground": "208 8.1% 58.6%",
+  "--accent": "218 11.4% 13.7%",
+  "--accent-foreground": "240 10% 96.1%",
+  "--destructive": "358 85.1% 60.4%",
+  "--destructive-foreground": "0 0% 100%",
+  "--destructive-soft": "0 50% 14%",
+  "--destructive-soft-foreground": "358 85% 78%",
+  "--border": "218 11.4% 13.7%",
+  "--input": "218 11.4% 13.7%",
+  "--ring": "249 80.6% 71.8%",
+  "--radius": "1.25rem",
+  "--brand": "249 77.5% 63.3%",
+  "--brand-foreground": "0 0% 100%",
+  "--brand-soft": "250 40% 17%",
+  "--brand-soft-foreground": "248 85.5% 89.2%",
+  "--positive": "162 82.2% 39.6%",
+  "--positive-foreground": "0 0% 100%",
+  "--positive-soft": "162 60% 11%",
+  "--positive-soft-foreground": "155 52% 78%",
+  "--warning": "39 100% 48%",
+  "--warning-foreground": "0 0% 100%",
+  "--warning-soft": "39 70% 12%",
+  "--warning-soft-foreground": "37 95% 75%",
+  "--info": "217 89.9% 61%",
+  "--info-foreground": "0 0% 100%",
+  "--info-soft": "217 60% 14%",
+  "--info-soft-foreground": "215 90% 80%",
+  "--inverse": "0 0% 100%",
+  "--inverse-foreground": "220 13% 9%",
 } as const;

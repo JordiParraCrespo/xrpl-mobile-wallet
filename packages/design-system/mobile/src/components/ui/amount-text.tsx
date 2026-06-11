@@ -7,26 +7,31 @@ import { Text } from "./text";
 // sign and semantic tone (incoming = positive, outgoing = negative).
 // Set in the display serif at weight 400; the currency code is a
 // smaller, muted sans suffix.
-const amountTextVariants = cva("font-display font-normal tabular-nums", {
-  variants: {
-    tone: {
-      default: "text-foreground",
-      positive: "text-positive-soft-foreground",
-      negative: "text-destructive",
-      muted: "text-muted-foreground",
+const amountTextVariants = cva(
+  "font-display font-normal tracking-[-0.2px] tabular-nums",
+  {
+    variants: {
+      tone: {
+        default: "text-foreground",
+        positive: "text-positive-soft-foreground",
+        negative: "text-destructive",
+        muted: "text-muted-foreground",
+      },
+      size: {
+        sm: "text-sm leading-[18px]",
+        md: "text-base leading-5",
+        lg: "text-2xl leading-7",
+        // Serif digits top out at 0.791em and iOS reserves 0.335em descent
+        // below the baseline, so xl needs >=1.13em leading (see text.tsx).
+        xl: "text-[48px] leading-[56px] tracking-[-0.8px]",
+      },
     },
-    size: {
-      sm: "text-sm leading-[18px]",
-      md: "text-base leading-5",
-      lg: "text-2xl leading-7",
-      xl: "text-[48px] leading-[48px] tracking-[-0.8px]",
+    defaultVariants: {
+      tone: "default",
+      size: "md",
     },
   },
-  defaultVariants: {
-    tone: "default",
-    size: "md",
-  },
-});
+);
 
 const currencyTextVariants = cva("font-sans font-semibold opacity-70", {
   variants: {
@@ -57,6 +62,8 @@ type AmountTextProps = Omit<React.ComponentProps<typeof View>, "children"> &
     signed?: boolean;
     tone?: "auto" | "default" | "positive" | "negative" | "muted";
     decimals?: number;
+    /** Render the amount in mono medium (list rows) instead of serif. */
+    mono?: boolean;
   };
 
 function formatAmount(value: number | string, decimals: number) {
@@ -75,6 +82,7 @@ function AmountText({
   tone = "auto",
   size,
   decimals = 2,
+  mono = false,
   className,
   ...props
 }: AmountTextProps) {
@@ -91,7 +99,12 @@ function AmountText({
   const sign = signed ? (isNegative ? "−" : "+") : "";
   return (
     <View className={cn("flex-row items-baseline gap-1", className)} {...props}>
-      <Text className={amountTextVariants({ tone: resolvedTone, size })}>
+      <Text
+        className={cn(
+          amountTextVariants({ tone: resolvedTone, size }),
+          mono && "font-mono font-medium",
+        )}
+      >
         {sign}
         {formatAmount(value, decimals)}
       </Text>

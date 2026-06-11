@@ -5,17 +5,18 @@ import {
   MenubarMenu,
   MenubarSeparator,
   MenubarTrigger,
-} from '@flama/design-system-mobile/menubar';
-import { Text } from '@flama/design-system-mobile/text';
-import * as React from 'react';
-import { ScrollView, View } from 'react-native';
+} from "@flama/design-system-mobile/menubar";
+import { Text } from "@flama/design-system-mobile/text";
+import * as React from "react";
+import { ScrollView, View } from "react-native";
 
 export default function MenubarScreen() {
+  const [value, setValue] = React.useState<string | undefined>(undefined);
   return (
     <ScrollView contentContainerClassName="p-6 gap-6">
       <View className="gap-2">
         <Text className="text-lg font-semibold text-foreground">Basic</Text>
-        <Menubar>
+        <Menubar value={value} onValueChange={setValue}>
           <MenubarMenu value="file">
             <MenubarTrigger>
               <Text>File</Text>
