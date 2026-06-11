@@ -24,6 +24,15 @@ export {
   useWipeWallet,
 } from './security.queries';
 export {
+  type RegisterTokenInput,
+  type SendTokenInput,
+  tokensKeys,
+  useRegisterToken,
+  useSendToken,
+  useTokenBalance,
+  useTokens,
+} from './tokens.queries';
+export {
   profileQueryKey,
   useDeleteUser,
   useProfile,

@@ -7,6 +7,9 @@ import {
   formatUnits,
   type NetworkConfig,
   type Signer,
+  type TokenBalance,
+  type TokenInfo,
+  type TokenTransferParams,
   type TransferParams,
   type TxResult,
 } from '@flama/chain-core';
@@ -17,6 +20,7 @@ import {
   createPublicClient,
   createWalletClient,
   defineChain,
+  erc20Abi,
   http,
   isAddress,
   keccak256,
@@ -114,6 +118,75 @@ export class EvmAdapter implements ChainAdapter {
     } catch (error) {
       throw mapEvmError(error, this.config.chainId);
     }
+    return this.waitForReceipt(hash);
+  }
+
+  async listTokens(address: string): Promise<TokenBalance[]> {
+    // EVM has no on-chain enumeration of held ERC-20s; query the curated list.
+    const tokens = this.config.tokens ?? [];
+    return Promise.all(tokens.map((token) => this.getTokenBalance(address, token)));
+  }
+
+  async getTokenBalance(address: string, token: TokenInfo): Promise<TokenBalance> {
+    const contract = token.issuer as Address;
+    try {
+      const [amount, decimals, symbol] = await Promise.all([
+        this.publicClient.readContract({
+          address: contract,
+          abi: erc20Abi,
+          functionName: 'balanceOf',
+          args: [address as Address],
+        }),
+        token.decimals
+          ? Promise.resolve(token.decimals)
+          : this.publicClient.readContract({
+              address: contract,
+              abi: erc20Abi,
+              functionName: 'decimals',
+            }),
+        token.symbol
+          ? Promise.resolve(token.symbol)
+          : this.publicClient.readContract({
+              address: contract,
+              abi: erc20Abi,
+              functionName: 'symbol',
+            }),
+      ]);
+      return {
+        symbol,
+        issuer: token.issuer,
+        decimals,
+        name: token.name,
+        amount,
+        formatted: formatUnits(amount, decimals),
+      };
+    } catch (error) {
+      throw mapEvmError(error, this.config.chainId);
+    }
+  }
+
+  async transferToken(params: TokenTransferParams, signer: Signer): Promise<TxResult> {
+    const walletClient = createWalletClient({
+      account: this.toAccount(signer),
+      chain: this.chain,
+      transport: http(),
+    });
+    let hash: `0x${string}`;
+    try {
+      hash = await walletClient.writeContract({
+        address: params.token.issuer as Address,
+        abi: erc20Abi,
+        functionName: 'transfer',
+        args: [params.to as Address, params.amount],
+      });
+    } catch (error) {
+      throw mapEvmError(error, this.config.chainId);
+    }
+    return this.waitForReceipt(hash);
+  }
+
+  /** Awaits a mined transaction and normalizes the receipt into a {@link TxResult}. */
+  private async waitForReceipt(hash: `0x${string}`): Promise<TxResult> {
     const explorerUrl = this.config.explorerUrl
       ? `${this.config.explorerUrl}/tx/${hash}`
       : undefined;

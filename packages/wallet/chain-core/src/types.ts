@@ -15,6 +15,12 @@ export interface NetworkConfig {
     symbol: string;
     decimals: number;
   };
+  /**
+   * Curated list of non-native tokens to surface for this network. XRPL
+   * enumerates the account's trustlines on chain, so this is only consulted by
+   * chains (EVM) that cannot enumerate held tokens without an indexer.
+   */
+  tokens?: TokenInfo[];
 }
 
 export interface Balance {
@@ -30,6 +36,52 @@ export interface TransferParams {
   to: string;
   /** Amount in base units (drops, wei). */
   amount: bigint;
+}
+
+/**
+ * A non-native fungible token: an XRPL issued currency (trustline) or an EVM
+ * ERC-20. `issuer` is the on-chain locator — the issuer's classic address on
+ * XRPL, the contract address on EVM — and together with `symbol` uniquely
+ * identifies the token on its chain.
+ */
+export interface TokenInfo {
+  /** Display ticker: XRPL currency code or ERC-20 symbol. */
+  symbol: string;
+  /** Issuer's classic address (XRPL) or ERC-20 contract address (EVM). */
+  issuer: string;
+  decimals: number;
+  /** Human-readable name when the chain exposes one. */
+  name?: string;
+}
+
+export interface TokenBalance extends TokenInfo {
+  /** Held amount in base units (10^decimals). */
+  amount: bigint;
+  formatted: string;
+}
+
+export interface TokenTransferParams {
+  from: string;
+  to: string;
+  token: TokenInfo;
+  /** Amount in the token's base units (10^token.decimals). */
+  amount: bigint;
+}
+
+/**
+ * Authorizes an account to hold a token. On XRPL this opens a trustline to the
+ * issuer (required before an issued currency can be received); chains that need
+ * no such step do not implement it.
+ */
+export interface RegisterTokenParams {
+  /** Account establishing the authorization. */
+  from: string;
+  token: TokenInfo;
+  /**
+   * Maximum amount the account is willing to hold, as a human-readable decimal
+   * string. Defaults to a large limit; "0" removes the authorization.
+   */
+  limit?: string;
 }
 
 export interface TxResult {

@@ -113,4 +113,13 @@ describe('EvmAdapter', () => {
     expect(adapter.isValidAddress('0x9858EfFD232B4033E47d90003D41EC34EcaEda94')).toBe(true);
     expect(adapter.isValidAddress('rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe')).toBe(false);
   });
+
+  it('lists no tokens when the network has no curated token list', async () => {
+    // EVM cannot enumerate held ERC-20s on chain, so an empty config means no
+    // RPC calls and an empty result.
+    const adapter = new EvmAdapter(XRPL_EVM_TESTNET);
+    await expect(adapter.listTokens('0x9858EfFD232B4033E47d90003D41EC34EcaEda94')).resolves.toEqual(
+      [],
+    );
+  });
 });

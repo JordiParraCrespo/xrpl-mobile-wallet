@@ -1,5 +1,15 @@
 import type { Signer } from './signer';
-import type { Balance, Block, NetworkConfig, TransferParams, TxResult } from './types';
+import type {
+  Balance,
+  Block,
+  NetworkConfig,
+  RegisterTokenParams,
+  TokenBalance,
+  TokenInfo,
+  TokenTransferParams,
+  TransferParams,
+  TxResult,
+} from './types';
 
 export interface ChainAdapter {
   readonly config: NetworkConfig;
@@ -15,4 +25,15 @@ export interface ChainAdapter {
    * networks that declare a `faucetUrl` in their config.
    */
   requestFaucet?(address: string): Promise<void>;
+  /** Non-native fungible tokens (issued currencies / ERC-20s) held by `address`. */
+  listTokens(address: string): Promise<TokenBalance[]>;
+  /** Balance of a single non-native token held by `address`. */
+  getTokenBalance(address: string, token: TokenInfo): Promise<TokenBalance>;
+  /** Builds, signs, submits and awaits a non-native token transfer. */
+  transferToken(params: TokenTransferParams, signer: Signer): Promise<TxResult>;
+  /**
+   * Authorizes the account to hold a token (XRPL trustline via TrustSet).
+   * Optional: chains that require no on-chain registration omit it.
+   */
+  registerToken?(params: RegisterTokenParams, signer: Signer): Promise<TxResult>;
 }

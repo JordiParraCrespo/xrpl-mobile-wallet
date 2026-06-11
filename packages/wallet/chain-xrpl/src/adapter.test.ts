@@ -64,9 +64,9 @@ function signPayment(
   // Same pipeline the adapter uses internally.
   return (
     adapter as unknown as {
-      signPayment(tx: Record<string, unknown>, s: Signer): Promise<string>;
+      signTransaction(tx: Record<string, unknown>, s: Signer): Promise<string>;
     }
-  ).signPayment(tx, signer);
+  ).signTransaction(tx, signer);
 }
 
 describe('XrplAdapter', () => {
@@ -99,9 +99,9 @@ describe('XrplAdapter', () => {
     // Same pipeline the adapter uses internally.
     const blob = await (
       adapter as unknown as {
-        signPayment(tx: Record<string, unknown>, s: typeof signer): Promise<string>;
+        signTransaction(tx: Record<string, unknown>, s: typeof signer): Promise<string>;
       }
-    ).signPayment({ ...tx }, signer);
+    ).signTransaction({ ...tx }, signer);
 
     const decoded = decode(blob) as Record<string, unknown>;
     expect(decoded.Account).toBe(account);
@@ -243,5 +243,71 @@ describe('XrplAdapter.requestFaucet', () => {
         code: ChainErrors.NETWORK.code,
       },
     );
+  });
+});
+
+describe('XrplAdapter token signing', () => {
+  it('signs an issued-currency payment carrying an IOU amount object', async () => {
+    const adapter = new XrplAdapter(XRPL_TESTNET);
+    const signer = await testSigner();
+    const account = adapter.deriveAddress(signer.publicKey);
+    const issuer = 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe';
+
+    const tx = {
+      TransactionType: 'Payment',
+      Account: account,
+      Destination: issuer,
+      Amount: { currency: 'USD', issuer, value: '1.5' },
+      Fee: '12',
+      Sequence: 1,
+      LastLedgerSequence: 100,
+    };
+
+    const blob = await (
+      adapter as unknown as {
+        signTransaction(tx: Record<string, unknown>, s: typeof signer): Promise<string>;
+      }
+    ).signTransaction({ ...tx }, signer);
+
+    const decoded = decode(blob) as Record<string, unknown>;
+    expect(decoded.Amount).toEqual({ currency: 'USD', issuer, value: '1.5' });
+
+    const digest = sha512(hexToBytes(encodeForSigning(decoded))).slice(0, 32);
+    const signature = secp256k1.Signature.fromDER(decoded.TxnSignature as string);
+    expect(secp256k1.verify(signature, digest, signer.publicKey)).toBe(true);
+  });
+
+  it('signs a TrustSet that registers a token via its LimitAmount', async () => {
+    const adapter = new XrplAdapter(XRPL_TESTNET);
+    const signer = await testSigner();
+    const account = adapter.deriveAddress(signer.publicKey);
+    const issuer = 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe';
+
+    const tx = {
+      TransactionType: 'TrustSet',
+      Account: account,
+      LimitAmount: { currency: 'USD', issuer, value: '1000000' },
+      Fee: '12',
+      Sequence: 1,
+      LastLedgerSequence: 100,
+    };
+
+    const blob = await (
+      adapter as unknown as {
+        signTransaction(tx: Record<string, unknown>, s: typeof signer): Promise<string>;
+      }
+    ).signTransaction({ ...tx }, signer);
+
+    const decoded = decode(blob) as Record<string, unknown>;
+    expect(decoded.TransactionType).toBe('TrustSet');
+    expect(decoded.LimitAmount).toEqual({
+      currency: 'USD',
+      issuer,
+      value: '1000000',
+    });
+
+    const digest = sha512(hexToBytes(encodeForSigning(decoded))).slice(0, 32);
+    const signature = secp256k1.Signature.fromDER(decoded.TxnSignature as string);
+    expect(secp256k1.verify(signature, digest, signer.publicKey)).toBe(true);
   });
 });
