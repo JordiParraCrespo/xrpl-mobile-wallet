@@ -142,6 +142,7 @@ export {
 } from './components/ui/menubar';
 export { MnemonicGrid, MnemonicWord } from './components/ui/mnemonic-grid';
 export { NotificationRow } from './components/ui/notification-row';
+export { PasscodeKeypad } from './components/ui/passcode-keypad';
 export {
   Popover,
   PopoverContent,

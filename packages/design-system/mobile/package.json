@@ -45,6 +45,7 @@
     "./menubar": "./src/components/ui/menubar.tsx",
     "./mnemonic-grid": "./src/components/ui/mnemonic-grid.tsx",
     "./notification-row": "./src/components/ui/notification-row.tsx",
+    "./passcode-keypad": "./src/components/ui/passcode-keypad.tsx",
     "./popover": "./src/components/ui/popover.tsx",
     "./price-change": "./src/components/ui/price-change.tsx",
     "./progress": "./src/components/ui/progress.tsx",
