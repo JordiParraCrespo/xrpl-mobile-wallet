@@ -1,6 +1,6 @@
 'use client';
 
-import type { Balance, TxResult } from '@flama/chain-core';
+import type { Balance, Block, TxResult } from '@flama/chain-core';
 import {
   type UseMutationOptions,
   type UseQueryOptions,
@@ -14,6 +14,7 @@ export const walletKeys = {
   all: ['wallet'] as const,
   restore: ['wallet', 'restore'] as const,
   balance: (chainId: string) => ['wallet', 'balance', chainId] as const,
+  blocks: (chainId: string) => ['wallet', 'blocks', chainId] as const,
 };
 
 /** Loads the vault from secure storage on app start. */
@@ -56,6 +57,21 @@ export function useChainBalance(
   return useQuery({
     queryKey: walletKeys.balance(chainId),
     queryFn: () => app.wallet.getBalance(chainId),
+    refetchInterval: 15_000,
+    ...options,
+  });
+}
+
+export function useRecentBlocks(
+  chainId: string,
+  limit?: number,
+  options?: Omit<UseQueryOptions<Block[], Error>, 'queryKey' | 'queryFn'>,
+) {
+  const app = useFlamaApp();
+
+  return useQuery({
+    queryKey: walletKeys.blocks(chainId),
+    queryFn: () => app.wallet.getRecentBlocks(chainId, limit),
     refetchInterval: 15_000,
     ...options,
   });

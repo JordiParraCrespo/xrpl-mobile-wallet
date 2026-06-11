@@ -24,6 +24,7 @@ export {
   type SendTransactionInput,
   useChainBalance,
   useImportWallet,
+  useRecentBlocks,
   useResetWallet,
   useSendTransaction,
   useWalletRestore,
