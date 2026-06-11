@@ -18,13 +18,16 @@ export const authKeys = {
 };
 
 export function useSessionRestore(
-  options?: Omit<UseQueryOptions<void, Error>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<null, Error>, 'queryKey' | 'queryFn'>,
 ) {
   const app = useFlamaApp();
 
   return useQuery({
     queryKey: authKeys.session,
-    queryFn: () => app.auth.restoreSession(),
+    queryFn: async () => {
+      await app.auth.restoreSession();
+      return null;
+    },
     retry: false,
     staleTime: Infinity,
     ...options,
