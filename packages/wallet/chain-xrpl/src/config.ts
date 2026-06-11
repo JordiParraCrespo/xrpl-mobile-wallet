@@ -6,6 +6,7 @@ export const XRPL_TESTNET: NetworkConfig = {
   name: 'XRPL Testnet',
   rpcUrl: 'https://s.altnet.rippletest.net:51234',
   explorerUrl: 'https://testnet.xrpl.org',
+  faucetUrl: 'https://faucet.altnet.rippletest.net/accounts',
   nativeCurrency: { symbol: 'XRP', decimals: 6 },
 };
 

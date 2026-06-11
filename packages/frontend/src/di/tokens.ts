@@ -11,4 +11,7 @@ export const TOKENS = {
   WalletStore: Symbol.for('WalletStore'),
   WalletService: Symbol.for('WalletService'),
   ExplorerService: Symbol.for('ExplorerService'),
+  BiometricProvider: Symbol.for('BiometricProvider'),
+  SecurityStore: Symbol.for('SecurityStore'),
+  SecurityService: Symbol.for('SecurityService'),
 } as const;

@@ -2,6 +2,7 @@ import {
   type Balance,
   type Block,
   type ChainAdapter,
+  ChainError,
   ChainErrors,
   formatUnits,
   type NetworkConfig,
@@ -130,8 +131,17 @@ export class EvmAdapter implements ChainAdapter {
   /**
    * Wraps the keyring Signer as a viem account: viem serializes and hashes,
    * the keyring signs the digest, viem re-serializes with the signature.
+   *
+   * EVM signatures must be recoverable, so only secp256k1 signers that return
+   * a recovery id are accepted.
    */
   toAccount(signer: Signer): LocalAccount {
+    if (signer.curve !== 'secp256k1') {
+      throw new ChainError(ChainErrors.SIGNING_FAILED, {
+        chainId: this.config.chainId,
+        detail: `EVM requires a secp256k1 signer, got ${signer.curve}`,
+      });
+    }
     const address = this.deriveAddress(signer.publicKey) as Address;
     return toAccount({
       address,
@@ -139,6 +149,12 @@ export class EvmAdapter implements ChainAdapter {
         const serializer = options?.serializer ?? serializeTransaction;
         const digest = keccak256(await serializer(transaction), 'bytes');
         const { signature, recovery } = await signer.signDigest(digest);
+        if (recovery === undefined) {
+          throw new ChainError(ChainErrors.SIGNING_FAILED, {
+            chainId: this.config.chainId,
+            detail: 'Signer did not return a recovery id',
+          });
+        }
         return serializer(transaction, {
           r: toHex(signature.slice(0, 32)),
           s: toHex(signature.slice(32, 64)),

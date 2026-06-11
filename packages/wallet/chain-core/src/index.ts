@@ -9,7 +9,7 @@ export {
   toChainError,
 } from './errors';
 export { ChainRegistry } from './registry';
-export type { SignatureResult, Signer } from './signer';
+export type { SignatureResult, Signer, SignerCurve } from './signer';
 export type {
   Balance,
   Block,

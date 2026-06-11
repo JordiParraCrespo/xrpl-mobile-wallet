@@ -9,6 +9,8 @@ export interface NetworkConfig {
   name: string;
   rpcUrl: string;
   explorerUrl?: string;
+  /** Test-network faucet endpoint, when the chain has one. */
+  faucetUrl?: string;
   nativeCurrency: {
     symbol: string;
     decimals: number;

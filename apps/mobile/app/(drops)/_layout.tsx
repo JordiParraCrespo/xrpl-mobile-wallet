@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { Stack } from 'expo-router';
 
 /**
  * Drops wallet shell — the single root presentation layer.
@@ -22,6 +22,7 @@ export default function DropsLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
+      <Stack.Screen name="unlock" options={{ gestureEnabled: false }} />
       <Stack.Screen name="onboarding" />
       <Stack.Screen name="(tabs)" />
 
@@ -31,18 +32,12 @@ export default function DropsLayout() {
       <Stack.Screen name="payment/[contact]" />
 
       {/* Modals — slide up over everything, including the tab bar. */}
-      <Stack.Screen
-        name="flows/add-money"
-        options={{ presentation: "modal" }}
-      />
-      <Stack.Screen name="flows/receive" options={{ presentation: "modal" }} />
-      <Stack.Screen name="flows/swap" options={{ presentation: "modal" }} />
-      <Stack.Screen name="flows/send" options={{ presentation: "modal" }} />
-      <Stack.Screen name="add-recipient" options={{ presentation: "modal" }} />
-      <Stack.Screen
-        name="transaction/[id]"
-        options={{ presentation: "modal" }}
-      />
+      <Stack.Screen name="flows/add-money" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="flows/receive" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="flows/swap" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="flows/send" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="add-recipient" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="transaction/[id]" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }
