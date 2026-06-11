@@ -11,7 +11,7 @@ import { Text, TextClassContext } from "./text";
 // quick actions and suggestion chips all share this shape. Flat,
 // hairline border on the outline look, glass over dark heroes.
 const chipVariants = cva(
-  "shrink-0 flex-row items-center justify-center rounded-full active:scale-[0.97]",
+  "shrink-0 flex-row items-center justify-center active:scale-[0.97]",
   {
     variants: {
       variant: {
@@ -25,10 +25,17 @@ const chipVariants = cva(
         sm: "h-[34px] gap-2 px-4",
         md: "h-[42px] gap-2 px-[18px]",
       },
+      // The classic chip is a pill; `md` squares it off to the shared
+      // radius token for grid-like uses (quiz word choices, option cells).
+      rounded: {
+        full: "rounded-full",
+        md: "rounded-md",
+      },
     },
     defaultVariants: {
       variant: "outline",
       size: "md",
+      rounded: "full",
     },
   },
 );
@@ -67,6 +74,7 @@ function Chip({
   className,
   variant,
   size,
+  rounded,
   icon,
   children,
   ...props
@@ -76,7 +84,7 @@ function Chip({
       <Pressable
         className={cn(
           props.disabled && "opacity-45",
-          chipVariants({ variant, size }),
+          chipVariants({ variant, size, rounded }),
           className,
         )}
         role="button"
