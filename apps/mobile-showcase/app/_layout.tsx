@@ -9,32 +9,19 @@ configureReanimatedLogger({ level: ReanimatedLogLevel.warn, strict: false });
 
 import { ThemeProvider } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
-import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme, vars } from "nativewind";
 import * as React from "react";
 import { Text, View } from "react-native";
 import { NAV_THEME } from "../lib/theme";
+import { useLoadFonts } from "../lib/use-load-fonts";
 
 export default function RootLayout() {
+  const { fontsLoaded } = useLoadFonts();
   const { colorScheme } = useColorScheme();
   const theme = colorScheme === "dark" ? darkVars : lightVars;
   const isDark = colorScheme === "dark";
-
-  // Expo Go can't use the expo-font config plugin (native embedding), so the
-  // showcase loads the Drops fonts at runtime. Extra weights are registered
-  // under their own keys; iOS groups them by the family in the name table.
-  const [fontsLoaded] = useFonts({
-    ReferoTitle: require("../assets/fonts/ReferoTitle-Regular.ttf"),
-    Inter: require("../assets/fonts/Inter_400Regular.ttf"),
-    "Inter-Medium": require("../assets/fonts/Inter_500Medium.ttf"),
-    "Inter-SemiBold": require("../assets/fonts/Inter_600SemiBold.ttf"),
-    "Inter-Bold": require("../assets/fonts/Inter_700Bold.ttf"),
-    JetBrainsMono: require("../assets/fonts/JetBrainsMono_400Regular.ttf"),
-    "JetBrainsMono-Medium": require("../assets/fonts/JetBrainsMono_500Medium.ttf"),
-    "JetBrainsMono-SemiBold": require("../assets/fonts/JetBrainsMono_600SemiBold.ttf"),
-  });
 
   if (!fontsLoaded) {
     return null;
