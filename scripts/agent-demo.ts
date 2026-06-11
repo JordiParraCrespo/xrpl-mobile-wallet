@@ -82,6 +82,8 @@ async function main(): Promise<void> {
     persona,
     policy: { maxPaymentXrp: 50 },
     model: process.env.MODEL,
+    // Set DEBUG=1 to surface the underlying agent subprocess's stderr.
+    onStderr: process.env.DEBUG ? (data) => process.stderr.write(data) : undefined,
     approve: async ({ input }) => {
       const answer = await rl.question(
         `\n⚠️  Approve this transaction?\n   ${JSON.stringify(input)}\n   (y/N) `,
@@ -102,12 +104,14 @@ async function main(): Promise<void> {
       break;
     }
     try {
+      process.stdout.write(`\n${persona.name} is thinking…`);
       const reply = await agent.ask(trimmed);
-      console.log(`\n${persona.name} › ${reply}\n`);
+      console.log(`\r${persona.name} › ${reply}\n`);
     } catch (error) {
-      console.error('Error:', error instanceof Error ? error.message : error);
+      console.error('\nError:', error instanceof Error ? error.message : error);
     }
   }
+  agent.close();
   rl.close();
 }
 

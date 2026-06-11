@@ -1,4 +1,4 @@
-import { query } from '@anthropic-ai/claude-agent-sdk';
+import { query, type SDKUserMessage } from '@anthropic-ai/claude-agent-sdk';
 import type { WalletGateway } from './gateway';
 import { buildSystemPrompt, DEFAULT_PERSONA, type Persona } from './persona';
 import {
@@ -23,6 +23,8 @@ export interface WalletAgentConfig {
   approve: ApproveFn;
   /** Claude model id; falls back to the SDK default when omitted. */
   model?: string;
+  /** Diagnostics: receives the underlying agent subprocess's stderr. */
+  onStderr?: (data: string) => void;
 }
 
 /** A structured event from a single agent turn. */
@@ -37,18 +39,72 @@ interface SdkMessageLike {
   message?: { content?: unknown };
 }
 
+type QueryStream = AsyncGenerator<unknown, void, unknown>;
+
+/**
+ * A pushable async-iterable of user messages. The Agent SDK requires
+ * streaming-input mode for `canUseTool` to work (permission decisions flow back
+ * over the same channel), so we feed turns through this queue instead of a
+ * one-shot string prompt.
+ */
+function createInputStream() {
+  const buffer: SDKUserMessage[] = [];
+  let pending: ((value: SDKUserMessage | null) => void) | null = null;
+  let closed = false;
+
+  const push = (message: SDKUserMessage) => {
+    if (pending) {
+      pending(message);
+      pending = null;
+    } else {
+      buffer.push(message);
+    }
+  };
+  const close = () => {
+    closed = true;
+    if (pending) {
+      pending(null);
+      pending = null;
+    }
+  };
+  const iterator = (async function* () {
+    while (!closed) {
+      const next =
+        buffer.shift() ??
+        (await new Promise<SDKUserMessage | null>((r) => {
+          pending = r;
+        }));
+      if (next === null) {
+        return;
+      }
+      yield next;
+    }
+  })();
+
+  return { iterator, push, close };
+}
+
+const userMessage = (text: string): SDKUserMessage => ({
+  type: 'user',
+  message: { role: 'user', content: text },
+  parent_tool_use_id: null,
+});
+
 /**
  * The XRPL wallet agent: a thin, key-free wrapper around the Claude Agent SDK
  * tool-use loop. It owns the system prompt (persona + code-owned scope/safety),
- * the wallet tools, and the `canUseTool` policy/approval gate, and resumes its
- * session across turns so the conversation has memory.
+ * the wallet tools, and the `canUseTool` policy/approval gate. A single
+ * streaming session is kept open so the conversation has memory across turns.
  */
 export class WalletAgent {
-  private sessionId: string | undefined;
-  private readonly mcpServer: ReturnType<typeof createWalletTools>;
   private readonly canUseTool: CanUseTool;
   private readonly systemPrompt: string;
   private readonly model: string | undefined;
+  private readonly mcpServer: ReturnType<typeof createWalletTools>;
+  private readonly onStderr: ((data: string) => void) | undefined;
+
+  private input: ReturnType<typeof createInputStream> | undefined;
+  private stream: QueryStream | undefined;
 
   constructor(config: WalletAgentConfig) {
     this.mcpServer = createWalletTools(config.gateway);
@@ -63,6 +119,7 @@ export class WalletAgent {
       symbol: config.symbol,
     });
     this.model = config.model;
+    this.onStderr = config.onStderr;
   }
 
   /** Sends a user message, runs the tool loop, and returns the final reply text. */
@@ -76,32 +133,53 @@ export class WalletAgent {
 
   /** Streams structured events (assistant text, final result) for one turn. */
   async *run(message: string): AsyncGenerator<AgentEvent> {
-    const stream = query({
-      prompt: message,
-      options: {
-        systemPrompt: this.systemPrompt,
-        mcpServers: { [WALLET_SERVER_NAME]: this.mcpServer },
-        // Our 2-arg callback is structurally assignable to the SDK's CanUseTool
-        // (it ignores the extra context arg; the return shape matches).
-        canUseTool: this.canUseTool,
-        ...(this.model ? { model: this.model } : {}),
-        ...(this.sessionId ? { resume: this.sessionId } : {}),
-      },
-    });
+    const stream = this.ensureStarted();
+    this.input?.push(userMessage(message));
 
-    for await (const raw of stream) {
-      const event = this.handle(raw as unknown as SdkMessageLike);
+    // Read with manual .next() rather than `for await … break`, which would
+    // call the stream's .return() and close the session after a single turn.
+    while (true) {
+      const { value, done } = await stream.next();
+      if (done) {
+        return;
+      }
+      const event = this.handle(value as SdkMessageLike);
       if (event) {
         yield event;
+        if (event.type === 'result') {
+          return; // end of this turn; the session stays open for the next ask()
+        }
       }
     }
   }
 
-  private handle(msg: SdkMessageLike): AgentEvent | undefined {
-    if (msg.type === 'system' && msg.subtype === 'init') {
-      this.sessionId = msg.session_id;
-      return undefined;
+  /** Closes the streaming session. Call when the conversation is finished. */
+  close(): void {
+    this.input?.close();
+  }
+
+  private ensureStarted(): QueryStream {
+    if (this.stream) {
+      return this.stream;
     }
+    const input = createInputStream();
+    this.input = input;
+    this.stream = query({
+      prompt: input.iterator,
+      options: {
+        systemPrompt: this.systemPrompt,
+        mcpServers: { [WALLET_SERVER_NAME]: this.mcpServer },
+        // Streaming input mode: our 2-arg callback is structurally assignable to
+        // the SDK's CanUseTool (it ignores the extra context arg).
+        canUseTool: this.canUseTool,
+        ...(this.model ? { model: this.model } : {}),
+        ...(this.onStderr ? { stderr: this.onStderr } : {}),
+      },
+    }) as unknown as QueryStream;
+    return this.stream;
+  }
+
+  private handle(msg: SdkMessageLike): AgentEvent | undefined {
     if (msg.type === 'assistant') {
       const text = extractText(msg.message?.content);
       return text ? { type: 'assistant', text } : undefined;
