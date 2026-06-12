@@ -8,6 +8,7 @@ configureReanimatedLogger({ level: ReanimatedLogLevel.warn, strict: false });
 
 import {
   FlamaProvider,
+  useProfileRestore,
   useSecurityRestore,
   useSecurityState,
   useSessionRestore,
@@ -71,7 +72,9 @@ function SessionGate() {
   const session = useSessionRestore();
   const wallet = useWalletRestore();
   const security = useSecurityRestore();
-  const isLoading = session.isLoading || wallet.isLoading || security.isLoading;
+  const profile = useProfileRestore();
+  const isLoading =
+    session.isLoading || wallet.isLoading || security.isLoading || profile.isLoading;
 
   React.useEffect(() => {
     if (!isLoading) SplashScreen.hideAsync();
