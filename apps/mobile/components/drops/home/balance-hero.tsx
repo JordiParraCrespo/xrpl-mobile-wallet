@@ -37,7 +37,7 @@ export function BalanceHero({
 
       {loading ? (
         <View className="h-[56px] justify-center">
-          <Skeleton className="h-11 w-[210px] rounded-[14px]" />
+          <Skeleton style={{ width: 210, height: 44, borderRadius: 14 }} />
         </View>
       ) : (
         <Text className="font-display text-[46px] leading-[56px] tracking-[-0.8px] text-foreground tabular-nums">

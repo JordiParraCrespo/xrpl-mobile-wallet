@@ -51,11 +51,11 @@ export function AccountTileSkeleton() {
   return (
     <View className="flex-1">
       <HomeCard className="min-h-[134px] justify-between rounded-xl p-4">
-        <Skeleton className="h-[38px] w-[38px] rounded-full" />
+        <Skeleton style={{ width: 38, height: 38, borderRadius: 19 }} />
         <View className="mt-4 gap-1.5">
-          <Skeleton className="h-[11px] w-[70px] rounded-md" />
-          <Skeleton className="h-5 w-24 rounded-md" />
-          <Skeleton className="h-3 w-14 rounded-md" />
+          <Skeleton style={{ width: 70, height: 11 }} />
+          <Skeleton style={{ width: 96, height: 20 }} />
+          <Skeleton style={{ width: 56, height: 12 }} />
         </View>
       </HomeCard>
     </View>
