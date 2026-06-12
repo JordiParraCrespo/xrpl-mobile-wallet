@@ -31,11 +31,14 @@ type KeypadProps = Omit<React.ComponentProps<typeof View>, "children"> & {
   onKey: (key: string) => void;
   /** Show the calculator operator row above the digit grid. */
   operators?: boolean;
+  /** Hide the "." key for integer-only entry (passcodes, counts). */
+  decimal?: boolean;
 };
 
 function Keypad({
   onKey,
   operators = false,
+  decimal = true,
   className,
   ...props
 }: KeypadProps) {
@@ -56,22 +59,26 @@ function Keypad({
         </View>
       ) : null}
       <View className="flex-row flex-wrap gap-y-1.5">
-        {KEYS.map((key) => (
-          <Pressable
-            key={key}
-            role="button"
-            onPress={() => onKey(key)}
-            className="h-[58px] basis-1/3 items-center justify-center rounded-lg active:bg-white/10"
-          >
-            {key === "backspace" ? (
-              <Icon as={Delete} size={24} className="text-foreground" />
-            ) : (
-              <Text className="font-display text-foreground text-[27px] font-normal">
-                {key}
-              </Text>
-            )}
-          </Pressable>
-        ))}
+        {KEYS.map((key) =>
+          key === "." && !decimal ? (
+            <View key={key} className="h-[58px] basis-1/3" />
+          ) : (
+            <Pressable
+              key={key}
+              role="button"
+              onPress={() => onKey(key)}
+              className="h-[58px] basis-1/3 items-center justify-center rounded-lg active:bg-white/10"
+            >
+              {key === "backspace" ? (
+                <Icon as={Delete} size={24} className="text-foreground" />
+              ) : (
+                <Text className="font-display text-foreground text-[27px] font-normal">
+                  {key}
+                </Text>
+              )}
+            </Pressable>
+          ),
+        )}
       </View>
     </View>
   );
