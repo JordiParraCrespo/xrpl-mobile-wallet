@@ -536,6 +536,7 @@
       "address": "Dirección",
       "addressPlaceholder": "r… o 0x…",
       "paste": "Pegar",
+      "scan": "Escanear",
       "destinationTag": "Etiqueta de destino (opcional)",
       "destinationTagPlaceholder": "p. ej. 584213",
       "recipientName": "Nombre del destinatario",
@@ -555,6 +556,16 @@
         "evm": "Direcciones 0x…"
       },
       "done": "Hecho"
+    },
+    "scanRecipient": {
+      "back": "Atrás",
+      "title": "Escanea para pagar",
+      "subtitle": "Apunta la cámara al código QR de pago del destinatario.",
+      "invalid": "Ese código QR no contiene una dirección de pago.",
+      "permissionTitle": "Se necesita acceso a la cámara",
+      "permissionBody": "Permite el acceso a la cámara para escanear el código QR de pago del destinatario.",
+      "grant": "Permitir cámara",
+      "enterManually": "Introducir dirección manualmente"
     },
     "chat": {
       "received": "Recibiste",

@@ -11,7 +11,7 @@ import { AddressBookErrors, AppError } from '@flama/frontend';
 import { useAddContact, useWalletState } from '@flama/frontend/react';
 import * as Clipboard from 'expo-clipboard';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Check, ChevronDown, ChevronLeft, ShieldCheck } from 'lucide-react-native';
+import { Check, ChevronDown, ChevronLeft, ScanLine, ShieldCheck } from 'lucide-react-native';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -25,6 +25,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PaymentsBackdrop } from '../components/payments/payments-backdrop';
+import { Routes } from '../lib/routes';
 
 /**
  * The design's PField: a white hairline card with the small label INSIDE,
@@ -88,20 +89,35 @@ export default function AddRecipientScreen() {
   const { t } = useTranslation();
   const { accounts } = useWalletState();
 
-  // Optional prefill when arriving from a payment's counterparty: the address
-  // and network are known, so the user only has to name the contact.
-  const prefill = useLocalSearchParams<{
+  // Params seed the form two ways: an initial prefill when arriving from a
+  // payment's counterparty (address + network known, just name it), and the
+  // values the scan screen returns with (`scanned*`).
+  const params = useLocalSearchParams<{
     address?: string;
     chainId?: string;
     name?: string;
+    scannedAddress?: string;
+    scannedTag?: string;
   }>();
 
-  const [chainId, setChainId] = React.useState<string | undefined>(prefill.chainId);
-  const [address, setAddress] = React.useState(prefill.address ?? '');
+  const [chainId, setChainId] = React.useState<string | undefined>(params.chainId);
+  const [address, setAddress] = React.useState(params.address ?? '');
   const [destinationTag, setDestinationTag] = React.useState('');
-  const [name, setName] = React.useState(prefill.name ?? '');
+  const [name, setName] = React.useState(params.name ?? '');
   const [networkOpen, setNetworkOpen] = React.useState(false);
   const [errorKey, setErrorKey] = React.useState<SaveErrorKey | null>(null);
+
+  // The scan screen returns here with the parsed address (and XRPL tag). Track
+  // the last applied address so a re-render doesn't clobber edits the user
+  // makes after the scan.
+  const appliedScan = React.useRef<string | undefined>(undefined);
+  React.useEffect(() => {
+    const scanned = params.scannedAddress;
+    if (!scanned || scanned === appliedScan.current) return;
+    appliedScan.current = scanned;
+    setAddress(scanned);
+    if (params.scannedTag) setDestinationTag(params.scannedTag);
+  }, [params.scannedAddress, params.scannedTag]);
 
   // Networks the wallet can pay on; default to the first (XRPL).
   const networks = accounts.map((account) => ({
@@ -190,9 +206,14 @@ export default function AddRecipientScreen() {
         <Field
           label={t('payments.addRecipient.address')}
           trailing={
-            <Chip size="sm" onPress={pasteAddress}>
-              {t('payments.addRecipient.paste')}
-            </Chip>
+            <View className="flex-row items-center gap-2">
+              <Chip size="sm" icon={ScanLine} onPress={() => router.push(Routes.ScanRecipient)}>
+                {t('payments.addRecipient.scan')}
+              </Chip>
+              <Chip size="sm" onPress={pasteAddress}>
+                {t('payments.addRecipient.paste')}
+              </Chip>
+            </View>
           }
         >
           <TextInput

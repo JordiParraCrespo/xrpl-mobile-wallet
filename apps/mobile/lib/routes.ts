@@ -48,6 +48,7 @@ export enum Routes {
   Swap = '/flows/swap',
   Send = '/flows/send',
   AddRecipient = '/add-recipient',
+  ScanRecipient = '/scan-recipient',
   Transaction = '/transaction/[id]',
   Notifications = '/notifications',
 }

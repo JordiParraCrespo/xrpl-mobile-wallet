@@ -29,6 +29,16 @@ const config: ExpoConfig = {
     'expo-secure-store',
     'expo-localization',
     [
+      // The camera is used solely to scan a recipient's payment QR when adding
+      // them. This description is shown the first time iOS/Android asks; audio
+      // recording is disabled since we never need the microphone.
+      'expo-camera',
+      {
+        cameraPermission: "Drops uses the camera to scan a recipient's payment QR code.",
+        recordAudioAndroid: false,
+      },
+    ],
+    [
       'expo-font',
       {
         // Drops typography: ReferoTitle (display serif, weight 400 only),
