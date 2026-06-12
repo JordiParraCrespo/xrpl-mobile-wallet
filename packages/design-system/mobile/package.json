@@ -32,6 +32,7 @@
     "./dialog": "./src/components/ui/dialog.tsx",
     "./dropdown-menu": "./src/components/ui/dropdown-menu.tsx",
     "./feature-row": "./src/components/ui/feature-row.tsx",
+    "./flow-header": "./src/components/ui/flow-header.tsx",
     "./glass-panel": "./src/components/ui/glass-panel.tsx",
     "./hover-card": "./src/components/ui/hover-card.tsx",
     "./icon": "./src/components/ui/icon.tsx",
