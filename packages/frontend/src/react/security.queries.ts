@@ -7,6 +7,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { useFlamaApp } from './context';
 import { walletKeys } from './wallet.queries';
 
@@ -90,6 +91,16 @@ export function useChangePasscode(
     ...options,
     mutationFn: ({ current, next }) => app.security.changePasscode(current, next),
   });
+}
+
+/**
+ * Returns a stable callback that locks the vault. Locking is synchronous (it
+ * just drops the in-memory key and flips the store to `locked`); the lock-gate
+ * then drives navigation to the unlock screen.
+ */
+export function useLock(): () => void {
+  const app = useFlamaApp();
+  return useCallback(() => app.security.lock(), [app]);
 }
 
 export function useEnableBiometrics(

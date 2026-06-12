@@ -64,13 +64,29 @@ export const buildRoute = {
     pathname: Routes.PaymentChat,
     params: { contact },
   }),
-  transaction: (id: string): Href => ({
+  transaction: (id: string, contact?: string): Href => ({
     pathname: Routes.Transaction,
-    params: { id },
+    params: contact ? { id, contact } : { id },
   }),
   chatSession: (session: string): Href => ({
     pathname: Routes.ChatSession,
     params: { session },
+  }),
+  /**
+   * Open the Send flow, optionally pre-seeded with a recipient (from a payment
+   * chat). With no recipient the screen falls back to a demo peer so the flow
+   * stays walkable; `address` is what the broadcast actually pays.
+   */
+  send: (recipient?: {
+    /** Address-book contact id, resolved to a real saved address by the flow. */
+    contactId?: string;
+    name?: string;
+    handle?: string;
+    /** Explicit destination address (overrides the contact lookup). */
+    address?: string;
+  }): Href => ({
+    pathname: Routes.Send,
+    params: { ...recipient },
   }),
   onboardingSuccess: (via: OnboardingVia): Href => ({
     pathname: Routes.OnboardingSuccess,
