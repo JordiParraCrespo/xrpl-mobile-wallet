@@ -1,81 +1,105 @@
+import { AssistantAvatar } from '@flama/design-system-mobile/assistant-avatar';
+import { TabBar, type TabBarItem } from '@flama/design-system-mobile/tab-bar';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Tabs, useRouter } from 'expo-router';
-import { ChartLine, Droplets, House, Sparkles, Users } from 'lucide-react-native';
+import { ArrowLeftRight, ChartColumn, House, Sparkle } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
+import { useTranslation } from 'react-i18next';
+import { Pressable, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Routes } from '../../lib/routes';
 
-// Indigo brand accent for the active tab; muted ink for idle (see Drops DS).
-const BRAND = { light: 'hsl(250 69.6% 56.1%)', dark: 'hsl(249 77.5% 63.3%)' };
-const IDLE = { light: 'hsl(210 9.3% 46.3%)', dark: 'hsl(208 8.1% 58.6%)' };
-const SURFACE = { light: 'hsl(0 0% 100%)', dark: 'hsl(220 13% 9%)' };
-const BORDER = { light: 'hsl(228 9.8% 90%)', dark: 'hsl(218 11.4% 13.7%)' };
+const TAB_ICONS = {
+  home: House,
+  market: ChartColumn,
+  payments: ArrowLeftRight,
+  droppoints: Sparkle,
+} as const;
+
+type TabKey = keyof typeof TAB_ICONS;
+
+// The design's nav shadows per theme (home-app.jsx --h-nav-shadow):
+// dark 0 12px 36px rgba(8,6,20,0.45) · light 0 8px 30px rgba(15,17,21,0.12).
+const NAV_SHADOW = {
+  dark: {
+    shadowColor: '#080614',
+    shadowOffset: { width: 0, height: 12 },
+    shadowRadius: 18,
+    shadowOpacity: 0.45,
+    elevation: 16,
+  },
+  light: {
+    shadowColor: '#0f1115',
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 15,
+    shadowOpacity: 0.12,
+    elevation: 10,
+  },
+} as const;
 
 /**
- * The signed-in hub. Bottom tab bar: Home · Market · Payments · DropPoints,
- * plus the Dewy assistant (a tab that opens the full chat rather than a page).
- *
- * TODO: replace this default tab bar with the design's floating frosted-glass
- * capsule (`HBottomNav` in home/home-parts2.jsx) — a pill that sits above the
- * content with the Dewy mascot beside it.
+ * The design's floating frosted-glass capsule (`HBottomNav` in
+ * home/home-parts2.jsx): the four tabs plus the Dewy mascot, hovering 14px
+ * from the screen edges. Glass over the dark home gradient; the solid card
+ * variant on the light tab surfaces. Content scrolls underneath it.
  */
-export default function TabsLayout() {
+function FloatingTabBar({ state, navigation }: BottomTabBarProps) {
   const router = useRouter();
-  const { colorScheme } = useColorScheme();
-  const mode = colorScheme === 'dark' ? 'dark' : 'light';
+  const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
+  const dark = useColorScheme().colorScheme === 'dark';
+
+  const items: TabBarItem[] = state.routes
+    .filter((route) => route.name in TAB_ICONS)
+    .map((route) => ({
+      key: route.name,
+      label: t(`tabs.${route.name as TabKey}`),
+      icon: TAB_ICONS[route.name as TabKey],
+    }));
+
+  const activeKey = state.routes[state.index]?.name ?? 'home';
 
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: BRAND[mode],
-        tabBarInactiveTintColor: IDLE[mode],
-        tabBarStyle: {
-          backgroundColor: SURFACE[mode],
-          borderTopColor: BORDER[mode],
-        },
+    <View
+      pointerEvents="box-none"
+      style={{
+        position: 'absolute',
+        left: 14,
+        right: 14,
+        bottom: insets.bottom + 8,
+        ...NAV_SHADOW[dark ? 'dark' : 'light'],
       }}
     >
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color, size }) => <House color={color} size={size} />,
-        }}
+      <TabBar
+        items={items}
+        activeKey={activeKey}
+        onChange={(key) => navigation.navigate(key)}
+        // Frosted only over the dark home gradient; the light Glow and the
+        // light tab surfaces use the solid card capsule.
+        glass={dark && activeKey === 'home'}
+        accessory={
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('tabs.dewy')}
+            onPress={() => router.push(Routes.Chat)}
+            className="pr-0.5 active:scale-[0.97]"
+          >
+            <AssistantAvatar source={require('../../assets/dewy.png')} size={46} ring />
+          </Pressable>
+        }
       />
-      <Tabs.Screen
-        name="market"
-        options={{
-          title: 'Market',
-          tabBarIcon: ({ color, size }) => <ChartLine color={color} size={size} />,
-        }}
-      />
-      <Tabs.Screen
-        name="payments"
-        options={{
-          title: 'Payments',
-          tabBarIcon: ({ color, size }) => <Users color={color} size={size} />,
-        }}
-      />
-      <Tabs.Screen
-        name="droppoints"
-        options={{
-          title: 'DropPoints',
-          tabBarIcon: ({ color, size }) => <Droplets color={color} size={size} />,
-        }}
-      />
-      <Tabs.Screen
-        name="dewy"
-        options={{
-          title: 'Dewy',
-          tabBarIcon: ({ color, size }) => <Sparkles color={color} size={size} />,
-        }}
-        listeners={{
-          tabPress: (e) => {
-            // Dewy opens the full assistant, not a tab page.
-            e.preventDefault();
-            router.push(Routes.Chat);
-          },
-        }}
-      />
+    </View>
+  );
+}
+
+/** The signed-in hub: Home · Market · Payments · DropPoints + Dewy. */
+export default function TabsLayout() {
+  return (
+    <Tabs tabBar={(props) => <FloatingTabBar {...props} />} screenOptions={{ headerShown: false }}>
+      <Tabs.Screen name="home" />
+      <Tabs.Screen name="market" />
+      <Tabs.Screen name="payments" />
+      <Tabs.Screen name="droppoints" />
     </Tabs>
   );
 }
