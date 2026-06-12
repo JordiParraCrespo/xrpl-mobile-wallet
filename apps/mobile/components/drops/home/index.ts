@@ -7,3 +7,4 @@ export { BalanceHero } from './balance-hero';
 export { HomeBackground } from './home-background';
 export * from './home-data';
 export { HomeHeader } from './home-header';
+export { MoreMenu } from './more-menu';
