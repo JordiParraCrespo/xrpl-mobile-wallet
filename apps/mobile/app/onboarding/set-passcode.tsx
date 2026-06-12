@@ -36,7 +36,9 @@ export default function SetPasscodeScreen() {
   const { status } = useSecurityState();
 
   const isImport = next === 'import';
-  const destination = isImport ? Routes.OnboardingImport : Routes.OnboardingRevealPhrase;
+  // Where the flow resumes when the vault already exists (re-entry skip):
+  // the keys block that follows the device-security block.
+  const destination = isImport ? Routes.OnboardingImport : Routes.OnboardingSecureIntro;
 
   const [phase, setPhase] = React.useState<'create' | 'confirm'>('create');
   const [first, setFirst] = React.useState('');
@@ -84,12 +86,13 @@ export default function SetPasscodeScreen() {
     return () => clearTimeout(timer);
   }, [error]);
 
-  // Success: hold the "Passcode set" state a beat, then on to the
-  // notifications ask, which continues into this path's next step.
+  // Success: hold the "Passcode set" state a beat, then on to the biometric
+  // enrollment ask (skipped automatically when no biometrics are enrolled),
+  // which continues into this path's next step.
   React.useEffect(() => {
     if (!done) return;
     const timer = setTimeout(
-      () => router.replace(buildRoute.onboardingNotifications(isImport ? 'import' : 'create')),
+      () => router.replace(buildRoute.onboardingBiometrics(isImport ? 'import' : 'create')),
       DONE_HOLD_MS,
     );
     return () => clearTimeout(timer);
@@ -133,8 +136,8 @@ export default function SetPasscodeScreen() {
     <View className="flex-1 bg-background">
       <View style={{ paddingTop: insets.top + 8 }} className="px-6">
         <ScreenHeader
-          step={isImport ? 1 : 2}
-          total={isImport ? 3 : 4}
+          step={2}
+          total={isImport ? 4 : 5}
           onBack={confirming && !locked ? resetToCreate : () => router.back()}
         />
       </View>

@@ -67,7 +67,7 @@ function DigitKey({
         experimentalBlurMethod={experimentalBlurMethod}
       />
       <Text
-        className="font-sans text-[28px] text-white"
+        className="font-sans text-[28px] leading-[34px] text-white"
         style={{ letterSpacing: 0.5 }}
       >
         {value}
