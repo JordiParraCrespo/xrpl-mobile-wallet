@@ -465,7 +465,8 @@
       "networkHint": {
         "xrp": "Direcciones clásicas r…",
         "evm": "Direcciones 0x…"
-      }
+      },
+      "done": "Hecho"
     }
   }
 }

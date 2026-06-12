@@ -14,7 +14,15 @@ import { useRouter } from 'expo-router';
 import { Check, ChevronDown, ChevronLeft, ShieldCheck } from 'lucide-react-native';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, TextInput, View } from 'react-native';
+import {
+  InputAccessoryView,
+  Keyboard,
+  Platform,
+  Pressable,
+  ScrollView,
+  TextInput,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PaymentsBackdrop } from '../components/payments/payments-backdrop';
 
@@ -54,6 +62,10 @@ function Field({
 
 const fieldInputClass =
   'text-foreground min-w-0 p-0 text-base placeholder:text-muted-foreground/50';
+
+// iOS's number-pad has no return key, so the destination-tag input gets a
+// keyboard accessory bar with a Done button to dismiss it.
+const TAG_ACCESSORY_ID = 'add-recipient-tag-done';
 
 /** Map address-book error codes to the screen's translated messages. */
 type SaveErrorKey = 'invalidName' | 'invalidAddress' | 'duplicate' | 'generic';
@@ -118,6 +130,13 @@ export default function AddRecipientScreen() {
     if (text) setAddress(text);
   };
 
+  // The sheet slides over the form — drop the keyboard first so it doesn't
+  // sit behind (or on top of) the sheet.
+  const openNetworkPicker = () => {
+    Keyboard.dismiss();
+    setNetworkOpen(true);
+  };
+
   return (
     <View className="bg-background flex-1">
       <PaymentsBackdrop />
@@ -140,11 +159,12 @@ export default function AddRecipientScreen() {
       <ScrollView
         className="flex-1"
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         contentContainerClassName="gap-3.5 px-5 pb-2 pt-5"
       >
         <Field
           label={t('payments.addRecipient.network')}
-          onPress={networks.length > 1 ? () => setNetworkOpen(true) : undefined}
+          onPress={networks.length > 1 ? openNetworkPicker : undefined}
           trailing={
             networks.length > 1 ? (
               <Icon as={ChevronDown} size={18} className="text-muted-foreground" />
@@ -175,6 +195,7 @@ export default function AddRecipientScreen() {
             autoCorrect={false}
             autoComplete="off"
             spellCheck={false}
+            returnKeyType="done"
             className={cn(fieldInputClass, 'font-mono')}
           />
         </Field>
@@ -185,6 +206,8 @@ export default function AddRecipientScreen() {
             onChangeText={(value) => setDestinationTag(value.replace(/[^0-9]/g, ''))}
             placeholder={t('payments.addRecipient.destinationTagPlaceholder')}
             keyboardType="number-pad"
+            returnKeyType="done"
+            inputAccessoryViewID={Platform.OS === 'ios' ? TAG_ACCESSORY_ID : undefined}
             className={cn(fieldInputClass, 'font-mono')}
           />
         </Field>
@@ -196,6 +219,7 @@ export default function AddRecipientScreen() {
             placeholder={t('payments.addRecipient.namePlaceholder')}
             autoCapitalize="words"
             autoCorrect={false}
+            returnKeyType="done"
             className={fieldInputClass}
           />
         </Field>
@@ -275,6 +299,22 @@ export default function AddRecipientScreen() {
           })}
         </View>
       </BottomSheet>
+
+      {Platform.OS === 'ios' ? (
+        <InputAccessoryView nativeID={TAG_ACCESSORY_ID}>
+          <View className="border-border bg-card flex-row justify-end border-t px-4 py-2">
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => Keyboard.dismiss()}
+              className="active:opacity-70"
+            >
+              <Text className="text-brand text-[15px] font-semibold">
+                {t('payments.addRecipient.done')}
+              </Text>
+            </Pressable>
+          </View>
+        </InputAccessoryView>
+      ) : null}
     </View>
   );
 }
