@@ -3,6 +3,7 @@ export * from './auth';
 export * from './chain';
 export * from './core';
 export * from './explorer';
+export * from './notifications';
 export * from './prices';
 export * from './profile';
 export * from './security';
