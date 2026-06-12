@@ -9,9 +9,9 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DroppointsBackground } from '../../components/drops/droppoints/droppoints-background';
 import { GlassIconDisc } from '../../components/drops/droppoints/glass-icon-disc';
 import { DROPPOINTS_PERKS } from '../../components/drops/droppoints/perks';
+import { LightWashBackground } from '../../components/drops/light-wash-background';
 
 /**
  * DropPoints — the rewards-programme teaser (`drops.html · drops/drops-app.jsx`).
@@ -29,7 +29,7 @@ export default function DropPointsScreen() {
   return (
     <View className="bg-background flex-1">
       <StatusBar style="dark" />
-      <DroppointsBackground />
+      <LightWashBackground />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
