@@ -281,6 +281,31 @@
       "defaultWalletName": "Cuenta 1",
       "cta": "Abrir mi cartera"
     },
+    "biometrics": {
+      "method": {
+        "face": "Face ID",
+        "touch": "huella"
+      },
+      "title": "Desbloquea con {{method}}",
+      "subtitle": "Usa {{method}} para abrir Drops y aprobar pagos. Es más rápido que un código — y nunca sale de tu dispositivo.",
+      "scanning": {
+        "face": "Mira tu teléfono para configurar Face ID…",
+        "touch": "Toca el sensor para configurar tu huella…"
+      },
+      "doneTitle": "Has activado {{method}}",
+      "doneSubtitle": "Todo listo. Puedes gestionarlo cuando quieras en Ajustes.",
+      "benefits": {
+        "instant": "Abre Drops al instante — sin escribir el código",
+        "approve": "Aprueba pagos con un vistazo",
+        "enclave": "Los datos de {{method}} permanecen en el enclave seguro de tu dispositivo"
+      },
+      "enable": "Activar {{method}}",
+      "enabling": "Configurando {{method}}…",
+      "switch": "Usar {{method}} en su lugar",
+      "skip": "Ahora no",
+      "continue": "Continuar",
+      "error": "No se pudo activar {{method}}. Inténtalo de nuevo."
+    },
     "notifications": {
       "title": "Mantente al tanto de tu dinero",
       "subtitle": "Recibe un aviso en cuanto se mueva tu dinero, sin tener que estar mirando.",
@@ -315,6 +340,12 @@
   },
   "unlock": {
     "welcomeBack": "Hola de nuevo",
-    "forgotPasscode": "¿Has olvidado tu código?"
+    "forgotPasscode": "¿Has olvidado tu código?",
+    "wrongPasscode": "Código incorrecto. Inténtalo de nuevo.",
+    "lockedOut": "Demasiados intentos. Vuelve a intentarlo en un momento.",
+    "wipeTitle": "¿Restablecer la cartera?",
+    "wipeMessage": "Esto elimina la cartera de este dispositivo. Solo podrás restaurarla con tu frase de recuperación, semilla familiar o números secretos.",
+    "wipeConfirm": "Eliminar cartera",
+    "wipeCancel": "Cancelar"
   }
 }

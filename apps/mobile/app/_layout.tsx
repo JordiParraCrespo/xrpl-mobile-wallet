@@ -10,19 +10,21 @@ import {
   FlamaProvider,
   useProfileRestore,
   useSecurityRestore,
+  useSecurityState,
   useSessionRestore,
   useWalletRestore,
 } from '@flama/frontend/react';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { SplashScreen, Stack } from 'expo-router';
+import { SplashScreen, Stack, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme, vars } from 'nativewind';
 import * as React from 'react';
 import { View } from 'react-native';
 import { app } from '../lib/flama';
 import { queryClient } from '../lib/query';
+import { Routes } from '../lib/routes';
 import { NAV_THEME } from '../lib/theme';
 import { useLoadFonts } from '../lib/use-load-fonts';
 
@@ -84,6 +86,24 @@ function SessionGate() {
 }
 
 /**
+ * Drives the app to the unlock gate whenever the vault locks mid-session
+ * (the security module's inactivity auto-lock, or an explicit lock). Cold
+ * starts are handled by the index gate; this covers locks that happen while
+ * the user is already inside the app.
+ */
+function useLockGate() {
+  const { status } = useSecurityState();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  React.useEffect(() => {
+    if (status === 'locked' && pathname !== Routes.Unlock) {
+      router.replace(Routes.Unlock);
+    }
+  }, [status, pathname, router]);
+}
+
+/**
  * Drops wallet shell — the single root presentation layer.
  *
  * This is the only navigator that sits above the tab bar, so EVERY screen that
@@ -102,6 +122,8 @@ function SessionGate() {
  * from a payment chat), because they all share this one root stack.
  */
 function DropsStack() {
+  useLockGate();
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />

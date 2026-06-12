@@ -281,6 +281,31 @@
       "defaultWalletName": "Account 1",
       "cta": "Open my wallet"
     },
+    "biometrics": {
+      "method": {
+        "face": "Face ID",
+        "touch": "Fingerprint"
+      },
+      "title": "Unlock with {{method}}",
+      "subtitle": "Use {{method}} to open Drops and approve payments. It's faster than a passcode — and never leaves your device.",
+      "scanning": {
+        "face": "Look at your phone to set up Face ID…",
+        "touch": "Touch the sensor to set up your fingerprint…"
+      },
+      "doneTitle": "{{method}} enabled",
+      "doneSubtitle": "You're all set. You can manage this any time in Settings.",
+      "benefits": {
+        "instant": "Unlock Drops instantly — no passcode to type",
+        "approve": "Approve payments with a glance",
+        "enclave": "{{method}} data stays in your device's secure enclave"
+      },
+      "enable": "Enable {{method}}",
+      "enabling": "Setting up {{method}}…",
+      "switch": "Use {{method}} instead",
+      "skip": "Not now",
+      "continue": "Continue",
+      "error": "Couldn't enable {{method}}. Try again."
+    },
     "notifications": {
       "title": "Stay on top of your money",
       "subtitle": "Get a heads-up the moment money moves, so you never have to keep checking.",
@@ -315,6 +340,12 @@
   },
   "unlock": {
     "welcomeBack": "Welcome back",
-    "forgotPasscode": "Forgot your passcode?"
+    "forgotPasscode": "Forgot your passcode?",
+    "wrongPasscode": "Wrong passcode. Try again.",
+    "lockedOut": "Too many attempts. Try again in a moment.",
+    "wipeTitle": "Reset wallet?",
+    "wipeMessage": "This deletes the wallet from this device. You can only restore it with your recovery phrase, family seed or secret numbers.",
+    "wipeConfirm": "Delete wallet",
+    "wipeCancel": "Cancel"
   }
 }
