@@ -6,6 +6,7 @@ import { Text } from '@flama/design-system-mobile/text';
 import { StatusBar } from 'expo-status-bar';
 import { Bell } from 'lucide-react-native';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DroppointsBackground } from '../../components/drops/droppoints/droppoints-background';
@@ -22,6 +23,7 @@ import { DROPPOINTS_PERKS } from '../../components/drops/droppoints/perks';
  */
 export default function DropPointsScreen() {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const [notified, setNotified] = React.useState(false);
 
   return (
@@ -40,34 +42,33 @@ export default function DropPointsScreen() {
       >
         <GlassIconDisc />
 
-        <Badge variant="glass" className="mt-6">
-          <Text>COMING SOON</Text>
+        <Badge variant="glass" className="mt-[26px]">
+          <Text>{t('droppoints.comingSoon')}</Text>
         </Badge>
 
         <Text
           className="font-display text-foreground mt-4 text-center"
           style={{ fontSize: 38, lineHeight: 40, letterSpacing: -0.6 }}
         >
-          DropPoints
+          {t('droppoints.title')}
         </Text>
 
         <Text
           className="text-muted-foreground mt-3 text-center text-base leading-6"
           style={{ maxWidth: 300 }}
         >
-          A rewards programme that gives back every time you move money on Drops. We're putting the
-          finishing touches on it.
+          {t('droppoints.subtitle')}
         </Text>
 
         <View className="mt-7 w-full gap-2.5" style={{ maxWidth: 320 }}>
           {DROPPOINTS_PERKS.map((perk) => (
             <FeatureRow
-              key={perk.title}
+              key={perk.key}
               circle
               tone="brand"
               icon={perk.icon}
-              title={perk.title}
-              description={perk.description}
+              title={t(`droppoints.perks.${perk.key}.title`)}
+              description={t(`droppoints.perks.${perk.key}.description`)}
             />
           ))}
         </View>
@@ -75,11 +76,11 @@ export default function DropPointsScreen() {
         <Button
           size="lg"
           variant={notified ? 'secondary' : 'default'}
-          className="mt-7"
+          className="mt-[26px]"
           onPress={() => setNotified(true)}
         >
           {notified ? <Icon as={Bell} size={18} /> : null}
-          <Text>{notified ? "We'll let you know" : "Notify me when it's ready"}</Text>
+          <Text>{notified ? t('droppoints.notified') : t('droppoints.notify')}</Text>
         </Button>
       </ScrollView>
     </View>
