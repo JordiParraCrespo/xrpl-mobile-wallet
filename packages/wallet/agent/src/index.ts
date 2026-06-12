@@ -1,5 +1,15 @@
-export { type AgentEvent, WalletAgent, type WalletAgentConfig } from './agent';
+export { WalletAgent, type WalletAgentConfig } from './agent';
 export { type WalletGateway, XrplWalletGateway } from './gateway';
+export {
+  type AnthropicClientConfig,
+  AnthropicMessagesClient,
+  type AnthropicTool,
+  type ContentBlock,
+  type CreateMessageRequest,
+  type CreateMessageResponse,
+  type MessageParam,
+  type MessagesClient,
+} from './messages';
 export {
   buildSystemPrompt,
   DEFAULT_PERSONA,
@@ -10,13 +20,18 @@ export {
 export {
   type ApprovalRequest,
   type ApproveFn,
-  type CanUseTool,
-  type CanUseToolConfig,
-  createCanUseTool,
+  createToolGate,
   evaluatePolicy,
+  type GateDecision,
   type PolicyDecision,
   type PolicyInput,
-  type ToolDecision,
+  type ToolGate,
+  type ToolGateConfig,
   type TransactionPolicy,
 } from './policy';
-export { createWalletTools, WALLET_SERVER_NAME } from './tools';
+export {
+  createWalletTools,
+  SUBMIT_PAYMENT_TOOL,
+  type ToolRunResult,
+  type WalletTool,
+} from './tools';

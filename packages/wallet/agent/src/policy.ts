@@ -1,10 +1,10 @@
-import type { TxSummary } from '@flama/wallet-xrpl-tx';
+import { SUBMIT_PAYMENT_TOOL } from './tools';
 
 /**
  * Hard policy rules, enforced in code outside the model. A prompt-injected or
- * jailbroken model can only ever *request* a payment; these rules (and the
- * human approval that follows) decide whether it happens. Mirrors Claude Code's
- * "deny rules checked first, overridable by nothing" guarantee.
+ * jailbroken model can only ever *request* a payment; these rules (and the human
+ * approval that follows) decide whether it happens. Mirrors Claude Code's "deny
+ * rules checked first, overridable by nothing" guarantee.
  */
 export interface TransactionPolicy {
   /** Hard cap on a single payment, in XRP. Above this is denied outright. */
@@ -50,68 +50,45 @@ export function evaluatePolicy(policy: TransactionPolicy, input: PolicyInput): P
 export interface ApprovalRequest {
   tool: string;
   input: Record<string, unknown>;
-  /** Ground-truth summary, when the tool produced one. */
-  summary?: TxSummary;
 }
 
 /** Asks the human to approve a gated action. Returns true to proceed. */
 export type ApproveFn = (request: ApprovalRequest) => Promise<boolean>;
 
-/** Allow/deny result in the shape the Agent SDK's `canUseTool` expects. */
-export type ToolDecision =
-  | { behavior: 'allow'; updatedInput: Record<string, unknown> }
-  | { behavior: 'deny'; message: string };
+/** Allow/deny result the agent loop uses before executing a tool. */
+export interface GateDecision {
+  allowed: boolean;
+  message?: string;
+}
 
-/** Function shape compatible with the Agent SDK `canUseTool` option. */
-export type CanUseTool = (
-  toolName: string,
-  input: Record<string, unknown>,
-) => Promise<ToolDecision>;
+/** Decides whether a tool call may execute. */
+export type ToolGate = (toolName: string, input: Record<string, unknown>) => Promise<GateDecision>;
 
-export interface CanUseToolConfig {
-  /** The SDK MCP server name, used to namespace tool names. */
-  serverName: string;
+export interface ToolGateConfig {
   policy: TransactionPolicy;
   approve: ApproveFn;
 }
 
 /**
- * Builds the layered `canUseTool` callback:
- *   default DENY → only known wallet tools pass → read tools auto-allow →
- *   the mutating `submit_payment` runs policy deny rules, then human approval.
- *
- * Default-deny means built-in tools (Bash, file access, ...) the SDK might offer
- * can never run: this agent has wallet tools and nothing else.
+ * Builds the gate the agent loop runs before executing a tool. Read tools and
+ * `prepare_payment` pass freely; the mutating `submit_payment` must clear the
+ * hard policy deny rules and then human approval. The model cannot bypass this.
  */
-export function createCanUseTool(config: CanUseToolConfig): CanUseTool {
-  const tool = (name: string) => `mcp__${config.serverName}__${name}`;
-  const submitTool = tool('submit_payment');
-  const readTools = new Set([
-    tool('get_balance'),
-    tool('get_recent_blocks'),
-    tool('prepare_payment'),
-  ]);
-
+export function createToolGate(config: ToolGateConfig): ToolGate {
   return async (toolName, input) => {
-    if (toolName === submitTool) {
-      const decision = evaluatePolicy(config.policy, input as PolicyInput);
-      if (!decision.allowed) {
-        return {
-          behavior: 'deny',
-          message: decision.reason ?? 'Denied by policy.',
-        };
-      }
-      const approved = await config.approve({ tool: toolName, input });
-      return approved
-        ? { behavior: 'allow', updatedInput: input }
-        : { behavior: 'deny', message: 'The user declined the transaction.' };
+    if (toolName !== SUBMIT_PAYMENT_TOOL) {
+      return { allowed: true };
     }
-    if (readTools.has(toolName)) {
-      return { behavior: 'allow', updatedInput: input };
+    const decision = evaluatePolicy(config.policy, input as PolicyInput);
+    if (!decision.allowed) {
+      return {
+        allowed: false,
+        message: decision.reason ?? 'Denied by policy.',
+      };
     }
-    return {
-      behavior: 'deny',
-      message: 'This agent can only use its wallet tools.',
-    };
+    const approved = await config.approve({ tool: toolName, input });
+    return approved
+      ? { allowed: true }
+      : { allowed: false, message: 'The user declined the transaction.' };
   };
 }
