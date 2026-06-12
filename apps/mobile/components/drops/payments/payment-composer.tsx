@@ -2,7 +2,7 @@ import { Button } from '@flama/design-system-mobile/button';
 import { GlassBackdrop } from '@flama/design-system-mobile/glass-panel';
 import { Icon } from '@flama/design-system-mobile/icon';
 import { Text } from '@flama/design-system-mobile/text';
-import { ArrowDownLeft, ArrowUpRight, Repeat, Sparkles } from 'lucide-react-native';
+import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Sparkles } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -30,7 +30,7 @@ export function PaymentComposer({
           onPress={onSplit}
           className="bg-card border-border h-12 w-12 shrink-0 items-center justify-center rounded-full border active:scale-[0.97]"
         >
-          <Icon as={Repeat} size={19} className="text-foreground" />
+          <Icon as={ArrowLeftRight} size={19} className="text-foreground" />
         </Pressable>
         <Button variant="secondary" size="lg" className="h-12 flex-1" onPress={onRequest}>
           <Icon as={ArrowDownLeft} size={17} />

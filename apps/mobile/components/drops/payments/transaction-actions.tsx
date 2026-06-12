@@ -1,5 +1,5 @@
 import { Chip } from '@flama/design-system-mobile/chip';
-import { ArrowDownLeft, ArrowUpRight, CalendarClock, Repeat } from 'lucide-react-native';
+import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, CalendarClock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { ScrollView } from 'react-native';
 
@@ -20,7 +20,7 @@ export function TransactionActions() {
       </Chip>
       <Chip icon={ArrowDownLeft}>{t('payments.transaction.actions.request')}</Chip>
       <Chip icon={CalendarClock}>{t('payments.transaction.actions.schedule')}</Chip>
-      <Chip icon={Repeat}>{t('payments.transaction.actions.split')}</Chip>
+      <Chip icon={ArrowLeftRight}>{t('payments.transaction.actions.split')}</Chip>
     </ScrollView>
   );
 }

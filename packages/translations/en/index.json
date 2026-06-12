@@ -488,7 +488,8 @@
       "split": "Split",
       "request": "Request",
       "send": "Send",
-      "messagePlaceholder": "Type a message…"
+      "messagePlaceholder": "Type a message…",
+      "back": "Back"
     },
     "transaction": {
       "actions": {
@@ -514,7 +515,9 @@
       "confirmation": "Confirmation",
       "download": "Download",
       "openExplorer": "Open in explorer",
-      "getHelp": "Get help with this payment"
+      "getHelp": "Get help with this payment",
+      "close": "Close",
+      "more": "More"
     }
   }
 }
