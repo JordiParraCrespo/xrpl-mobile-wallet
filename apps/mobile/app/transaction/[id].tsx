@@ -69,10 +69,10 @@ export default function TransactionDetailScreen() {
         className="flex-row items-center justify-between px-4 pb-1"
         style={{ paddingTop: insets.top + 8 }}
       >
-        <RoundControl label="Close" onPress={() => router.back()}>
+        <RoundControl label={t('payments.transaction.close')} onPress={() => router.back()}>
           <Icon as={X} size={19} className="text-foreground" />
         </RoundControl>
-        <RoundControl label="More">
+        <RoundControl label={t('payments.transaction.more')}>
           <Icon as={MoreHorizontal} size={19} className="text-foreground" />
         </RoundControl>
       </View>
@@ -124,7 +124,7 @@ export default function TransactionDetailScreen() {
           />
           <DetailRow
             label={t('payments.transaction.ledgerIndex')}
-            value={tx.ledger.toLocaleString('en-US')}
+            value={tx.ledger.toLocaleString()}
             mono
           />
           <DetailRow label={t('payments.transaction.networkFee')} value={`${tx.fee} XRP`} mono />

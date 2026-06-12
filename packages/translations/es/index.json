@@ -394,7 +394,8 @@
       "split": "Dividir",
       "request": "Solicitar",
       "send": "Enviar",
-      "messagePlaceholder": "Escribe un mensaje…"
+      "messagePlaceholder": "Escribe un mensaje…",
+      "back": "Atrás"
     },
     "transaction": {
       "actions": {
@@ -420,7 +421,9 @@
       "confirmation": "Confirmación",
       "download": "Descargar",
       "openExplorer": "Abrir en el explorador",
-      "getHelp": "Obtener ayuda con este pago"
+      "getHelp": "Obtener ayuda con este pago",
+      "close": "Cerrar",
+      "more": "Más"
     }
   }
 }
