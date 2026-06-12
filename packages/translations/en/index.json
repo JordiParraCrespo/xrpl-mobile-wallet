@@ -99,6 +99,16 @@
     "signingOut": "Signing out...",
     "openWallet": "Open wallet"
   },
+  "notifications": {
+    "title": "Notifications",
+    "close": "Close notifications",
+    "markAllRead": "Mark all as read",
+    "groups": {
+      "today": "Today",
+      "earlier": "Earlier"
+    },
+    "empty": "You're all caught up."
+  },
   "wallet": {
     "title": "Wallet",
     "import": {
