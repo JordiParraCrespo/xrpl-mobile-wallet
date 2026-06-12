@@ -137,6 +137,7 @@ function DropsStack() {
       <Stack.Screen name="payment/[contact]" />
 
       {/* Modals — slide up over everything, including the tab bar. */}
+      <Stack.Screen name="notifications" options={{ presentation: 'modal' }} />
       <Stack.Screen name="flows/add-money" options={{ presentation: 'modal' }} />
       <Stack.Screen name="flows/receive" options={{ presentation: 'modal' }} />
       <Stack.Screen name="flows/swap" options={{ presentation: 'modal' }} />

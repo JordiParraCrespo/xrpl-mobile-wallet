@@ -20,4 +20,5 @@ export const TOKENS = {
   PriceProvider: Symbol.for('PriceProvider'),
   PricesStore: Symbol.for('PricesStore'),
   PricesService: Symbol.for('PricesService'),
+  NotificationsService: Symbol.for('NotificationsService'),
 } as const;

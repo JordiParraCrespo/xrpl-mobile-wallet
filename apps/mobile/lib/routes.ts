@@ -43,6 +43,7 @@ export enum Routes {
   PaymentChat = '/payment/[contact]',
 
   // Modals
+  Notifications = '/notifications',
   AddMoney = '/flows/add-money',
   Receive = '/flows/receive',
   Swap = '/flows/swap',

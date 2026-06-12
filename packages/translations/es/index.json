@@ -99,6 +99,16 @@
     "signingOut": "Cerrando sesión...",
     "openWallet": "Abrir cartera"
   },
+  "notifications": {
+    "title": "Notificaciones",
+    "close": "Cerrar notificaciones",
+    "markAllRead": "Marcar todo como leído",
+    "groups": {
+      "today": "Hoy",
+      "earlier": "Antes"
+    },
+    "empty": "Estás al día."
+  },
   "wallet": {
     "title": "Cartera",
     "import": {

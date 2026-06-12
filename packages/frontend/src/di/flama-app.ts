@@ -9,6 +9,8 @@ import { createCoreModule } from '../modules/core/core.module';
 import type { IStorageService } from '../modules/core/storage.service';
 import type { ExplorerService } from '../modules/explorer';
 import { ExplorerModule } from '../modules/explorer';
+import type { NotificationsService } from '../modules/notifications';
+import { NotificationsModule } from '../modules/notifications';
 import type { IPriceProvider, PricesService } from '../modules/prices';
 import { createPricesModule } from '../modules/prices';
 import type { ProfileService } from '../modules/profile';
@@ -61,6 +63,7 @@ export class FlamaApp {
     container.load(ProfileModule);
     container.load(WalletModule);
     container.load(ExplorerModule);
+    container.load(NotificationsModule);
     container.load(TokensModule);
     container.load(createPricesModule(config.priceProvider));
     container.load(createSecurityModule(config.biometricProvider));
@@ -93,6 +96,10 @@ export class FlamaApp {
 
   get explorer(): ExplorerService {
     return this.container.get(TOKENS.ExplorerService);
+  }
+
+  get notifications(): NotificationsService {
+    return this.container.get(TOKENS.NotificationsService);
   }
 
   get tokens(): TokensService {

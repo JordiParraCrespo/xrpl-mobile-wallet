@@ -27,6 +27,11 @@ export default function HomeScreen() {
           { label: 'Add money', href: Routes.AddMoney },
           { label: 'Receive', href: Routes.Receive, variant: 'secondary' },
           { label: 'Swap', href: Routes.Swap, variant: 'secondary' },
+          {
+            label: 'Notifications',
+            href: Routes.Notifications,
+            variant: 'outline',
+          },
           { label: 'Profile', href: Routes.Profile, variant: 'outline' },
           { label: 'Ask Dewy', href: Routes.Chat, variant: 'outline' },
         ]}

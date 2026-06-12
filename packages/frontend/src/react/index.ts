@@ -21,6 +21,11 @@ export {
   useSecurityState,
   useWalletState,
 } from './hooks';
+export {
+  notificationsKeys,
+  useMarkAllNotificationsRead,
+  useNotifications,
+} from './notifications.queries';
 export { pricesKeys, useExchangeRate } from './prices.queries';
 export {
   profileKeys,
