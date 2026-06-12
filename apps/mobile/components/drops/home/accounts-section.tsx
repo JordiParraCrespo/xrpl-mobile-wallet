@@ -3,6 +3,7 @@ import { IconButton } from '@flama/design-system-mobile/icon-button';
 import { Text } from '@flama/design-system-mobile/text';
 import { Plus } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { AccountTile } from './account-tile';
 import type { HomeAccount } from './home-data';
@@ -21,14 +22,17 @@ export function AccountsSection({
   onAddAccount: () => void;
 }) {
   const dark = useColorScheme().colorScheme === 'dark';
+  const { t } = useTranslation();
   return (
     <View className="mt-[22px]">
       <View className="flex-row items-center justify-between px-1 pb-2.5">
-        <Text className="font-display text-[19px] tracking-[-0.2px] text-foreground">Accounts</Text>
+        <Text className="font-display text-[19px] tracking-[-0.2px] text-foreground">
+          {t('home.hub.accounts')}
+        </Text>
         <IconButton
           variant={dark ? 'glass' : 'soft'}
           size="sm"
-          accessibilityLabel="Add account"
+          accessibilityLabel={t('home.hub.addAccount')}
           onPress={onAddAccount}
         >
           <Icon as={Plus} size={18} />

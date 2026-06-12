@@ -97,7 +97,21 @@
     "reset": "Reiniciar",
     "signOut": "Cerrar sesión",
     "signingOut": "Cerrando sesión...",
-    "openWallet": "Abrir cartera"
+    "openWallet": "Abrir cartera",
+    "hub": {
+      "search": "Buscar",
+      "testnet": "TESTNET",
+      "addMoney": "Añadir dinero",
+      "receive": "Recibir",
+      "swap": "Intercambiar",
+      "more": "Más",
+      "accounts": "Cuentas",
+      "addAccount": "Añadir cuenta",
+      "activity": "Actividad",
+      "seeAll": "Ver todo",
+      "profile": "Perfil",
+      "notifications": "Notificaciones"
+    }
   },
   "wallet": {
     "title": "Cartera",

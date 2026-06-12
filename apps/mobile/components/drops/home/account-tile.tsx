@@ -4,15 +4,9 @@ import { Text } from '@flama/design-system-mobile/text';
 import { ChevronRight } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 import { HomeCard } from './home-card';
-import {
-  accountUsd,
-  type ChainBadgeKind,
-  formatUsd,
-  formatXrp,
-  type HomeAccount,
-} from './home-data';
+import { type ChainBadgeKind, formatUsd, formatXrp, type HomeAccount } from './home-data';
 
-/** Maps a mocked badge descriptor onto the design-system `ChainBadge`. */
+/** Maps a badge descriptor onto the design-system `ChainBadge`. */
 export function AccountBadge({ badge, size }: { badge: ChainBadgeKind; size: number }) {
   if (badge.kind === 'letter') {
     return <ChainBadge kind="letter" label={badge.label} color={badge.color} size={size} />;
@@ -37,7 +31,7 @@ export function AccountTile({ account, onPress }: { account: HomeAccount; onPres
             {account.name}
           </Text>
           <Text className="font-mono text-[22px] font-semibold tracking-[-0.4px] text-foreground">
-            {formatUsd(accountUsd(account))}
+            {formatUsd(account.usd)}
           </Text>
           <Text className="font-mono text-xs text-muted-foreground">
             {formatXrp(account.amount)} {account.unit}

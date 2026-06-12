@@ -1,6 +1,7 @@
 import { Separator } from '@flama/design-system-mobile/separator';
 import { Text } from '@flama/design-system-mobile/text';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import { ActivityRow } from './activity-row';
 import { HomeCard } from './home-card';
@@ -17,12 +18,17 @@ export function ActivitySection({
   activity: HomeActivity[];
   onSeeAll: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <View className="mt-[22px]">
       <View className="flex-row items-center justify-between px-1 pb-2.5">
-        <Text className="font-display text-[19px] tracking-[-0.2px] text-foreground">Activity</Text>
+        <Text className="font-display text-[19px] tracking-[-0.2px] text-foreground">
+          {t('home.hub.activity')}
+        </Text>
         <Pressable onPress={onSeeAll} className="active:opacity-70">
-          <Text className="text-[13.5px] font-semibold text-muted-foreground">See all</Text>
+          <Text className="text-[13.5px] font-semibold text-muted-foreground">
+            {t('home.hub.seeAll')}
+          </Text>
         </Pressable>
       </View>
 

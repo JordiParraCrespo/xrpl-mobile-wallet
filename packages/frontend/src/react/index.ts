@@ -60,6 +60,7 @@ export {
 export {
   type SendTransactionInput,
   useChainBalance,
+  useChainBalances,
   useCreateWallet,
   useImportFamilySeed,
   useImportSecretNumbers,

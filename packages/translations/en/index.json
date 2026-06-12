@@ -97,7 +97,21 @@
     "reset": "Reset",
     "signOut": "Sign out",
     "signingOut": "Signing out...",
-    "openWallet": "Open wallet"
+    "openWallet": "Open wallet",
+    "hub": {
+      "search": "Search",
+      "testnet": "TESTNET",
+      "addMoney": "Add money",
+      "receive": "Receive",
+      "swap": "Swap",
+      "more": "More",
+      "accounts": "Accounts",
+      "addAccount": "Add account",
+      "activity": "Activity",
+      "seeAll": "See all",
+      "profile": "Profile",
+      "notifications": "Notifications"
+    }
   },
   "wallet": {
     "title": "Wallet",

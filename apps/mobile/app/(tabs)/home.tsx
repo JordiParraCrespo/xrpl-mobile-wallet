@@ -8,11 +8,10 @@ import {
   ActionsRow,
   ActivitySection,
   BalanceHero,
-  HOME_ACCOUNTS,
   HOME_ACTIVITY,
   HomeBackground,
   HomeHeader,
-  totalUsd,
+  useHome,
 } from '../../components/drops/home';
 import { Routes } from '../../lib/routes';
 
@@ -21,13 +20,14 @@ import { Routes } from '../../lib/routes';
  * the four core action circles, account tiles per XRPL chain and recent
  * activity, in both design themes: the light lavender "Glow" (default) and
  * the indigo→ink "Dark" gradient, following the system color scheme. The
- * theme tokens come from the root layout; data is mocked for now (see
- * `home-data.ts`); search, notifications and More are follow-up overlays.
+ * theme tokens come from the root layout. Balances and their USD value are
+ * live (`useHome`); recent activity is still mocked (`home-data.ts`).
  */
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const dark = useColorScheme().colorScheme === 'dark';
+  const { walletName, accounts, totalUsd, isLoading } = useHome();
 
   return (
     <View className="flex-1 bg-background">
@@ -47,7 +47,7 @@ export default function HomeScreen() {
         contentContainerClassName="px-4"
         contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
       >
-        <BalanceHero usd={totalUsd(HOME_ACCOUNTS)} />
+        <BalanceHero usd={totalUsd} walletName={walletName} loading={isLoading} />
 
         <ActionsRow
           onAddMoney={() => router.push(Routes.AddMoney)}
@@ -57,7 +57,7 @@ export default function HomeScreen() {
         />
 
         <AccountsSection
-          accounts={HOME_ACCOUNTS}
+          accounts={accounts}
           onAccountPress={() => router.push(Routes.Receive)}
           onAddAccount={() => {}}
         />
