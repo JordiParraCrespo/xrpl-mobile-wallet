@@ -2,16 +2,17 @@ import { Stack } from 'expo-router';
 import { CreateWalletProvider } from '../../components/auth/create-wallet';
 
 /**
- * Onboarding — account entry. Both paths open with the name screen (the local
- * display name, saved to the device) and run through backup-info →
- * set-passcode, where set-passcode initializes the vault — nothing wallet-side
- * can be persisted before it. The freshly unlocked vault then lets the
- * biometrics step enroll Face ID / fingerprint (auto-skipped when the device
- * has none):
+ * Onboarding — account entry, organized in four themed blocks so related
+ * screens always follow each other: who you are (name), secure this device
+ * (backup-info explains the passcode → set-passcode initializes the vault →
+ * biometrics enrolls Face ID / fingerprint on the fresh vault, auto-skipped
+ * without hardware), your wallet keys (create: secure-intro → reveal →
+ * verify; import: picker → method), then celebrate and the one app-level
+ * extra (success → notifications):
  *
- *   welcome ─┬─ create ── name → secure-intro → backup-info → set-passcode → biometrics → notifications → reveal-phrase → backup-quiz ─┐
- *            └─ import ── name → backup-info → set-passcode → biometrics → notifications → import (picker) → phrase | seed | secret-numbers ─┤
- *                                                                                                  └─→ success → home
+ *   welcome ─┬─ create ── name → backup-info → set-passcode → biometrics → secure-intro → reveal-phrase → backup-quiz ─┐
+ *            └─ import ── name → backup-info → set-passcode → biometrics → import (picker) → phrase | seed | secret-numbers ─┤
+ *                                                                                  └─→ success → notifications → home
  */
 export default function OnboardingLayout() {
   return (

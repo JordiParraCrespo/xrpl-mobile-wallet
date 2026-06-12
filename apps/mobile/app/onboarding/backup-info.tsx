@@ -27,7 +27,7 @@ export default function BackupInfoScreen() {
 
   return (
     <OnboardingStepScreen
-      step={isImport ? 2 : 3}
+      step={2}
       totalSteps={isImport ? 4 : 5}
       icon={Lock}
       title={t('onboarding.backupInfo.title')}

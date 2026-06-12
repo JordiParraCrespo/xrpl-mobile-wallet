@@ -1,18 +1,18 @@
-import { Button } from '@flama/design-system-mobile/button';
-import { Icon } from '@flama/design-system-mobile/icon';
-import { InputField } from '@flama/design-system-mobile/input-field';
-import { ScreenHeader } from '@flama/design-system-mobile/screen-header';
-import { Text } from '@flama/design-system-mobile/text';
-import { MAX_NAME_LENGTH } from '@flama/frontend';
-import { useSetDisplayName } from '@flama/frontend/react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { CircleCheck, User } from 'lucide-react-native';
-import * as React from 'react';
-import { useTranslation } from 'react-i18next';
-import { ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { NamePreview } from '../../components/auth/name-preview';
-import { buildRoute, type OnboardingPath, Routes } from '../../lib/routes';
+import { Button } from "@flama/design-system-mobile/button";
+import { Icon } from "@flama/design-system-mobile/icon";
+import { InputField } from "@flama/design-system-mobile/input-field";
+import { ScreenHeader } from "@flama/design-system-mobile/screen-header";
+import { Text } from "@flama/design-system-mobile/text";
+import { MAX_NAME_LENGTH } from "@flama/frontend";
+import { useSetDisplayName } from "@flama/frontend/react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { CircleCheck, User } from "lucide-react-native";
+import * as React from "react";
+import { useTranslation } from "react-i18next";
+import { ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { NamePreview } from "../../components/auth/name-preview";
+import { buildRoute, type OnboardingPath, Routes } from "../../lib/routes";
 
 /** Smallest accepted name; mirrors the `profile` module's MIN_NAME_LENGTH. */
 const MIN_NAME_LENGTH = 2;
@@ -30,12 +30,14 @@ export default function NameScreen() {
   const { t } = useTranslation();
   const { next } = useLocalSearchParams<{ next?: OnboardingPath }>();
 
-  const isImport = next === 'import';
-  const destination = isImport
-    ? buildRoute.onboardingBackupInfo('import')
-    : Routes.OnboardingSecureIntro;
+  const isImport = next === "import";
+  // Both paths continue into the device-security block (passcode explainer →
+  // keypad → biometrics); the paths only diverge after it.
+  const destination = buildRoute.onboardingBackupInfo(
+    isImport ? "import" : "create",
+  );
 
-  const [name, setName] = React.useState('');
+  const [name, setName] = React.useState("");
   const valid = name.trim().length >= MIN_NAME_LENGTH;
 
   const setDisplayName = useSetDisplayName({
@@ -51,7 +53,11 @@ export default function NameScreen() {
   return (
     <View className="flex-1 bg-background">
       <View style={{ paddingTop: insets.top + 8 }} className="px-6">
-        <ScreenHeader step={1} total={isImport ? 4 : 5} onBack={() => router.back()} />
+        <ScreenHeader
+          step={1}
+          total={isImport ? 4 : 5}
+          onBack={() => router.back()}
+        />
       </View>
 
       <ScrollView
@@ -63,28 +69,31 @@ export default function NameScreen() {
           <Icon as={User} size={28} className="text-brand-soft-foreground" />
         </View>
         <Text className="mt-5 font-display text-[30px] leading-[34px] tracking-[-0.5px] text-foreground">
-          {t('onboarding.name.title')}
+          {t("onboarding.name.title")}
         </Text>
         <Text className="mt-2.5 text-[15px] leading-6 text-muted-foreground">
-          {t('onboarding.name.subtitle')}
+          {t("onboarding.name.subtitle")}
         </Text>
 
         <View className="mt-[26px]">
           <InputField
-            label={t('onboarding.name.label')}
+            label={t("onboarding.name.label")}
             value={name}
-            onChangeText={(value) => setName(value.replace(/^\s+/, '').slice(0, MAX_NAME_LENGTH))}
-            placeholder={t('onboarding.name.fieldPlaceholder')}
+            onChangeText={(value) =>
+              setName(value.replace(/^\s+/, "").slice(0, MAX_NAME_LENGTH))
+            }
+            placeholder={t("onboarding.name.fieldPlaceholder")}
             autoCapitalize="words"
             autoComplete="name"
             autoCorrect={false}
-            autoFocus
             returnKeyType="done"
             onSubmitEditing={submit}
             maxLength={MAX_NAME_LENGTH}
             leading={<Icon as={User} size={20} />}
             trailing={
-              valid ? <Icon as={CircleCheck} size={20} className="text-positive" /> : undefined
+              valid ? (
+                <Icon as={CircleCheck} size={20} className="text-positive" />
+              ) : undefined
             }
           />
         </View>
@@ -100,7 +109,9 @@ export default function NameScreen() {
           disabled={!valid || isPending}
           onPress={submit}
         >
-          <Text>{valid ? t('onboarding.name.cta') : t('onboarding.name.ctaEmpty')}</Text>
+          <Text>
+            {valid ? t("onboarding.name.cta") : t("onboarding.name.ctaEmpty")}
+          </Text>
         </Button>
       </View>
     </View>
