@@ -1,13 +1,19 @@
-import QRCode from 'qrcode';
-import type { ReactNode } from 'react';
-import * as React from 'react';
-import { View } from 'react-native';
-import Svg, { Circle, ClipPath, Defs, Rect, Image as SvgImage } from 'react-native-svg';
+import QRCode from "qrcode";
+import type { ReactNode } from "react";
+import * as React from "react";
+import { View } from "react-native";
+import Svg, {
+  Circle,
+  ClipPath,
+  Defs,
+  Rect,
+  Image as SvgImage,
+} from "react-native-svg";
 
 // Brand indigo for the QR center mark. Hard-coded (not a theme token) because
 // the code always sits on a white card, independent of light/dark.
-const BRAND = '#5b41dd';
-const MODULE_DARK = '#0b0a14';
+const BRAND = "#5b41dd";
+const MODULE_DARK = "#0b0a14";
 
 /**
  * A real, scannable QR for `value`, styled like the design's `FakeQR`
@@ -15,9 +21,15 @@ const MODULE_DARK = '#0b0a14';
  * a brand disc in the center. Error correction is H so the center mark's
  * ~4% coverage stays well within budget.
  */
-export function ReceiveQr({ value, size = 196 }: { value: string; size?: number }) {
+export function ReceiveQr({
+  value,
+  size = 196,
+}: {
+  value: string;
+  size?: number;
+}) {
   const matrix = React.useMemo(() => {
-    const qr = QRCode.create(value, { errorCorrectionLevel: 'H' });
+    const qr = QRCode.create(value, { errorCorrectionLevel: "H" });
     return { count: qr.modules.size, data: qr.modules.data };
   }, [value]);
 
@@ -34,14 +46,17 @@ export function ReceiveQr({ value, size = 196 }: { value: string; size?: number 
     for (let x = 0; x < n; x++) {
       if (inFinder(x, y)) continue;
       if (matrix.data[y * n + x]) {
+        // 0.85 coverage / 0.18 rounding: the largest dot styling that still
+        // round-trips through a strict decoder (verified with jsQR) at every
+        // size — the design's looser 0.76 dots fail to scan.
         cells.push(
           <Rect
             key={`m-${x}-${y}`}
-            x={x * cell + cell * 0.12}
-            y={y * cell + cell * 0.12}
-            width={cell * 0.76}
-            height={cell * 0.76}
-            rx={cell * 0.22}
+            x={x * cell + cell * 0.075}
+            y={y * cell + cell * 0.075}
+            width={cell * 0.85}
+            height={cell * 0.85}
+            rx={cell * 0.18}
             fill={MODULE_DARK}
           />,
         );
@@ -84,10 +99,10 @@ export function ReceiveQr({ value, size = 196 }: { value: string; size?: number 
   return (
     <View
       style={{
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         borderRadius: 22,
         padding: 16,
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOpacity: 0.4,
         shadowRadius: 40,
         shadowOffset: { width: 0, height: 10 },
@@ -107,7 +122,7 @@ export function ReceiveQr({ value, size = 196 }: { value: string; size?: number 
         <Circle cx={size / 2} cy={size / 2} r={size * 0.11} fill="#fff" />
         <Circle cx={size / 2} cy={size / 2} r={size * 0.092} fill={BRAND} />
         <SvgImage
-          href={require('../../../assets/dewy.png')}
+          href={require("../../../assets/dewy.png")}
           x={size / 2 - dewySize / 2}
           y={size / 2 - dewySize / 2}
           width={dewySize}
