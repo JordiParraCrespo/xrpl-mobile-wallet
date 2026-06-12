@@ -26,6 +26,7 @@ export enum Routes {
   OnboardingImportSeed = '/onboarding/import-seed',
   OnboardingImportSecretNumbers = '/onboarding/import-secret-numbers',
   OnboardingSuccess = '/onboarding/success',
+  OnboardingBiometrics = '/onboarding/biometrics',
   OnboardingNotifications = '/onboarding/notifications',
 
   // Hub (tabs)
@@ -79,6 +80,10 @@ export const buildRoute = {
   }),
   onboardingSetPasscode: (next: OnboardingPath): Href => ({
     pathname: Routes.OnboardingSetPasscode,
+    params: { next },
+  }),
+  onboardingBiometrics: (next: OnboardingPath): Href => ({
+    pathname: Routes.OnboardingBiometrics,
     params: { next },
   }),
   onboardingNotifications: (next: OnboardingPath): Href => ({
