@@ -491,6 +491,43 @@
         "evm": "0x… addresses"
       },
       "done": "Done"
+    },
+    "chat": {
+      "received": "You received",
+      "sent": "You sent",
+      "split": "Split",
+      "request": "Request",
+      "send": "Send",
+      "messagePlaceholder": "Type a message…",
+      "back": "Back"
+    },
+    "transaction": {
+      "actions": {
+        "send": "Send",
+        "request": "Request",
+        "schedule": "Schedule",
+        "split": "Split"
+      },
+      "status": "Status",
+      "settled": "Settled",
+      "from": "From",
+      "to": "To",
+      "account": "Account",
+      "accountValue": "Personal · XRP",
+      "date": "Date",
+      "submitted": "Submitted",
+      "validated": "Validated",
+      "network": "Network",
+      "networkValue": "XRP Ledger",
+      "ledgerIndex": "Ledger index",
+      "networkFee": "Network fee",
+      "transaction": "Transaction",
+      "confirmation": "Confirmation",
+      "download": "Download",
+      "openExplorer": "Open in explorer",
+      "getHelp": "Get help with this payment",
+      "close": "Close",
+      "more": "More"
     }
   }
 }
