@@ -15,8 +15,18 @@ export {
   useAccountTransactions,
   useRecentBlocks,
 } from './explorer.queries';
-export { useAuthState, useSecurityState, useWalletState } from './hooks';
+export {
+  useAuthState,
+  useProfileState,
+  useSecurityState,
+  useWalletState,
+} from './hooks';
 export { pricesKeys, useExchangeRate } from './prices.queries';
+export {
+  profileKeys,
+  useProfileRestore,
+  useSetDisplayName,
+} from './profile.queries';
 export {
   securityKeys,
   useChangePasscode,

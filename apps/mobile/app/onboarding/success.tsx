@@ -97,7 +97,7 @@ export default function OnboardingSuccessScreen() {
           variant="brand"
           size="lg"
           className="w-full"
-          onPress={() => router.replace(Routes.Home)}
+          onPress={() => router.replace(Routes.OnboardingNotifications)}
         >
           <Text>{t('onboarding.success.cta')}</Text>
           <Icon as={ArrowRight} size={18} className="text-brand-foreground" />
