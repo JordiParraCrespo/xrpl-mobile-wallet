@@ -298,5 +298,15 @@
       "errorImport": "Something went wrong creating your wallet. Please try again.",
       "reassurance": "Almost there. Confirming proves your phrase is safely written down."
     }
+  },
+  "unlock": {
+    "welcomeBack": "Welcome back",
+    "forgotPasscode": "Forgot your passcode?",
+    "wrongPasscode": "Wrong passcode. Try again.",
+    "lockedOut": "Too many attempts. Try again in a moment.",
+    "wipeTitle": "Reset wallet?",
+    "wipeMessage": "This deletes the wallet from this device. You can only restore it with your recovery phrase, family seed or secret numbers.",
+    "wipeConfirm": "Delete wallet",
+    "wipeCancel": "Cancel"
   }
 }
