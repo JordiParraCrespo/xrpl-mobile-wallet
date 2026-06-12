@@ -1,11 +1,17 @@
+import { useProfileState } from '@flama/frontend/react';
 import type { ApproveFn, WalletAgent } from '@flama/wallet-agent';
 import * as React from 'react';
 import { createWalletAgent } from '../../lib/agent';
-import { GREETING, newSession, SESSION_SEEDS } from './chat-seeds';
+import { greeting, newSession, SESSION_SEEDS } from './chat-seeds';
 import type { ChatPayload, Msg, Session } from './types';
 
 const RATE = 0.6184;
 const XRPL_BAL = 1204.51;
+
+/** Matches an XRPL classic r-address anywhere in a message. */
+const XRPL_ADDRESS = /\br[1-9A-HJ-NP-Za-km-z]{24,34}\b/;
+/** "raHZ…w9r" — a compact, readable label for a raw address. */
+const shortAddress = (a: string): string => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
 /** Safe text accessor for the live session title/preview sync. */
 function textOf(m: Msg): string | undefined {
@@ -18,10 +24,14 @@ function textOf(m: Msg): string | undefined {
  * approve/decline card — the flow never executes anything silently.
  */
 export function useChatFlow() {
+  const { name: profileName } = useProfileState();
   const idRef = React.useRef(1);
   const flowRef = React.useRef<{
     name?: 'send' | 'swap';
+    /** Display label for the recipient (a saved name or a shortened address). */
     recipient?: string;
+    /** The real XRPL destination address, when the user supplied one. */
+    recipientAddress?: string;
     amount?: number;
     network?: string;
     to?: string;
@@ -117,13 +127,20 @@ export function useChatFlow() {
       preview: 'Start a conversation',
       time: 'Now',
       group: 'Today',
-      msgs: [GREETING],
+      msgs: [greeting(profileName)],
     },
     ...SESSION_SEEDS,
   ]);
   const [activeId, setActiveId] = React.useState('live');
   const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const [msgs, setMsgs] = React.useState<Msg[]>([GREETING]);
+  const [msgs, setMsgs] = React.useState<Msg[]>([greeting(profileName)]);
+
+  // Personalize the opening greeting once the profile name loads (if the live
+  // thread is still just the greeting).
+  React.useEffect(() => {
+    if (!profileName) return;
+    setMsgs((cur) => (cur.length === 1 && cur[0]?.id === 0 ? [greeting(profileName)] : cur));
+  }, [profileName]);
 
   // Keep the active session in sync — live title, preview and messages.
   React.useEffect(() => {
@@ -150,7 +167,7 @@ export function useChatFlow() {
     setDrawerOpen(false);
     if (id === activeId) return;
     const target = sessions.find((s) => s.id === id);
-    const tmsgs = target ? target.msgs : [GREETING];
+    const tmsgs = target ? target.msgs : [greeting(profileName)];
     setMsgs(tmsgs);
     idRef.current = Math.max(0, ...tmsgs.map((m) => m.id)) + 1;
     flowRef.current = {};
@@ -159,9 +176,9 @@ export function useChatFlow() {
   };
 
   const startNew = () => {
-    const s = newSession();
+    const s = newSession(profileName);
     setSessions((list) => [s, ...list]);
-    setMsgs([GREETING]);
+    setMsgs([greeting(profileName)]);
     idRef.current = 1;
     flowRef.current = {};
     pendingRef.current = null;
@@ -199,7 +216,7 @@ export function useChatFlow() {
 
   /* ---- scripted flow steps ---- */
   const askAmount = () => {
-    const who = (flowRef.current.recipient || 'Maria').split(' ')[0];
+    const who = (flowRef.current.recipient ?? 'them').split(' ')[0];
     add({
       role: 'bot',
       kind: 'text',
@@ -238,7 +255,7 @@ export function useChatFlow() {
       title: 'Send payment',
       status: 'pending',
       rows: [
-        { label: 'To', value: f.recipient ?? 'Maria Gutiérrez', mono: true },
+        { label: 'To', value: f.recipient ?? 'recipient', mono: true },
         {
           label: 'Amount',
           value: `${(f.amount ?? 0).toLocaleString('en-US')} XRP`,
@@ -292,13 +309,32 @@ export function useChatFlow() {
       ],
     });
   };
+  /**
+   * Routes the step after an amount is chosen: swaps ask for a token, a real
+   * address hands off to the agent (prepare → approval → submit), and a
+   * named/demo contact continues the scripted network → review path.
+   */
+  const afterAmountChosen = () => {
+    const f = flowRef.current;
+    if (f.name === 'swap') {
+      think(askSwapTo);
+      return;
+    }
+    if (f.recipientAddress) {
+      void runAgent(`Send ${f.amount} XRP to ${f.recipientAddress}. Go ahead and submit it.`);
+      return;
+    }
+    think(askNetwork);
+  };
+
   const routeUser = (text: string) => {
     const lc = text.toLowerCase();
     if (pendingRef.current === 'amount') {
       const n = Number.parseFloat(text.replace(/[^0-9.]/g, ''));
       pendingRef.current = null;
       flowRef.current.amount = Number.isNaN(n) ? 25 : n;
-      return think(flowRef.current.name === 'swap' ? askSwapTo : askNetwork);
+      afterAmountChosen();
+      return;
     }
     if (/balance|how much do i|what.*have/.test(lc)) {
       void runAgent(text);
@@ -309,11 +345,24 @@ export function useChatFlow() {
       void runAgent(text);
       return;
     }
-    // A real XRPL payment: the message names an r-address. The agent prepares,
-    // then pauses on the approval card before signing + submitting on-device.
-    if (/send|pay|transfer/.test(lc) && /\br[1-9A-HJ-NP-Za-km-z]{24,34}\b/.test(text)) {
-      void runAgent(text);
-      return;
+    // A real XRPL payment: the message contains an r-address. With an amount we
+    // hand it to the agent (prepare → approval card → submit on-device). With
+    // just the address, capture it as the recipient and ask for the amount.
+    const inlineAddress = text.match(XRPL_ADDRESS)?.[0];
+    if (inlineAddress) {
+      const inlineAmount = text.match(/([\d][\d,]*(?:\.\d+)?)\s*xrp/i)?.[1];
+      if (inlineAmount) {
+        void runAgent(
+          `Send ${inlineAmount.replace(/,/g, '')} XRP to ${inlineAddress}. Go ahead and submit it.`,
+        );
+        return;
+      }
+      flowRef.current = {
+        name: 'send',
+        recipient: shortAddress(inlineAddress),
+        recipientAddress: inlineAddress,
+      };
+      return think(askAmount);
     }
     if (/swap|convert|exchange/.test(lc)) {
       flowRef.current = { name: 'swap' };
@@ -342,15 +391,24 @@ export function useChatFlow() {
       );
     const num = text.match(/([\d][\d,]*(?:\.\d+)?)\s*xrp/i);
     const nameM = text.match(/to\s+([A-Z][a-z]+)/);
-    flowRef.current = {
-      name: 'send',
-      recipient: nameM ? nameM[1] : 'Maria Gutiérrez',
-    };
-    if (num) {
-      flowRef.current.amount = Number.parseFloat(num[1].replace(/,/g, ''));
-      return think(askNetwork);
+    if (nameM) {
+      // A named contact without an on-chain address yet (e.g. "Send to Maria").
+      flowRef.current = { name: 'send', recipient: nameM[1] };
+      if (num) {
+        flowRef.current.amount = Number.parseFloat(num[1].replace(/,/g, ''));
+        return think(askNetwork);
+      }
+      return think(askAmount);
     }
-    return think(askAmount);
+    // A send with no recipient yet — ask for the address rather than assume one.
+    flowRef.current = { name: 'send' };
+    return think(() =>
+      add({
+        role: 'bot',
+        kind: 'text',
+        text: 'Sure — who would you like to send to? Paste an r-address (or scan a QR), or pick a saved recipient.',
+      }),
+    );
   };
 
   const onAnswer = (msg: Msg, opt: string) => {
@@ -370,7 +428,8 @@ export function useChatFlow() {
         );
       }
       flowRef.current.amount = Number.parseFloat(opt);
-      return think(flowRef.current.name === 'swap' ? askSwapTo : askNetwork);
+      afterAmountChosen();
+      return;
     }
     if (qid === 'network') {
       flowRef.current.network = opt;
@@ -437,7 +496,7 @@ export function useChatFlow() {
         role: 'bot',
         kind: 'result',
         text: `Sent ${(f.amount ?? 0).toLocaleString('en-US')} XRP to ${
-          (f.recipient || 'Maria').split(' ')[0]
+          (f.recipient ?? 'them').split(' ')[0]
         }.`,
         meta: 'Settled on the XRP Ledger in 3.7s · fee 0.00001 XRP',
         tx: '0x9f3c…a1b2',
@@ -451,7 +510,7 @@ export function useChatFlow() {
     if (retry) {
       flowRef.current = {
         name: 'send',
-        recipient: flowRef.current.recipient || 'Maria Gutiérrez',
+        recipient: flowRef.current.recipient,
       };
       return think(askAmount);
     }
