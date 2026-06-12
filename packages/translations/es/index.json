@@ -413,6 +413,16 @@
     "locked": "Desbloquea tu cartera para recibir.",
     "empty": "Todavía no hay ninguna cuenta disponible para recibir."
   },
+  "flows": {
+    "addMoney": {
+      "title": "Añadir dinero",
+      "destination": "A {{ledger}} · {{balance}}",
+      "noFee": "Sin comisión",
+      "arrivingLabel": "Llega",
+      "arrivingValue": "Normalmente al instante",
+      "submit": "Añadir dinero de forma segura"
+    }
+  },
   "droppoints": {
     "comingSoon": "MUY PRONTO",
     "title": "DropPoints",
