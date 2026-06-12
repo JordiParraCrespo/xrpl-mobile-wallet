@@ -2,10 +2,15 @@ import { Badge } from '@flama/design-system-mobile/badge';
 import { BottomSheet } from '@flama/design-system-mobile/bottom-sheet';
 import { Button } from '@flama/design-system-mobile/button';
 import { FeatureRow } from '@flama/design-system-mobile/feature-row';
-import { GlassBackdrop } from '@flama/design-system-mobile/glass-panel';
 import { Icon } from '@flama/design-system-mobile/icon';
 import { Text } from '@flama/design-system-mobile/text';
-import { ArrowLeftRight, type LucideIcon, ShieldCheck, TrendingUp } from 'lucide-react-native';
+import {
+  ArrowLeftRight,
+  ChartNoAxesColumnIncreasing,
+  type LucideIcon,
+  ShieldCheck,
+  TrendingUp,
+} from 'lucide-react-native';
 import { View } from 'react-native';
 
 type Perk = { icon: LucideIcon; title: string; description: string };
@@ -17,7 +22,7 @@ const PERKS: Perk[] = [
     description: 'Put idle XRP to work, no lock-up.',
   },
   {
-    icon: TrendingUp,
+    icon: ChartNoAxesColumnIncreasing,
     title: 'Up to 5.2% APY',
     description: 'Variable rate, paid daily.',
   },
@@ -39,8 +44,11 @@ export function MarketEarnSheet({ open, onClose }: { open: boolean; onClose: () 
     <BottomSheet open={open} onClose={onClose}>
       <View className="items-center">
         <View
-          className="relative h-[88px] w-[88px] items-center justify-center overflow-hidden rounded-full border border-white/70 bg-white/55"
+          className="bg-brand-soft relative items-center justify-center border border-white/70"
           style={{
+            width: 88,
+            height: 88,
+            borderRadius: 44,
             shadowColor: '#5b41dd',
             shadowOpacity: 0.14,
             shadowRadius: 17,
@@ -48,11 +56,10 @@ export function MarketEarnSheet({ open, onClose }: { open: boolean; onClose: () 
             elevation: 6,
           }}
         >
-          <GlassBackdrop intensity={18} />
           <Text className="font-display text-brand" style={{ fontSize: 40, lineHeight: 44 }}>
             %
           </Text>
-          <View className="absolute right-4 top-3.5">
+          <View className="absolute" style={{ top: 16, right: 16 }}>
             <Icon as={TrendingUp} size={18} strokeWidth={2.4} className="text-brand" />
           </View>
         </View>
