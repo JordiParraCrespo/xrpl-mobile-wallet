@@ -2,9 +2,10 @@ import type { LucideIcon } from "lucide-react-native";
 import * as React from "react";
 import { Pressable, View } from "react-native";
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 import { cn } from "../../lib/utils";
 import { GlassBackdrop } from "./glass-panel";
@@ -66,7 +67,11 @@ function TabBar({
       pillX.value = target;
       return;
     }
-    pillX.value = withSpring(target, { damping: 26, stiffness: 320 });
+    // Ease-out slide that stops dead on the target — no spring, no overshoot.
+    pillX.value = withTiming(target, {
+      duration: 220,
+      easing: Easing.out(Easing.cubic),
+    });
   }, [activeIndex, itemWidth, pillX]);
 
   const pillStyle = useAnimatedStyle(() => ({
