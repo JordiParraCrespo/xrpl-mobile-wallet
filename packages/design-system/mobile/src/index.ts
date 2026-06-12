@@ -30,6 +30,7 @@ export { AspectRatio } from './components/ui/aspect-ratio';
 export { AssetIcon } from './components/ui/asset-icon';
 export { AssistantAvatar } from './components/ui/assistant-avatar';
 export { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar';
+export { AvatarTile, type AvatarTileProps } from './components/ui/avatar-tile';
 export { Badge, badgeTextVariants, badgeVariants } from './components/ui/badge';
 export { BottomSheet } from './components/ui/bottom-sheet';
 export {

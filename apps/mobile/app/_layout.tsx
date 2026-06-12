@@ -8,6 +8,7 @@ configureReanimatedLogger({ level: ReanimatedLogLevel.warn, strict: false });
 
 import {
   FlamaProvider,
+  useAddressBookRestore,
   useProfileRestore,
   useSecurityRestore,
   useSecurityState,
@@ -73,6 +74,10 @@ function SessionGate() {
   const wallet = useWalletRestore();
   const security = useSecurityRestore();
   const profile = useProfileRestore();
+  // Restore the address book too so saved recipients resolve on the payments
+  // screen from the first paint. It is local-only and must never hold the
+  // splash, so it stays out of the `isLoading` gate below.
+  useAddressBookRestore();
   const isLoading =
     session.isLoading || wallet.isLoading || security.isLoading || profile.isLoading;
 
