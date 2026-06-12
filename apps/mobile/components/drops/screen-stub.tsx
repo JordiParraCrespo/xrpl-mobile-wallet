@@ -1,13 +1,13 @@
-import { Button } from "@flama/design-system-mobile/button";
-import { Text } from "@flama/design-system-mobile/text";
-import { type Href, useRouter } from "expo-router";
-import { ScrollView, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Button } from '@flama/design-system-mobile/button';
+import { Text } from '@flama/design-system-mobile/text';
+import { type Href, useRouter } from 'expo-router';
+import { ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export type StubLink = {
   label: string;
   href: Href;
-  variant?: "default" | "secondary" | "outline" | "destructive";
+  variant?: 'default' | 'secondary' | 'outline' | 'destructive';
   /** Use router.replace instead of push (e.g. ending an onboarding flow). */
   replace?: boolean;
 };
@@ -57,27 +57,19 @@ export function ScreenStub({
     >
       <View className="gap-2">
         {eyebrow ? (
-          <Text className="text-xs uppercase tracking-widest text-muted-foreground">
-            {eyebrow}
-          </Text>
+          <Text className="text-xs uppercase tracking-widest text-muted-foreground">{eyebrow}</Text>
         ) : null}
         <Text className="font-display text-4xl text-foreground">{title}</Text>
-        {blurb ? (
-          <Text className="text-base text-muted-foreground">{blurb}</Text>
-        ) : null}
+        {blurb ? <Text className="text-base text-muted-foreground">{blurb}</Text> : null}
       </View>
 
       {design ? (
         <View className="gap-2 rounded-2xl border border-border bg-card p-4">
-          <Text className="text-xs uppercase tracking-widest text-muted-foreground">
-            Todo
-          </Text>
+          <Text className="text-xs uppercase tracking-widest text-muted-foreground">Todo</Text>
           <Text className="text-sm text-card-foreground">
             Build this screen from the bound Drops design system.
           </Text>
-          <Text className="font-mono text-xs text-muted-foreground">
-            {design}
-          </Text>
+          <Text className="font-mono text-xs text-muted-foreground">{design}</Text>
         </View>
       ) : null}
 
@@ -86,12 +78,8 @@ export function ScreenStub({
           {links.map((link) => (
             <Button
               key={link.label}
-              variant={link.variant ?? "default"}
-              onPress={() =>
-                link.replace
-                  ? router.replace(link.href)
-                  : router.push(link.href)
-              }
+              variant={link.variant ?? 'default'}
+              onPress={() => (link.replace ? router.replace(link.href) : router.push(link.href))}
             >
               <Text>{link.label}</Text>
             </Button>

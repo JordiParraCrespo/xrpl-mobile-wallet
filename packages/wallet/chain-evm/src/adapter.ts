@@ -1,10 +1,13 @@
 import {
+  type AccountTxPage,
+  type AccountTxQuery,
   type Balance,
   type Block,
   type ChainAdapter,
   ChainError,
   ChainErrors,
   formatUnits,
+  type LedgerTransaction,
   type NetworkConfig,
   type Signer,
   type TokenBalance,
@@ -33,6 +36,35 @@ import { publicKeyToAddress, toAccount } from 'viem/accounts';
 import { mapEvmError } from './errors';
 
 const DEFAULT_RECENT_BLOCKS = 10;
+const DEFAULT_TX_LIMIT = 20;
+const MAX_TX_LIMIT = 100;
+
+/**
+ * One row from the Blockscout `?module=account&action=txlist` (eth-explorer
+ * compatibility) endpoint. Numeric fields arrive as decimal strings.
+ */
+interface BlockscoutTxRow {
+  hash: string;
+  from: string;
+  to: string;
+  /** Value moved, in wei (decimal string). */
+  value: string;
+  /** Inclusion time, unix seconds (decimal string). */
+  timeStamp: string;
+  gasUsed: string;
+  gasPrice: string;
+  /** '0' on success, '1' on error. */
+  isError: string;
+  /** '1' when the receipt succeeded, '0' otherwise. */
+  txreceipt_status: string;
+}
+
+/** Envelope returned by the Blockscout eth-explorer compatibility API. */
+interface BlockscoutTxListResponse {
+  status: '0' | '1';
+  message: string;
+  result: BlockscoutTxRow[] | string;
+}
 
 export class EvmAdapter implements ChainAdapter {
   private readonly chain: Chain;
@@ -101,6 +133,104 @@ export class EvmAdapter implements ChainAdapter {
     } catch (error) {
       throw mapEvmError(error, this.config.chainId);
     }
+  }
+
+  /**
+   * Fetches native (XRP) transaction history from the chain's Blockscout
+   * instance via its eth-explorer compatibility endpoint
+   * (`?module=account&action=txlist`). This lists native value transfers only;
+   * ERC-20 token history is out of scope.
+   *
+   * The cursor is the Blockscout page number as a string. A full page (returned
+   * length === requested limit) implies more history, so `nextCursor` points at
+   * the next page; a partial page exhausts history.
+   */
+  async getAccountTransactions(address: string, query?: AccountTxQuery): Promise<AccountTxPage> {
+    const { explorerApiUrl, chainId } = this.config;
+    if (!explorerApiUrl) {
+      throw new ChainError(ChainErrors.RPC, {
+        chainId,
+        detail: 'No history endpoint configured',
+      });
+    }
+
+    const limit = Math.min(MAX_TX_LIMIT, Math.max(1, Math.floor(query?.limit ?? DEFAULT_TX_LIMIT)));
+    const page = query?.cursor ? Math.max(1, Number(query.cursor)) : 1;
+
+    const url =
+      `${explorerApiUrl}?module=account&action=txlist` +
+      `&address=${address}&sort=desc&page=${page}&offset=${limit}`;
+
+    let response: Response;
+    try {
+      response = await fetch(url);
+    } catch (cause) {
+      throw new ChainError(ChainErrors.NETWORK, { chainId, cause });
+    }
+
+    if (!response.ok) {
+      throw new ChainError(ChainErrors.RPC, {
+        chainId,
+        detail: `Explorer responded with HTTP ${response.status}`,
+      });
+    }
+
+    const body = (await response.json()) as BlockscoutTxListResponse;
+
+    if (body.status !== '1') {
+      // Blockscout reports an empty history as a non-1 status with this exact
+      // message; that is success with no rows, not an error.
+      if (typeof body.result === 'string' && body.result === 'No transactions found') {
+        return { transactions: [] };
+      }
+      throw new ChainError(ChainErrors.RPC, {
+        chainId,
+        detail: typeof body.result === 'string' ? body.result : body.message,
+      });
+    }
+
+    const rows = Array.isArray(body.result) ? body.result : [];
+    const transactions = rows.map((row) => this.mapTxRow(row, address));
+    const nextCursor = transactions.length === limit ? String(page + 1) : undefined;
+
+    return { transactions, nextCursor };
+  }
+
+  /** Normalizes a Blockscout txlist row into a {@link LedgerTransaction}. */
+  private mapTxRow(row: BlockscoutTxRow, address: string): LedgerTransaction {
+    const account = address.toLowerCase();
+    const from = row.from?.toLowerCase() ?? '';
+    const to = row.to?.toLowerCase() ?? '';
+    const isFrom = from === account;
+    const isTo = to === account;
+
+    const direction = isFrom && isTo ? 'self' : isFrom ? 'out' : 'in';
+    const success = row.isError === '0' && row.txreceipt_status !== '0';
+
+    let counterparty: string | undefined;
+    if (direction === 'out') {
+      counterparty = row.to;
+    } else if (direction === 'in') {
+      counterparty = row.from;
+    }
+
+    const fee =
+      row.gasUsed && row.gasPrice ? BigInt(row.gasUsed) * BigInt(row.gasPrice) : undefined;
+
+    return {
+      hash: row.hash,
+      timestamp: Number(row.timeStamp),
+      kind: 'payment',
+      direction,
+      success,
+      amount: BigInt(row.value),
+      symbol: this.config.nativeCurrency.symbol,
+      counterparty,
+      fee,
+      explorerUrl: this.config.explorerUrl
+        ? `${this.config.explorerUrl}/tx/${row.hash}`
+        : undefined,
+    };
   }
 
   async transfer(params: TransferParams, signer: Signer): Promise<TxResult> {

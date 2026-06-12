@@ -1,4 +1,4 @@
-export type { ChainAdapter } from './adapter';
+export type { ChainAdapter } from "./adapter";
 export {
   ChainError,
   type ChainErrorCode,
@@ -7,19 +7,25 @@ export {
   type ChainErrorEntry,
   ChainErrors,
   toChainError,
-} from './errors';
-export { ChainRegistry } from './registry';
-export type { SignatureResult, Signer, SignerCurve } from './signer';
+} from "./errors";
+export { ChainRegistry } from "./registry";
+export type { SignatureResult, Signer, SignerCurve } from "./signer";
 export type {
+  AccountTxPage,
+  AccountTxQuery,
   Balance,
   Block,
   ChainKind,
+  LedgerTransaction,
+  LedgerTxKind,
   NetworkConfig,
   RegisterTokenParams,
   TokenBalance,
   TokenInfo,
   TokenTransferParams,
   TransferParams,
+  TxContext,
+  TxDirection,
   TxResult,
-} from './types';
-export { formatUnits, parseUnits } from './units';
+} from "./types";
+export { formatUnits, parseUnits } from "./units";

@@ -10,12 +10,9 @@ import {
 } from '@tanstack/react-query';
 import type { WalletInfo } from '../modules/wallet';
 import { useFlamaApp } from './context';
+import { invalidateAfterTransfer, walletKeys } from './query-keys';
 
-export const walletKeys = {
-  all: ['wallet'] as const,
-  restore: ['wallet', 'restore'] as const,
-  balance: (chainId: string) => ['wallet', 'balance', chainId] as const,
-};
+export { walletKeys } from './query-keys';
 
 /** Loads the vault from secure storage on app start. */
 export function useWalletRestore(
@@ -221,7 +218,8 @@ export function useSendTransaction(
     mutationFn: ({ chainId, to, amount }: SendTransactionInput) =>
       app.wallet.send(chainId, to, amount),
     onSuccess: (...args) => {
-      queryClient.invalidateQueries({ queryKey: walletKeys.all });
+      // A send moves the native balance, costs a fee and adds a history row.
+      invalidateAfterTransfer(queryClient);
       options?.onSuccess?.(...args);
     },
     ...options,
@@ -241,9 +239,8 @@ export function useRequestFaucetFunds(
   return useMutation({
     mutationFn: ({ chainId }: RequestFaucetFundsInput) => app.wallet.requestFaucetFunds(chainId),
     onSuccess: (...args) => {
-      queryClient.invalidateQueries({
-        queryKey: walletKeys.balance(args[1].chainId),
-      });
+      // Faucet funding credits the balance and shows up as an incoming tx.
+      invalidateAfterTransfer(queryClient);
       options?.onSuccess?.(...args);
     },
     ...options,

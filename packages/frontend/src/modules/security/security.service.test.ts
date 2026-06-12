@@ -7,7 +7,7 @@ import { SecurityErrors } from './security.errors';
 import { SecurityService } from './security.service';
 import { createSecurityStore, type SecurityStore } from './security.state';
 
-const BIOMETRIC_KEY_STORAGE_KEY = 'flama.security.biometric-key';
+const BIOMETRICS_ENABLED_STORAGE_KEY = 'flama.security.biometrics-enabled';
 const ATTEMPTS_STORAGE_KEY = 'flama.security.attempts';
 
 class InvalidPasscodeError extends Error {
@@ -16,7 +16,6 @@ class InvalidPasscodeError extends Error {
 
 class FakeKeyring {
   passcode: string | null = null;
-  vaultKey = new Uint8Array([0xde, 0xad, 0xbe, 0xef, 0x01, 0x02]);
   isUnlocked = false;
 
   isInitialized(): Promise<boolean> {
@@ -41,22 +40,9 @@ class FakeKeyring {
     return Promise.resolve();
   }
 
-  unlockWithKey(vaultKey: Uint8Array): Promise<void> {
-    const matches =
-      vaultKey.length === this.vaultKey.length &&
-      vaultKey.every((byte, i) => byte === this.vaultKey[i]);
-    if (!matches) {
-      return Promise.reject(new InvalidPasscodeError());
-    }
+  unlockTrusted(): Promise<void> {
     this.isUnlocked = true;
     return Promise.resolve();
-  }
-
-  getVaultKey(): Uint8Array {
-    if (!this.isUnlocked) {
-      throw new Error('Vault is locked');
-    }
-    return this.vaultKey;
   }
 
   lock(): void {
@@ -182,7 +168,7 @@ describe('SecurityService', () => {
 
     it('loads biometric availability and enrollment', async () => {
       biometrics.available = true;
-      storage.data.set(BIOMETRIC_KEY_STORAGE_KEY, 'deadbeef0102');
+      storage.data.set(BIOMETRICS_ENABLED_STORAGE_KEY, '1');
       await service.restore();
       expect(store.getState().biometricsAvailable).toBe(true);
       expect(store.getState().biometricsEnabled).toBe(true);
@@ -323,12 +309,12 @@ describe('SecurityService', () => {
     it('enableBiometrics rejects when the prompt is declined', async () => {
       biometrics.promptResult = false;
       await expectAppError(service.enableBiometrics(), SecurityErrors.BIOMETRIC_AUTH_FAILED.code);
-      expect(storage.data.has(BIOMETRIC_KEY_STORAGE_KEY)).toBe(false);
+      expect(storage.data.has(BIOMETRICS_ENABLED_STORAGE_KEY)).toBe(false);
     });
 
-    it('enableBiometrics stores the vault key as hex', async () => {
+    it('enableBiometrics stores the enabled flag', async () => {
       await service.enableBiometrics();
-      expect(storage.data.get(BIOMETRIC_KEY_STORAGE_KEY)).toBe('deadbeef0102');
+      expect(storage.data.get(BIOMETRICS_ENABLED_STORAGE_KEY)).toBe('1');
       expect(store.getState().biometricsEnabled).toBe(true);
     });
 
@@ -366,7 +352,7 @@ describe('SecurityService', () => {
       expect(store.getState().status).toBe('locked');
     });
 
-    it('unlockWithBiometrics unlocks with the stored vault key', async () => {
+    it('unlockWithBiometrics unlocks via a trusted unlock', async () => {
       await service.enableBiometrics();
       service.lock();
       await service.unlockWithBiometrics();
@@ -374,10 +360,10 @@ describe('SecurityService', () => {
       expect(keyring.isUnlocked).toBe(true);
     });
 
-    it('disableBiometrics removes the stored key', async () => {
+    it('disableBiometrics removes the enabled flag', async () => {
       await service.enableBiometrics();
       await service.disableBiometrics();
-      expect(storage.data.has(BIOMETRIC_KEY_STORAGE_KEY)).toBe(false);
+      expect(storage.data.has(BIOMETRICS_ENABLED_STORAGE_KEY)).toBe(false);
       expect(store.getState().biometricsEnabled).toBe(false);
       service.lock();
       await expectAppError(
@@ -444,7 +430,7 @@ describe('SecurityService', () => {
       await service.wipe();
 
       expect(keyring.passcode).toBeNull();
-      expect(storage.data.has(BIOMETRIC_KEY_STORAGE_KEY)).toBe(false);
+      expect(storage.data.has(BIOMETRICS_ENABLED_STORAGE_KEY)).toBe(false);
       expect(storage.data.has(ATTEMPTS_STORAGE_KEY)).toBe(false);
       expect(store.getState()).toMatchObject({
         status: 'uninitialized',
@@ -459,6 +445,91 @@ describe('SecurityService', () => {
       await service.wipe();
       await service.setupPasscode('654321');
       expect(store.getState().status).toBe('unlocked');
+    });
+  });
+
+  describe('auto-lock', () => {
+    const AUTO_LOCK_STORAGE_KEY = 'flama.security.autolock';
+
+    beforeEach(async () => {
+      await service.setupPasscode(PASSCODE);
+      service.lock();
+    });
+
+    it('auto-locks the wallet once the inactivity timeout elapses', async () => {
+      await service.unlock(PASSCODE);
+      expect(store.getState().status).toBe('unlocked');
+
+      await vi.advanceTimersByTimeAsync(60_000);
+
+      expect(store.getState().status).toBe('locked');
+      expect(keyring.isUnlocked).toBe(false);
+    });
+
+    it('touch() resets the inactivity countdown', async () => {
+      await service.unlock(PASSCODE);
+
+      await vi.advanceTimersByTimeAsync(50_000);
+      service.touch();
+      await vi.advanceTimersByTimeAsync(50_000);
+      expect(store.getState().status).toBe('unlocked');
+
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(store.getState().status).toBe('locked');
+    });
+
+    it('setAutoLockTimeout(0) disables auto-lock', async () => {
+      await service.setAutoLockTimeout(0);
+      await service.unlock(PASSCODE);
+
+      await vi.advanceTimersByTimeAsync(60 * 60_000);
+
+      expect(store.getState().status).toBe('unlocked');
+    });
+
+    it('persists the timeout and restore() reads it back', async () => {
+      await service.setAutoLockTimeout(120_000);
+      expect(storage.data.get(AUTO_LOCK_STORAGE_KEY)).toBe('120000');
+
+      const fresh = createSecurityStore();
+      const restored = new SecurityService(
+        keyring as unknown as KeyringManager,
+        storage,
+        biometrics,
+        fresh,
+      );
+      await restored.restore();
+      expect(fresh.getState().autoLockMs).toBe(120_000);
+    });
+
+    it('restore() falls back to the default timeout when none is persisted', async () => {
+      await service.restore();
+      expect(store.getState().autoLockMs).toBe(60_000);
+    });
+
+    it('rejects a negative timeout with INVALID_AUTO_LOCK', async () => {
+      await expectAppError(service.setAutoLockTimeout(-1), SecurityErrors.INVALID_AUTO_LOCK.code);
+    });
+
+    it('reschedules the timer when the timeout changes while unlocked', async () => {
+      await service.unlock(PASSCODE);
+      await service.setAutoLockTimeout(10_000);
+
+      await vi.advanceTimersByTimeAsync(10_000);
+
+      expect(store.getState().status).toBe('locked');
+    });
+
+    it('a manual lock() clears the pending auto-lock timer', async () => {
+      await service.unlock(PASSCODE);
+      service.lock();
+      expect(store.getState().status).toBe('locked');
+
+      const lockSpy = vi.spyOn(keyring, 'lock');
+      await vi.advanceTimersByTimeAsync(60_000);
+
+      expect(lockSpy).not.toHaveBeenCalled();
+      expect(store.getState().status).toBe('locked');
     });
   });
 });
