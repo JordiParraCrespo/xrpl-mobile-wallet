@@ -31,6 +31,10 @@ export interface RecentPayment extends PaymentParty {
   /** Inclusion time in unix seconds. */
   timestamp: number;
   success: boolean;
+  /** Network fee paid, scaled to native units; present on the payer's side. */
+  fee?: number;
+  /** Deep link to this transaction on the chain's block explorer. */
+  explorerUrl?: string;
 }
 
 /** One entry on the people rail: a saved contact and/or a recent counterparty. */
@@ -114,6 +118,8 @@ export function buildPaymentsFeed(
       symbol: tx.symbol,
       timestamp: tx.timestamp,
       success: tx.success,
+      fee: tx.fee === undefined ? undefined : Number(formatUnits(tx.fee, options.decimals)),
+      explorerUrl: tx.explorerUrl,
     };
   });
 

@@ -46,11 +46,9 @@ export default function PaymentsListScreen() {
   const openPerson = (person: PaymentPerson) =>
     openChat(person.contactId ?? person.address ?? person.key);
 
-  const openPayment = (payment: RecentPayment) => {
-    // Payment detail isn't built yet — a row opens that person's chat instead.
-    const contact = payment.contactId ?? payment.address;
-    if (contact) openChat(contact);
-  };
+  // A row opens the transaction detail, which merges the payment with the
+  // address book (saved name when known, "save recipient" when not).
+  const openPayment = (payment: RecentPayment) => router.push(buildRoute.transaction(payment.id));
 
   return (
     <View className="bg-background flex-1">
