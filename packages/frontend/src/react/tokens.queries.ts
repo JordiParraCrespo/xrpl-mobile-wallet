@@ -58,6 +58,7 @@ export function useSendToken(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: ({ chainId, to, token, amount }: SendTokenInput) =>
       app.tokens.send(chainId, to, token, amount),
     onSuccess: (...args) => {
@@ -65,7 +66,6 @@ export function useSendToken(
       invalidateAfterTransfer(queryClient);
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -84,6 +84,7 @@ export function useRegisterToken(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: ({ chainId, token, limit }: RegisterTokenInput) =>
       app.tokens.register(chainId, token, limit),
     onSuccess: (...args) => {
@@ -91,6 +92,5 @@ export function useRegisterToken(
       invalidateAfterTransfer(queryClient);
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }

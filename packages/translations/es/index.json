@@ -355,6 +355,17 @@
     "wipeConfirm": "Eliminar cartera",
     "wipeCancel": "Cancelar"
   },
+  "receive": {
+    "title": "Recibir",
+    "yourAddress": "Tu dirección de {{name}}",
+    "destinationTag": "Etiqueta de destino",
+    "warning": "Envía activos solo por la red <network>{{network}}</network>. Enviar desde otra red puede suponer la pérdida de tus fondos.",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "share": "Compartir",
+    "locked": "Desbloquea tu cartera para recibir.",
+    "empty": "Todavía no hay ninguna cuenta disponible para recibir."
+  },
   "droppoints": {
     "comingSoon": "MUY PRONTO",
     "title": "DropPoints",

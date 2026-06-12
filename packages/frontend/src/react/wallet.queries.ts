@@ -49,13 +49,13 @@ export function useCreateWallet(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     // biome-ignore lint/suspicious/noConfusingVoidType: `void` lets callers run `mutate()` with no input
     mutationFn: (input: CreateWalletInput | void) => app.wallet.createWallet(input ?? undefined),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: walletKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -66,12 +66,12 @@ export function useImportWallet(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: (mnemonic: string) => app.wallet.importMnemonic(mnemonic),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: walletKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -87,12 +87,12 @@ export function useImportFamilySeed(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: ({ seed, name }: ImportFamilySeedInput) => app.wallet.importFamilySeed(seed, name),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: walletKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -108,13 +108,13 @@ export function useImportSecretNumbers(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: ({ rows, name }: ImportSecretNumbersInput) =>
       app.wallet.importSecretNumbers(rows, name),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: walletKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -125,12 +125,12 @@ export function useSetActiveWallet(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: (id: string) => app.wallet.setActiveWallet(id),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: walletKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -146,12 +146,12 @@ export function useRenameWallet(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: ({ id, name }: RenameWalletInput) => app.wallet.renameWallet(id, name),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: walletKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -162,12 +162,12 @@ export function useRemoveWallet(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: (id: string) => app.wallet.removeWallet(id),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: walletKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -178,12 +178,12 @@ export function useMarkWalletBackedUp(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: (id: string) => app.wallet.markBackedUp(id),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: walletKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -215,6 +215,7 @@ export function useSendTransaction(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: ({ chainId, to, amount }: SendTransactionInput) =>
       app.wallet.send(chainId, to, amount),
     onSuccess: (...args) => {
@@ -222,7 +223,6 @@ export function useSendTransaction(
       invalidateAfterTransfer(queryClient);
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -237,13 +237,13 @@ export function useRequestFaucetFunds(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: ({ chainId }: RequestFaucetFundsInput) => app.wallet.requestFaucetFunds(chainId),
     onSuccess: (...args) => {
       // Faucet funding credits the balance and shows up as an incoming tx.
       invalidateAfterTransfer(queryClient);
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -254,11 +254,11 @@ export function useResetWallet(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: () => app.wallet.reset(),
     onSuccess: (...args) => {
       queryClient.removeQueries({ queryKey: walletKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }

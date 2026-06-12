@@ -90,13 +90,13 @@ export function useUpdateUser(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: ({ id, dto }: { id: string; dto: UpdateUserDto }) => app.users.update(id, dto),
     onSuccess: (...args) => {
       queryClient.setQueryData(usersKeys.detail(args[1].id), args[0]);
       queryClient.invalidateQueries({ queryKey: usersKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -107,11 +107,11 @@ export function useDeleteUser(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: (id: string) => app.users.delete(id),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: usersKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
