@@ -29,7 +29,7 @@ function memoryStorage(): SecureStorage {
 
 async function testSigner() {
   // Light KDF params: these tests exercise the adapter, not the vault.
-  const keyring = new KeyringManager(memoryStorage(), { n: 1024, r: 8, p: 1 });
+  const keyring = new KeyringManager(memoryStorage());
   await keyring.initialize('123456');
   const wallet = await keyring.importMnemonic(MNEMONIC);
   return keyring.getSigner(wallet.id, 'xrpl');

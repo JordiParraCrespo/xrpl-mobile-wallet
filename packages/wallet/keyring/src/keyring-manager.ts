@@ -1,46 +1,38 @@
-import type { ChainKind, Signer } from "@flama/chain-core";
-import { bytesToHex, randomBytes } from "@noble/hashes/utils";
-import { HDKey } from "@scure/bip32";
-import {
-  generateMnemonic,
-  mnemonicToSeedSync,
-  validateMnemonic,
-} from "@scure/bip39";
-import { wordlist } from "@scure/bip39/wordlists/english";
-import { derivationPath } from "./derivation";
+import type { ChainKind, Signer } from '@flama/chain-core';
+import { bytesToHex, randomBytes } from '@noble/hashes/utils';
+import { HDKey } from '@scure/bip32';
+import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
+import { derivationPath } from './derivation';
 import {
   InvalidMnemonicError,
+  InvalidPasscodeError,
   KeyringLockedError,
   UnsupportedChainError,
   VaultCorruptedError,
   WalletNotFoundError,
-} from "./errors";
-import { Secp256k1Signer } from "./signer";
-import type { SecureStorage } from "./storage";
+} from './errors';
+import { Secp256k1Signer } from './signer';
+import type { SecureStorage } from './storage';
 import {
-  createEnvelope,
-  DEFAULT_KDF_PARAMS,
-  decryptVaultData,
-  encryptVaultData,
-  type KdfParams,
+  createPasscodeVerifier,
   LEGACY_VAULT_STORAGE_KEY,
-  parseEnvelope,
-  rewrapVaultKey,
-  serializeEnvelope,
-  unwrapVaultKey,
+  PASSCODE_STORAGE_KEY,
+  parseVault,
+  serializeVault,
   VAULT_STORAGE_KEY,
   type VaultData,
-  type VaultEnvelope,
   type VaultWallet,
-} from "./vault";
+  verifyPasscode,
+} from './vault';
 import {
   createFamilySeedSigner,
   InvalidFamilySeedError,
   isValidFamilySeed,
-} from "./xrpl/family-seed";
-import { secretNumbersToFamilySeed } from "./xrpl/secret-numbers";
+} from './xrpl/family-seed';
+import { secretNumbersToFamilySeed } from './xrpl/secret-numbers';
 
-export type WalletType = "hd" | "xrpl-seed";
+export type WalletType = 'hd' | 'xrpl-seed';
 
 export interface WalletMeta {
   id: string;
@@ -58,52 +50,48 @@ export interface CreateWalletOptions {
 
 interface LegacyVault {
   version: 1;
-  wallets: { id: string; name: string; type: "hd"; mnemonic: string }[];
+  wallets: { id: string; name: string; type: 'hd'; mnemonic: string }[];
 }
 
 const CHAINS_BY_TYPE: Record<WalletType, ChainKind[]> = {
-  hd: ["xrpl", "evm"],
-  "xrpl-seed": ["xrpl"],
+  hd: ['xrpl', 'evm'],
+  'xrpl-seed': ['xrpl'],
 };
 
 /**
- * Owns all key material. Secrets live in an AES-256-GCM encrypted vault
- * behind a passcode-derived KEK (see `vault.ts`); the decrypted vault and
- * vault key are held in memory only while unlocked. Private keys never
- * leave this package — chain adapters only ever see a `Signer`.
+ * Owns all key material. Secrets live as plaintext JSON in the host's
+ * hardware-backed secure store (see `vault.ts`) and are held in memory only
+ * while unlocked; the passcode is a UI lock verified against a salted hash, not
+ * an encryption key. Private keys never leave this package — chain adapters
+ * only ever see a `Signer`.
  */
 export class KeyringManager {
-  private vaultKey: Uint8Array | null = null;
-  private envelope: VaultEnvelope | null = null;
   private data: VaultData | null = null;
 
-  constructor(
-    private readonly storage: SecureStorage,
-    private readonly kdf: KdfParams = DEFAULT_KDF_PARAMS,
-  ) {}
+  constructor(private readonly storage: SecureStorage) {}
 
-  /** Whether a v2 encrypted vault exists in storage. */
+  /** Whether a vault exists in storage. */
   async isInitialized(): Promise<boolean> {
     return (await this.storage.get(VAULT_STORAGE_KEY)) !== null;
   }
 
-  /** Whether a legacy v1 plaintext vault exists in storage. */
+  /** Whether a legacy v1 vault exists in storage. */
   async hasLegacyVault(): Promise<boolean> {
     return (await this.storage.get(LEGACY_VAULT_STORAGE_KEY)) !== null;
   }
 
   get isUnlocked(): boolean {
-    return this.vaultKey !== null;
+    return this.data !== null;
   }
 
   /**
-   * Creates the v2 vault and leaves the keyring unlocked. If a legacy v1
-   * vault exists its wallets are migrated in (marked backed up, first one
+   * Creates the vault and passcode and leaves the keyring unlocked. If a legacy
+   * v1 vault exists its wallets are migrated in (marked backed up, first one
    * active) and the legacy key is removed.
    */
   async initialize(passcode: string): Promise<void> {
     if (await this.isInitialized()) {
-      throw new Error("Keyring is already initialized");
+      throw new Error('Keyring is already initialized');
     }
     const wallets: VaultWallet[] = [];
     const legacyRaw = await this.storage.get(LEGACY_VAULT_STORAGE_KEY);
@@ -111,16 +99,16 @@ export class KeyringManager {
       let legacy: LegacyVault;
       try {
         legacy = JSON.parse(legacyRaw) as LegacyVault;
-        if (!Array.isArray(legacy.wallets)) throw new Error("missing wallets");
+        if (!Array.isArray(legacy.wallets)) throw new Error('missing wallets');
       } catch {
-        throw new VaultCorruptedError("Legacy vault is corrupted");
+        throw new VaultCorruptedError('Legacy vault is corrupted');
       }
       const now = Date.now();
       for (const wallet of legacy.wallets) {
         wallets.push({
           id: wallet.id,
           name: wallet.name,
-          type: "hd",
+          type: 'hd',
           mnemonic: wallet.mnemonic,
           backedUp: true,
           createdAt: now,
@@ -132,72 +120,55 @@ export class KeyringManager {
       wallets,
       activeWalletId: wallets[0]?.id ?? null,
     };
-    const vaultKey = randomBytes(32);
-    const envelope = createEnvelope(passcode, vaultKey, data, this.kdf);
-    await this.storage.set(VAULT_STORAGE_KEY, serializeEnvelope(envelope));
+    await this.storage.set(PASSCODE_STORAGE_KEY, createPasscodeVerifier(passcode));
+    await this.storage.set(VAULT_STORAGE_KEY, serializeVault(data));
     if (legacyRaw) {
       await this.storage.remove(LEGACY_VAULT_STORAGE_KEY);
     }
-    this.vaultKey = vaultKey;
-    this.envelope = envelope;
     this.data = data;
   }
 
   /** Unlocks with the passcode. `InvalidPasscodeError` | `VaultCorruptedError`. */
   async unlock(passcode: string): Promise<void> {
-    const envelope = await this.loadEnvelope();
-    const vaultKey = unwrapVaultKey(envelope, passcode);
-    this.data = decryptVaultData(envelope, vaultKey);
-    this.vaultKey = vaultKey;
-    this.envelope = envelope;
+    if (!(await this.checkPasscode(passcode))) {
+      throw new InvalidPasscodeError();
+    }
+    this.data = await this.loadVault();
   }
 
-  /** Unlocks with the raw vault key (biometric path). Wrong key → `InvalidPasscodeError`. */
-  async unlockWithKey(vaultKey: Uint8Array): Promise<void> {
-    const envelope = await this.loadEnvelope();
-    this.data = decryptVaultData(envelope, vaultKey);
-    this.vaultKey = new Uint8Array(vaultKey);
-    this.envelope = envelope;
+  /**
+   * Unlocks without the passcode, for callers that have authenticated the user
+   * another way (the security module after a biometric prompt).
+   */
+  async unlockTrusted(): Promise<void> {
+    this.data = await this.loadVault();
   }
 
-  /** Copy of the raw vault key (for biometric enrollment) while unlocked. */
-  getVaultKey(): Uint8Array {
-    const { vaultKey } = this.unlocked();
-    return new Uint8Array(vaultKey);
-  }
-
-  /** Drops the in-memory key and decrypted vault (best-effort zeroing). */
+  /** Drops the in-memory vault. */
   lock(): void {
-    this.vaultKey?.fill(0);
-    this.vaultKey = null;
-    this.envelope = null;
     this.data = null;
   }
 
-  /** Verifies `current`, then rewraps the same vault key with a fresh salt + KEK. */
+  /** Verifies `current`, then replaces the passcode verifier. Secrets untouched. */
   async changePasscode(current: string, next: string): Promise<void> {
-    const envelope = await this.loadEnvelope();
-    const vaultKey = unwrapVaultKey(envelope, current);
-    const rewrapped = rewrapVaultKey(envelope, vaultKey, next, this.kdf);
-    vaultKey.fill(0);
-    await this.storage.set(VAULT_STORAGE_KEY, serializeEnvelope(rewrapped));
-    if (this.isUnlocked) {
-      this.envelope = rewrapped;
+    if (!(await this.checkPasscode(current))) {
+      throw new InvalidPasscodeError();
     }
+    await this.storage.set(PASSCODE_STORAGE_KEY, createPasscodeVerifier(next));
   }
 
   getWallets(): WalletMeta[] {
-    return this.unlocked().data.wallets.map(toMeta);
+    return this.unlocked().wallets.map(toMeta);
   }
 
   getActiveWallet(): WalletMeta | null {
-    const { data } = this.unlocked();
+    const data = this.unlocked();
     const wallet = data.wallets.find((w) => w.id === data.activeWalletId);
     return wallet ? toMeta(wallet) : null;
   }
 
   async setActiveWallet(walletId: string): Promise<void> {
-    const { data } = this.unlocked();
+    const data = this.unlocked();
     this.findWallet(walletId);
     data.activeWalletId = walletId;
     await this.persist();
@@ -214,57 +185,38 @@ export class KeyringManager {
   /** Generates a fresh mnemonic (12 words by default) and makes it active. */
   async createWallet(options?: CreateWalletOptions): Promise<WalletMeta> {
     this.unlocked();
-    const mnemonic = generateMnemonic(
-      wordlist,
-      options?.words === 24 ? 256 : 128,
-    );
-    return this.addWallet(
-      { type: "hd", mnemonic, backedUp: false },
-      options?.name,
-    );
+    const mnemonic = generateMnemonic(wordlist, options?.words === 24 ? 256 : 128);
+    return this.addWallet({ type: 'hd', mnemonic, backedUp: false }, options?.name);
   }
 
   /** Imports a BIP-39 mnemonic and makes it active. */
   async importMnemonic(mnemonic: string, name?: string): Promise<WalletMeta> {
-    const { data } = this.unlocked();
-    const normalized = mnemonic.trim().toLowerCase().split(/\s+/).join(" ");
+    const data = this.unlocked();
+    const normalized = mnemonic.trim().toLowerCase().split(/\s+/).join(' ');
     if (!validateMnemonic(normalized, wordlist)) {
       throw new InvalidMnemonicError();
     }
-    if (
-      data.wallets.some((w) => w.type === "hd" && w.mnemonic === normalized)
-    ) {
-      throw new Error("A wallet with this mnemonic already exists");
+    if (data.wallets.some((w) => w.type === 'hd' && w.mnemonic === normalized)) {
+      throw new Error('A wallet with this mnemonic already exists');
     }
-    return this.addWallet(
-      { type: "hd", mnemonic: normalized, backedUp: true },
-      name,
-    );
+    return this.addWallet({ type: 'hd', mnemonic: normalized, backedUp: true }, name);
   }
 
   /** Imports an XRPL family seed (secp256k1 or `sEd…` ed25519) and makes it active. */
   async importFamilySeed(seed: string, name?: string): Promise<WalletMeta> {
-    const { data } = this.unlocked();
+    const data = this.unlocked();
     const normalized = seed.trim();
     if (!isValidFamilySeed(normalized)) {
       throw new InvalidFamilySeedError();
     }
-    if (
-      data.wallets.some((w) => w.type === "xrpl-seed" && w.seed === normalized)
-    ) {
-      throw new Error("A wallet with this family seed already exists");
+    if (data.wallets.some((w) => w.type === 'xrpl-seed' && w.seed === normalized)) {
+      throw new Error('A wallet with this family seed already exists');
     }
-    return this.addWallet(
-      { type: "xrpl-seed", seed: normalized, backedUp: true },
-      name,
-    );
+    return this.addWallet({ type: 'xrpl-seed', seed: normalized, backedUp: true }, name);
   }
 
   /** Imports Xaman secret numbers, stored as the family seed they encode. */
-  async importSecretNumbers(
-    rows: string[],
-    name?: string,
-  ): Promise<WalletMeta> {
+  async importSecretNumbers(rows: string[], name?: string): Promise<WalletMeta> {
     this.unlocked();
     return this.importFamilySeed(secretNumbersToFamilySeed(rows), name);
   }
@@ -276,7 +228,7 @@ export class KeyringManager {
 
   /** Removes a wallet; if it was active, the first remaining one becomes active. */
   async removeWallet(walletId: string): Promise<void> {
-    const { data } = this.unlocked();
+    const data = this.unlocked();
     this.findWallet(walletId);
     data.wallets = data.wallets.filter((w) => w.id !== walletId);
     if (data.activeWalletId === walletId) {
@@ -293,8 +245,8 @@ export class KeyringManager {
   /** HD wallets only — `UnsupportedChainError` for family-seed wallets. */
   exportMnemonic(walletId: string): string {
     const wallet = this.findWallet(walletId);
-    if (wallet.type !== "hd") {
-      throw new UnsupportedChainError("Wallet has no mnemonic to export");
+    if (wallet.type !== 'hd') {
+      throw new UnsupportedChainError('Wallet has no mnemonic to export');
     }
     return wallet.mnemonic;
   }
@@ -302,8 +254,8 @@ export class KeyringManager {
   /** Family-seed wallets only — `UnsupportedChainError` for HD wallets. */
   exportFamilySeed(walletId: string): string {
     const wallet = this.findWallet(walletId);
-    if (wallet.type !== "xrpl-seed") {
-      throw new UnsupportedChainError("Wallet has no family seed to export");
+    if (wallet.type !== 'xrpl-seed') {
+      throw new UnsupportedChainError('Wallet has no family seed to export');
     }
     return wallet.seed;
   }
@@ -314,11 +266,9 @@ export class KeyringManager {
    */
   getSigner(walletId: string, kind: ChainKind, accountIndex = 0): Signer {
     const wallet = this.findWallet(walletId);
-    if (wallet.type === "xrpl-seed") {
-      if (kind !== "xrpl") {
-        throw new UnsupportedChainError(
-          `Family seed wallets cannot sign for "${kind}"`,
-        );
+    if (wallet.type === 'xrpl-seed') {
+      if (kind !== 'xrpl') {
+        throw new UnsupportedChainError(`Family seed wallets cannot sign for "${kind}"`);
       }
       return createFamilySeedSigner(wallet.seed);
     }
@@ -332,38 +282,40 @@ export class KeyringManager {
     return new Secp256k1Signer(node.privateKey);
   }
 
-  /** Removes the v2 and legacy vaults from storage and locks. */
+  /** Removes the vault, passcode and legacy vault from storage and locks. */
   async reset(): Promise<void> {
     await this.storage.remove(VAULT_STORAGE_KEY);
+    await this.storage.remove(PASSCODE_STORAGE_KEY);
     await this.storage.remove(LEGACY_VAULT_STORAGE_KEY);
     this.lock();
   }
 
-  private unlocked(): {
-    data: VaultData;
-    vaultKey: Uint8Array;
-    envelope: VaultEnvelope;
-  } {
-    if (!this.vaultKey || !this.data || !this.envelope) {
+  private unlocked(): VaultData {
+    if (!this.data) {
       throw new KeyringLockedError();
     }
-    return {
-      data: this.data,
-      vaultKey: this.vaultKey,
-      envelope: this.envelope,
-    };
+    return this.data;
   }
 
-  private async loadEnvelope(): Promise<VaultEnvelope> {
+  /** Verifies a passcode against the stored verifier. */
+  private async checkPasscode(passcode: string): Promise<boolean> {
+    const raw = await this.storage.get(PASSCODE_STORAGE_KEY);
+    if (!raw) {
+      throw new Error('Keyring is not initialized');
+    }
+    return verifyPasscode(passcode, raw);
+  }
+
+  private async loadVault(): Promise<VaultData> {
     const raw = await this.storage.get(VAULT_STORAGE_KEY);
     if (!raw) {
-      throw new Error("Keyring is not initialized");
+      throw new Error('Keyring is not initialized');
     }
-    return parseEnvelope(raw);
+    return parseVault(raw);
   }
 
   private findWallet(walletId: string): VaultWallet {
-    const wallet = this.unlocked().data.wallets.find((w) => w.id === walletId);
+    const wallet = this.unlocked().wallets.find((w) => w.id === walletId);
     if (!wallet) {
       throw new WalletNotFoundError(walletId);
     }
@@ -372,11 +324,11 @@ export class KeyringManager {
 
   private async addWallet(
     secret:
-      | { type: "hd"; mnemonic: string; backedUp: boolean }
-      | { type: "xrpl-seed"; seed: string; backedUp: boolean },
+      | { type: 'hd'; mnemonic: string; backedUp: boolean }
+      | { type: 'xrpl-seed'; seed: string; backedUp: boolean },
     name?: string,
   ): Promise<WalletMeta> {
-    const { data } = this.unlocked();
+    const data = this.unlocked();
     const wallet: VaultWallet = {
       id: bytesToHex(randomBytes(8)),
       name: name ?? `Wallet ${data.wallets.length + 1}`,
@@ -389,11 +341,9 @@ export class KeyringManager {
     return toMeta(wallet);
   }
 
-  /** Re-encrypts the data blob with the in-memory vault key and persists it. */
+  /** Writes the in-memory vault back to storage. */
   private async persist(): Promise<void> {
-    const { data, vaultKey, envelope } = this.unlocked();
-    this.envelope = encryptVaultData(envelope, vaultKey, data);
-    await this.storage.set(VAULT_STORAGE_KEY, serializeEnvelope(this.envelope));
+    await this.storage.set(VAULT_STORAGE_KEY, serializeVault(this.unlocked()));
   }
 }
 

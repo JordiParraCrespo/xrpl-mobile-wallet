@@ -10,7 +10,7 @@ import type { SecurityStore } from './security.state';
 export const PASSCODE_LENGTH = 6;
 const PASSCODE_PATTERN = /^\d{6}$/;
 
-const BIOMETRIC_KEY_STORAGE_KEY = 'flama.security.biometric-key';
+const BIOMETRICS_ENABLED_STORAGE_KEY = 'flama.security.biometrics-enabled';
 const ATTEMPTS_STORAGE_KEY = 'flama.security.attempts';
 const AUTO_LOCK_STORAGE_KEY = 'flama.security.autolock';
 
@@ -26,18 +26,6 @@ const MAX_LOCKOUT_MS = 30 * 60_000;
 interface PersistedAttempts {
   failedAttempts: number;
   lockoutUntil: number | null;
-}
-
-function toHex(bytes: Uint8Array): string {
-  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
-}
-
-function fromHex(hex: string): Uint8Array {
-  const bytes = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < bytes.length; i++) {
-    bytes[i] = Number.parseInt(hex.slice(i * 2, i * 2 + 2), 16);
-  }
-  return bytes;
 }
 
 function isInvalidPasscodeError(error: unknown): boolean {
@@ -61,10 +49,10 @@ export class SecurityService {
 
   /** Loads persisted security state and resolves the current lock status. */
   async restore(): Promise<void> {
-    const [biometricsAvailable, biometricKey, attempts, autoLockMs, initialized] =
+    const [biometricsAvailable, biometricsEnabledFlag, attempts, autoLockMs, initialized] =
       await Promise.all([
         this.biometrics.isAvailable(),
-        this.storage.get(BIOMETRIC_KEY_STORAGE_KEY),
+        this.storage.get(BIOMETRICS_ENABLED_STORAGE_KEY),
         this.readPersistedAttempts(),
         this.readPersistedAutoLockMs(),
         this.keyring.isInitialized(),
@@ -72,7 +60,7 @@ export class SecurityService {
     this.store.setState({
       status: !initialized ? 'uninitialized' : this.keyring.isUnlocked ? 'unlocked' : 'locked',
       biometricsAvailable,
-      biometricsEnabled: biometricKey !== null,
+      biometricsEnabled: biometricsEnabledFlag !== null,
       failedAttempts: attempts.failedAttempts,
       lockoutUntil: attempts.lockoutUntil,
       autoLockMs,
@@ -111,7 +99,7 @@ export class SecurityService {
     this.touch();
   }
 
-  /** Unlocks the vault with the biometric-protected vault key. */
+  /** Unlocks the vault via a biometric-authorized trusted unlock. */
   async unlockWithBiometrics(): Promise<void> {
     if (!(await this.keyring.isInitialized())) {
       throw new AppError(SecurityErrors.NOT_INITIALIZED);
@@ -119,21 +107,14 @@ export class SecurityService {
     if (!(await this.biometrics.isAvailable())) {
       throw new AppError(SecurityErrors.BIOMETRICS_UNAVAILABLE);
     }
-    const biometricKey = await this.storage.get(BIOMETRIC_KEY_STORAGE_KEY);
-    if (biometricKey === null) {
+    const biometricsEnabledFlag = await this.storage.get(BIOMETRICS_ENABLED_STORAGE_KEY);
+    if (biometricsEnabledFlag === null) {
       throw new AppError(SecurityErrors.BIOMETRICS_NOT_ENROLLED);
     }
     if (!(await this.biometrics.authenticate('Unlock your wallet'))) {
       throw new AppError(SecurityErrors.BIOMETRIC_AUTH_FAILED);
     }
-    try {
-      await this.keyring.unlockWithKey(fromHex(biometricKey));
-    } catch (error) {
-      if (isInvalidPasscodeError(error)) {
-        throw new AppError(SecurityErrors.INVALID_PASSCODE);
-      }
-      throw error;
-    }
+    await this.keyring.unlockTrusted();
     await this.clearAttempts();
     this.store.setState({ status: 'unlocked' });
     this.touch();
@@ -179,8 +160,8 @@ export class SecurityService {
   }
 
   /**
-   * Changes the passcode. The underlying vault key is unchanged, so an
-   * enrolled biometric key stays valid.
+   * Changes the passcode. Biometric unlock is not tied to the passcode, so an
+   * enrolled biometric stays valid.
    */
   async changePasscode(current: string, next: string): Promise<void> {
     this.assertPasscodeFormat(next);
@@ -194,7 +175,7 @@ export class SecurityService {
     }
   }
 
-  /** Enrolls biometric unlock by storing the vault key behind a biometric gate. */
+  /** Enrolls biometric unlock by recording an enabled flag behind a biometric gate. */
   async enableBiometrics(): Promise<void> {
     if (this.store.getState().status !== 'unlocked') {
       throw new AppError(SecurityErrors.NOT_INITIALIZED);
@@ -205,12 +186,12 @@ export class SecurityService {
     if (!(await this.biometrics.authenticate('Enable biometric unlock'))) {
       throw new AppError(SecurityErrors.BIOMETRIC_AUTH_FAILED);
     }
-    await this.storage.set(BIOMETRIC_KEY_STORAGE_KEY, toHex(this.keyring.getVaultKey()));
+    await this.storage.set(BIOMETRICS_ENABLED_STORAGE_KEY, '1');
     this.store.setState({ biometricsEnabled: true });
   }
 
   async disableBiometrics(): Promise<void> {
-    await this.storage.remove(BIOMETRIC_KEY_STORAGE_KEY);
+    await this.storage.remove(BIOMETRICS_ENABLED_STORAGE_KEY);
     this.store.setState({ biometricsEnabled: false });
   }
 
@@ -221,7 +202,7 @@ export class SecurityService {
   async wipe(): Promise<void> {
     this.clearAutoLock();
     await this.keyring.reset();
-    await this.storage.remove(BIOMETRIC_KEY_STORAGE_KEY);
+    await this.storage.remove(BIOMETRICS_ENABLED_STORAGE_KEY);
     await this.storage.remove(ATTEMPTS_STORAGE_KEY);
     this.store.setState({
       status: 'uninitialized',
