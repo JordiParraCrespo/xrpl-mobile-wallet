@@ -1,8 +1,12 @@
-import { useChainBalances, useMarkets, useWalletState } from '@flama/frontend/react';
-import * as React from 'react';
-import { badgeForChainKind, type HomeAccount, totalUsd } from './home-data';
+import {
+  useChainBalances,
+  useMarkets,
+  useWalletState,
+} from "@flama/frontend/react";
+import * as React from "react";
+import { badgeForChainKind, type HomeAccount, totalUsd } from "./home-data";
 
-export type HomeStatus = 'idle' | 'no_wallet' | 'locked' | 'ready';
+export type HomeStatus = "idle" | "no_wallet" | "locked" | "ready";
 
 export type UseHome = {
   /** Active wallet's display name (the balance-hero switcher label). */
@@ -29,11 +33,17 @@ export type UseHome = {
 export function useHome(): UseHome {
   const { status, accounts, wallets, activeWalletId } = useWalletState();
 
-  const chainIds = React.useMemo(() => accounts.map((a) => a.chainId), [accounts]);
+  const chainIds = React.useMemo(
+    () => accounts.map((a) => a.chainId),
+    [accounts],
+  );
   const balances = useChainBalances(chainIds);
 
-  const symbols = React.useMemo(() => [...new Set(accounts.map((a) => a.symbol))], [accounts]);
-  const { data: markets } = useMarkets(symbols, 'usd', {
+  const symbols = React.useMemo(
+    () => [...new Set(accounts.map((a) => a.symbol))],
+    [accounts],
+  );
+  const { data: markets } = useMarkets(symbols, "usd", {
     enabled: symbols.length > 0,
   });
 
@@ -62,10 +72,18 @@ export function useHome(): UseHome {
     });
   }, [accounts, balances, priceBySymbol]);
 
-  const walletName = wallets.find((w) => w.id === activeWalletId)?.name ?? wallets[0]?.name ?? '';
+  const walletName =
+    wallets.find((w) => w.id === activeWalletId)?.name ??
+    wallets[0]?.name ??
+    "";
 
   const pricesLoading = symbols.length > 0 && markets === undefined;
-  const isLoading = balances.some((b) => b.isLoading) || pricesLoading;
+  // Until the wallet store is 'ready' there are no accounts yet, so the
+  // balance/price queries haven't even started — that early window is still
+  // "loading" or the skeletons would flash in only after the sync.
+  const walletPending = status === "idle" || status === "locked";
+  const isLoading =
+    walletPending || balances.some((b) => b.isLoading) || pricesLoading;
   const isError = balances.some((b) => b.isError);
 
   return {
