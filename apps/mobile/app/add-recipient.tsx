@@ -10,8 +10,8 @@ import { cn } from '@flama/design-system-mobile/utils';
 import { AddressBookErrors, AppError } from '@flama/frontend';
 import { useAddContact, useWalletState } from '@flama/frontend/react';
 import * as Clipboard from 'expo-clipboard';
-import { useRouter } from 'expo-router';
-import { Check, ChevronDown, ChevronLeft, ShieldCheck } from 'lucide-react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Check, ChevronDown, ChevronLeft, ScanLine, ShieldCheck } from 'lucide-react-native';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -25,6 +25,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PaymentsBackdrop } from '../components/payments/payments-backdrop';
+import { Routes } from '../lib/routes';
 
 /**
  * The design's PField: a white hairline card with the small label INSIDE,
@@ -94,6 +95,22 @@ export default function AddRecipientScreen() {
   const [name, setName] = React.useState('');
   const [networkOpen, setNetworkOpen] = React.useState(false);
   const [errorKey, setErrorKey] = React.useState<SaveErrorKey | null>(null);
+
+  // The scan screen returns here with the parsed address (and XRPL tag), so
+  // prefill the form from those params. Track the last applied address so a
+  // re-render doesn't clobber edits the user makes after the scan.
+  const scan = useLocalSearchParams<{
+    scannedAddress?: string;
+    scannedTag?: string;
+  }>();
+  const appliedScan = React.useRef<string | undefined>(undefined);
+  React.useEffect(() => {
+    const scanned = scan.scannedAddress;
+    if (!scanned || scanned === appliedScan.current) return;
+    appliedScan.current = scanned;
+    setAddress(scanned);
+    if (scan.scannedTag) setDestinationTag(scan.scannedTag);
+  }, [scan.scannedAddress, scan.scannedTag]);
 
   // Networks the wallet can pay on; default to the first (XRPL).
   const networks = accounts.map((account) => ({
@@ -182,9 +199,14 @@ export default function AddRecipientScreen() {
         <Field
           label={t('payments.addRecipient.address')}
           trailing={
-            <Chip size="sm" onPress={pasteAddress}>
-              {t('payments.addRecipient.paste')}
-            </Chip>
+            <View className="flex-row items-center gap-2">
+              <Chip size="sm" icon={ScanLine} onPress={() => router.push(Routes.ScanRecipient)}>
+                {t('payments.addRecipient.scan')}
+              </Chip>
+              <Chip size="sm" onPress={pasteAddress}>
+                {t('payments.addRecipient.paste')}
+              </Chip>
+            </View>
           }
         >
           <TextInput

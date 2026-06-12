@@ -536,6 +536,7 @@
       "address": "Address",
       "addressPlaceholder": "r… or 0x…",
       "paste": "Paste",
+      "scan": "Scan",
       "destinationTag": "Destination tag (optional)",
       "destinationTagPlaceholder": "e.g. 584213",
       "recipientName": "Recipient name",
@@ -555,6 +556,16 @@
         "evm": "0x… addresses"
       },
       "done": "Done"
+    },
+    "scanRecipient": {
+      "back": "Back",
+      "title": "Scan to pay",
+      "subtitle": "Point your camera at a recipient's payment QR code.",
+      "invalid": "That QR code doesn't contain a payment address.",
+      "permissionTitle": "Camera access needed",
+      "permissionBody": "Allow camera access to scan a recipient's payment QR code.",
+      "grant": "Allow camera",
+      "enterManually": "Enter address manually"
     },
     "chat": {
       "received": "You received",
