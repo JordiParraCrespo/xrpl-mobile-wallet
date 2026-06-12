@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppError } from '../core/errors';
-import { CoinGeckoPriceProvider, type IPriceProvider } from './price.provider';
+import { CoinGeckoPriceProvider, type IPriceProvider, type MarketRate } from './price.provider';
 import { PricesErrors } from './prices.errors';
 import { DEFAULT_CURRENCY, PricesService } from './prices.service';
 import { createPricesStore, type PricesStore } from './prices.state';
@@ -8,7 +8,9 @@ import { createPricesStore, type PricesStore } from './prices.state';
 /** Scriptable price provider: returns a number or throws. */
 class FakePriceProvider implements IPriceProvider {
   calls: Array<{ symbol: string; currency: string }> = [];
+  marketCalls: Array<{ symbols: string[]; currency: string }> = [];
   result: number | Error = 1;
+  markets: MarketRate[] | Error = [];
 
   getRate(symbol: string, currency: string): Promise<number> {
     this.calls.push({ symbol, currency });
@@ -16,6 +18,14 @@ class FakePriceProvider implements IPriceProvider {
       return Promise.reject(this.result);
     }
     return Promise.resolve(this.result);
+  }
+
+  getMarkets(symbols: string[], currency: string): Promise<MarketRate[]> {
+    this.marketCalls.push({ symbols, currency });
+    if (this.markets instanceof Error) {
+      return Promise.reject(this.markets);
+    }
+    return Promise.resolve(this.markets);
   }
 }
 
@@ -74,6 +84,38 @@ describe('PricesService', () => {
     it('maps a provider failure to RATE_UNAVAILABLE', async () => {
       provider.result = new Error('network down');
       await expectAppError(service.getRate('XRP', 'usd'), PricesErrors.RATE_UNAVAILABLE.code);
+    });
+  });
+
+  describe('getMarkets', () => {
+    it('returns the provider snapshots and caches each spot price', async () => {
+      provider.markets = [
+        { symbol: 'XRP', price: 0.62, change24h: 2.41, spark: [1, 2] },
+        { symbol: 'BTC', price: 61240.5, change24h: -0.92, spark: [3, 2] },
+      ];
+      const markets = await service.getMarkets(['XRP', 'BTC'], 'usd');
+      expect(markets).toHaveLength(2);
+      expect(provider.marketCalls[0]).toEqual({
+        symbols: ['XRP', 'BTC'],
+        currency: 'usd',
+      });
+      // Each price is cached so toFiat keeps working.
+      expect(service.getCachedRate('XRP', 'usd')).toBe(0.62);
+      expect(service.getCachedRate('BTC', 'usd')).toBe(61240.5);
+    });
+
+    it('defaults the currency to usd', async () => {
+      provider.markets = [{ symbol: 'XRP', price: 1, change24h: 0, spark: [] }];
+      await service.getMarkets(['XRP']);
+      expect(provider.marketCalls[0]).toEqual({
+        symbols: ['XRP'],
+        currency: DEFAULT_CURRENCY,
+      });
+    });
+
+    it('maps a provider failure to RATE_UNAVAILABLE', async () => {
+      provider.markets = new Error('network down');
+      await expectAppError(service.getMarkets(['XRP'], 'usd'), PricesErrors.RATE_UNAVAILABLE.code);
     });
   });
 
@@ -137,5 +179,47 @@ describe('CoinGeckoPriceProvider', () => {
       }),
     );
     await expect(provider.getRate('XRP', 'usd')).rejects.toThrow();
+  });
+
+  it('requests the markets URL and maps ids back to symbols', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve([
+          {
+            id: 'ripple',
+            current_price: 0.62,
+            price_change_percentage_24h: 2.41,
+            sparkline_in_7d: { price: [0.6, 0.62] },
+          },
+          {
+            id: 'bitcoin',
+            current_price: 61240.5,
+            price_change_percentage_24h: -0.92,
+          },
+        ]),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const markets = await provider.getMarkets(['XRP', 'BTC'], 'usd');
+    expect(markets).toEqual([
+      { symbol: 'XRP', price: 0.62, change24h: 2.41, spark: [0.6, 0.62] },
+      { symbol: 'BTC', price: 61240.5, change24h: -0.92, spark: [] },
+    ]);
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ripple,bitcoin&sparkline=true&price_change_percentage=24h',
+    );
+  });
+
+  it('returns an empty array without fetching when given no symbols', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(provider.getMarkets([], 'usd')).resolves.toEqual([]);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('throws when the markets response is not ok', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 429 }));
+    await expect(provider.getMarkets(['XRP'], 'usd')).rejects.toThrow();
   });
 });

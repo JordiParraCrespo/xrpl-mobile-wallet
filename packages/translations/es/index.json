@@ -97,7 +97,30 @@
     "reset": "Reiniciar",
     "signOut": "Cerrar sesión",
     "signingOut": "Cerrando sesión...",
-    "openWallet": "Abrir cartera"
+    "openWallet": "Abrir cartera",
+    "more": {
+      "title": "Más",
+      "buy": {
+        "label": "Comprar XRP",
+        "sub": "Tarjeta o transferencia bancaria"
+      },
+      "request": {
+        "label": "Solicitar dinero",
+        "sub": "Pide a alguien que te pague"
+      },
+      "convert": {
+        "label": "Convertir",
+        "sub": "Entre tus tokens"
+      },
+      "statements": {
+        "label": "Extractos",
+        "sub": "Exporta tu actividad"
+      },
+      "rewards": {
+        "label": "Recompensas",
+        "sub": "DropPoints · muy pronto"
+      }
+    }
   },
   "notifications": {
     "title": "Notificaciones",
@@ -105,7 +128,7 @@
     "markAllRead": "Marcar todo como leído",
     "groups": {
       "today": "Hoy",
-      "earlier": "Antes"
+      "earlier": "Anterior"
     },
     "empty": "Estás al día."
   },
@@ -364,5 +387,37 @@
     "wipeMessage": "Esto elimina la cartera de este dispositivo. Solo podrás restaurarla con tu frase de recuperación, semilla familiar o números secretos.",
     "wipeConfirm": "Eliminar cartera",
     "wipeCancel": "Cancelar"
+  },
+  "receive": {
+    "title": "Recibir",
+    "yourAddress": "Tu dirección de {{name}}",
+    "destinationTag": "Etiqueta de destino",
+    "warning": "Envía activos solo por la red <network>{{network}}</network>. Enviar desde otra red puede suponer la pérdida de tus fondos.",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "share": "Compartir",
+    "locked": "Desbloquea tu cartera para recibir.",
+    "empty": "Todavía no hay ninguna cuenta disponible para recibir."
+  },
+  "droppoints": {
+    "comingSoon": "MUY PRONTO",
+    "title": "DropPoints",
+    "subtitle": "Un programa de recompensas que te devuelve algo cada vez que mueves dinero en Drops. Le estamos dando los últimos retoques.",
+    "perks": {
+      "earn": {
+        "title": "Gana con cada movimiento",
+        "description": "Acumula puntos cuando envías, recibes o intercambias."
+      },
+      "rebates": {
+        "title": "Descuentos en comisiones",
+        "description": "Canjea puntos para reducir tus comisiones de red."
+      },
+      "perks": {
+        "title": "Ventajas de miembro",
+        "description": "Desbloquea mejoras, funciones anticipadas y sorpresas."
+      }
+    },
+    "notify": "Avísame cuando esté listo",
+    "notified": "Te avisaremos"
   }
 }

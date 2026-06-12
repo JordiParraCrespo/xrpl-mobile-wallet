@@ -43,13 +43,13 @@ export enum Routes {
   PaymentChat = '/payment/[contact]',
 
   // Modals
-  Notifications = '/notifications',
   AddMoney = '/flows/add-money',
   Receive = '/flows/receive',
   Swap = '/flows/swap',
   Send = '/flows/send',
   AddRecipient = '/add-recipient',
   Transaction = '/transaction/[id]',
+  Notifications = '/notifications',
 }
 
 /** Which identity a successful onboarding restored (phrase = all chains). */

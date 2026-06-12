@@ -26,7 +26,7 @@ export {
   useMarkAllNotificationsRead,
   useNotifications,
 } from './notifications.queries';
-export { pricesKeys, useExchangeRate } from './prices.queries';
+export { pricesKeys, useExchangeRate, useMarkets } from './prices.queries';
 export {
   profileKeys,
   useProfileRestore,
