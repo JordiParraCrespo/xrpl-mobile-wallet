@@ -40,8 +40,8 @@ export function useSocialLogin(
   const app = useFlamaApp();
 
   return useMutation({
-    mutationFn: (provider: SocialProvider) => app.auth.socialLogin(provider),
     ...options,
+    mutationFn: (provider: SocialProvider) => app.auth.socialLogin(provider),
   });
 }
 
@@ -50,12 +50,12 @@ export function useLogin(options?: Omit<UseMutationOptions<void, Error, LoginDto
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: (dto: LoginDto) => app.auth.login(dto),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: profileQueryKey });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -66,12 +66,12 @@ export function useRegister(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: (dto: RegisterDto) => app.auth.register(dto),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: profileQueryKey });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -80,12 +80,12 @@ export function useLogout(options?: Omit<UseMutationOptions<void, Error, void>, 
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: () => app.auth.logout(),
     onSuccess: (...args) => {
       queryClient.clear();
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -95,8 +95,8 @@ export function useForgotPassword(
   const app = useFlamaApp();
 
   return useMutation({
-    mutationFn: (email: string) => app.auth.forgotPassword(email),
     ...options,
+    mutationFn: (email: string) => app.auth.forgotPassword(email),
   });
 }
 
@@ -109,8 +109,8 @@ export function useResetPassword(
   const app = useFlamaApp();
 
   return useMutation({
-    mutationFn: ({ token, password }) => app.auth.resetPassword(token, password),
     ...options,
+    mutationFn: ({ token, password }) => app.auth.resetPassword(token, password),
   });
 }
 
@@ -123,8 +123,8 @@ export function useChangePassword(
   const app = useFlamaApp();
 
   return useMutation({
+    ...options,
     mutationFn: ({ currentPassword, newPassword }) =>
       app.auth.changePassword(currentPassword, newPassword),
-    ...options,
   });
 }
