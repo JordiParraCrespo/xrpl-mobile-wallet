@@ -11,6 +11,12 @@ const config: ExpoConfig = {
   ios: {
     bundleIdentifier: 'com.flama.app',
     supportsTablet: true,
+    infoPlist: {
+      // Face ID never works in Expo Go (the host app lacks this key) — it
+      // needs a development build, where this description is shown the first
+      // time the OS asks for Face ID permission.
+      NSFaceIDUsageDescription: 'Drops uses Face ID to unlock your wallet.',
+    },
   },
   android: {
     package: 'com.flama.app',
