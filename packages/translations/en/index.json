@@ -407,6 +407,27 @@
       "out": "You sent",
       "self": "You moved"
     },
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "addRecipient": {
+      "back": "Back",
+      "title": "Add recipient",
+      "network": "Network",
+      "address": "Address",
+      "addressPlaceholder": "r… or 0x…",
+      "paste": "Paste",
+      "destinationTag": "Destination tag (optional)",
+      "destinationTagPlaceholder": "e.g. 584213",
+      "recipientName": "Recipient name",
+      "namePlaceholder": "Name to save",
+      "securityNote": "Double-check the address. XRPL transactions can't be reversed once sent.",
+      "save": "Save recipient",
+      "saving": "Saving…",
+      "errors": {
+        "invalidName": "Enter a name with at least 2 characters.",
+        "invalidAddress": "Enter a valid recipient address.",
+        "duplicate": "A contact with this address already exists.",
+        "generic": "Couldn't save the recipient. Try again."
+      }
+    }
   }
 }

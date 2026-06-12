@@ -407,6 +407,27 @@
       "out": "Enviaste",
       "self": "Moviste"
     },
-    "unknown": "Desconocido"
+    "unknown": "Desconocido",
+    "addRecipient": {
+      "back": "Atrás",
+      "title": "Añadir destinatario",
+      "network": "Red",
+      "address": "Dirección",
+      "addressPlaceholder": "r… o 0x…",
+      "paste": "Pegar",
+      "destinationTag": "Etiqueta de destino (opcional)",
+      "destinationTagPlaceholder": "p. ej. 584213",
+      "recipientName": "Nombre del destinatario",
+      "namePlaceholder": "Nombre para guardar",
+      "securityNote": "Comprueba bien la dirección. Las transacciones XRPL no se pueden revertir una vez enviadas.",
+      "save": "Guardar destinatario",
+      "saving": "Guardando…",
+      "errors": {
+        "invalidName": "Introduce un nombre de al menos 2 caracteres.",
+        "invalidAddress": "Introduce una dirección de destinatario válida.",
+        "duplicate": "Ya existe un contacto con esta dirección.",
+        "generic": "No se pudo guardar el destinatario. Inténtalo de nuevo."
+      }
+    }
   }
 }
