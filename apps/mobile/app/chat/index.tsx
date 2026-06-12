@@ -25,7 +25,7 @@ export default function ChatScreen() {
   };
 
   return (
-    <View className="bg-background flex-1">
+    <View className="bg-chat-bg flex-1">
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}

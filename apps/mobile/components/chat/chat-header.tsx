@@ -20,25 +20,25 @@ export function ChatHeader({
   const insets = useSafeAreaInsets();
   return (
     <View
-      className="border-border flex-row items-center gap-2 border-b-hairline px-3 pb-3"
+      className="border-chat-hairline flex-row items-center gap-2 border-b-hairline px-3 pb-3"
       style={{ paddingTop: insets.top + 8 }}
     >
       <HeaderButton label="Close" onPress={onClose}>
-        <Icon as={ChevronLeft} size={20} className="text-foreground" />
+        <Icon as={ChevronLeft} size={20} className="text-chat-fg" />
       </HeaderButton>
       <HeaderButton label="Sessions" onPress={onOpenSessions}>
-        <Icon as={Menu} size={20} className="text-foreground" />
+        <Icon as={Menu} size={20} className="text-chat-fg" />
       </HeaderButton>
       <DewyAvatar size={38} ring />
       <View className="min-w-0 flex-1">
-        <Text className="text-foreground text-base font-bold">Dewy</Text>
+        <Text className="text-chat-fg text-base font-bold">Dewy</Text>
         <View className="flex-row items-center gap-1.5">
-          <View className="bg-positive h-1.5 w-1.5 rounded-full" />
-          <Text className="text-muted-foreground text-[12.5px]">Online · XRPL assistant</Text>
+          <View className="bg-chat-positive h-1.5 w-1.5 rounded-full" />
+          <Text className="text-chat-dim text-[12.5px]">Online · XRPL assistant</Text>
         </View>
       </View>
       <HeaderButton label="New chat" onPress={onNewChat}>
-        <Icon as={SquarePen} size={18} className="text-foreground" />
+        <Icon as={SquarePen} size={18} className="text-chat-fg" />
       </HeaderButton>
     </View>
   );
@@ -58,7 +58,7 @@ function HeaderButton({
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
-      className="border-input bg-card h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full active:opacity-70"
+      className="border-chat-chip-line bg-chat-chip h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full border active:opacity-70"
     >
       {children}
     </Pressable>

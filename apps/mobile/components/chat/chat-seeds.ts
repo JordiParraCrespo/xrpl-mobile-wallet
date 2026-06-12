@@ -144,7 +144,9 @@ export const SESSION_SEEDS: Session[] = [
   },
 ];
 
-export const CHIPS = ['Send to Maria', 'Send 5,000 XRP', 'Check my balance', 'Swap XRP → RLUSD'];
+// The composer quick-chips, matching the design (chat-app.jsx) minus the
+// "Add a contact" chip — the address-book flow is intentionally out of scope.
+export const CHIPS = ['Send to Maria', 'Check my balance', 'Swap XRP → RLUSD'];
 
 /** A fresh, empty conversation for the "New chat" action. */
 export function newSession(): Session {

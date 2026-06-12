@@ -44,26 +44,26 @@ export function SessionsDrawer({
 
   return (
     <View pointerEvents={open ? 'auto' : 'none'} className="absolute inset-0 z-50">
-      <Animated.View style={scrimStyle} className="absolute inset-0 bg-black/50">
+      <Animated.View style={scrimStyle} className="absolute inset-0 bg-[#080810]/50">
         <Pressable className="flex-1" onPress={onClose} />
       </Animated.View>
 
       <Animated.View
         style={[panelStyle, { width: panelWidth }]}
-        className="border-border bg-background absolute bottom-0 left-0 top-0 border-r-hairline"
+        className="border-chat-hairline bg-chat-bg absolute bottom-0 left-0 top-0 border-r-hairline"
       >
         {/* header */}
         <View
-          className="border-border flex-row items-center justify-between border-b-hairline px-[18px] pb-3.5"
+          className="border-chat-hairline flex-row items-center justify-between border-b-hairline px-[18px] pb-3.5"
           style={{ paddingTop: insets.top + 12 }}
         >
-          <Text className="font-display text-2xl text-foreground">Chats</Text>
+          <Text className="font-display text-chat-fg text-2xl">Chats</Text>
           <Pressable
             accessibilityLabel="Close"
             onPress={onClose}
-            className="bg-secondary h-9 w-9 items-center justify-center rounded-full active:opacity-70"
+            className="bg-chat-chip h-9 w-9 items-center justify-center rounded-full active:opacity-70"
           >
-            <Icon as={X} size={18} className="text-foreground" />
+            <Icon as={X} size={18} className="text-chat-fg" />
           </Pressable>
         </View>
 
@@ -71,7 +71,7 @@ export function SessionsDrawer({
         <View className="px-4 pb-1.5 pt-3.5">
           <Pressable
             onPress={onNew}
-            className="bg-brand active:bg-brand/90 h-12 flex-row items-center justify-center gap-2 rounded-[14px]"
+            className="bg-chat-brand h-12 flex-row items-center justify-center gap-2 rounded-[14px] active:opacity-90"
           >
             <Icon as={SquarePen} size={18} className="text-white" />
             <Text className="text-[15px] font-semibold text-white">New chat</Text>
@@ -85,7 +85,7 @@ export function SessionsDrawer({
             if (items.length === 0) return null;
             return (
               <View key={group} className="mt-2 gap-0.5">
-                <Text className="text-muted-foreground px-2 py-1.5 text-[11.5px] font-bold uppercase tracking-wide">
+                <Text className="text-chat-faint px-2 py-1.5 text-[11.5px] font-bold uppercase tracking-wide">
                   {group}
                 </Text>
                 {items.map((s) => (
