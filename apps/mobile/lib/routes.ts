@@ -92,8 +92,4 @@ export const buildRoute = {
     pathname: Routes.OnboardingBiometrics,
     params: { next },
   }),
-  onboardingNotifications: (next: OnboardingPath): Href => ({
-    pathname: Routes.OnboardingNotifications,
-    params: { next },
-  }),
 } as const;

@@ -36,7 +36,9 @@ export default function SetPasscodeScreen() {
   const { status } = useSecurityState();
 
   const isImport = next === 'import';
-  const destination = isImport ? Routes.OnboardingImport : Routes.OnboardingRevealPhrase;
+  // Where the flow resumes when the vault already exists (re-entry skip):
+  // the keys block that follows the device-security block.
+  const destination = isImport ? Routes.OnboardingImport : Routes.OnboardingSecureIntro;
 
   const [phase, setPhase] = React.useState<'create' | 'confirm'>('create');
   const [first, setFirst] = React.useState('');
@@ -134,7 +136,7 @@ export default function SetPasscodeScreen() {
     <View className="flex-1 bg-background">
       <View style={{ paddingTop: insets.top + 8 }} className="px-6">
         <ScreenHeader
-          step={isImport ? 2 : 3}
+          step={2}
           total={isImport ? 4 : 5}
           onBack={confirming && !locked ? resetToCreate : () => router.back()}
         />

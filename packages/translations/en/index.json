@@ -348,6 +348,13 @@
       "reassurance": "Almost there. Confirming proves your phrase is safely written down."
     }
   },
+  "tabs": {
+    "home": "Home",
+    "market": "Market",
+    "payments": "Payments",
+    "droppoints": "DropPoints",
+    "dewy": "Open Dewy, your assistant"
+  },
   "unlock": {
     "welcomeBack": "Welcome back",
     "forgotPasscode": "Forgot your passcode?",
