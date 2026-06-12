@@ -1,6 +1,8 @@
-// Mocked Receive-screen data — mirrors the Drops design handoff
-// (`flows/receive-app.jsx`). Stand-in accounts until the wallet module feeds
-// real per-chain addresses (`useWalletState` keyed by the selected chain).
+// Receive-screen data — the per-chain receiving accounts come from the wallet
+// domain (`useWalletState().accounts`); this module maps a domain
+// `WalletAccount` onto the presentational `ReceiveAccount` the screen renders.
+
+import type { WalletAccount } from '@flama/frontend';
 
 export type ReceiveAccount = {
   symbol: string;
@@ -15,26 +17,36 @@ export type ReceiveAccount = {
   seed: number;
 };
 
-export const RECEIVE_ACCOUNTS: ReceiveAccount[] = [
-  {
-    symbol: 'XRP',
-    name: 'XRP Ledger',
-    color: '#14161a',
-    address: 'rJordn4PqW9bExAmp1eXRPLedgerKq7vZ2',
-    tag: '584213',
-    network: 'XRPL Mainnet',
-    seed: 3,
-  },
-  {
-    symbol: 'XRP',
-    name: 'XRPL EVM',
-    color: '#5b41dd',
-    address: '0x8fC2e3A1bD49a07cF3e1b2A6d9E0f4C7a1B3d2E6',
+// XRP black for the Ledger, brand indigo for the EVM sidechain — mirrors the
+// AssetIcon defaults and the design's account pills.
+function chainColor(kind: WalletAccount['kind']): string {
+  return kind === 'evm' ? '#5b41dd' : '#14161a';
+}
+
+// A stable, address-derived seed so each account's faux QR pattern is
+// deterministic (and distinct between chains) without a real encoder.
+function seedFromAddress(address: string): number {
+  let hash = 0;
+  for (let i = 0; i < address.length; i++) {
+    hash = (hash * 31 + address.charCodeAt(i)) & 0x7fffffff;
+  }
+  return hash || 1;
+}
+
+/** Map a domain wallet account onto the shape the Receive screen renders. */
+export function toReceiveAccount(account: WalletAccount): ReceiveAccount {
+  return {
+    symbol: account.symbol,
+    name: account.chainName,
+    color: chainColor(account.kind),
+    address: account.address,
+    // Receiving to your own classic address needs no destination tag; the
+    // domain doesn't issue one, so it stays hidden.
     tag: null,
-    network: 'XRPL EVM Sidechain',
-    seed: 4,
-  },
-];
+    network: account.chainName,
+    seed: seedFromAddress(account.address),
+  };
+}
 
 // The money flows are immersive dark surfaces. We pin the dark design tokens on
 // the screen subtree via `vars()` so every `@flama/design-system-mobile`
