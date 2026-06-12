@@ -89,28 +89,35 @@ export default function AddRecipientScreen() {
   const { t } = useTranslation();
   const { accounts } = useWalletState();
 
-  const [chainId, setChainId] = React.useState<string | undefined>(undefined);
-  const [address, setAddress] = React.useState('');
-  const [destinationTag, setDestinationTag] = React.useState('');
-  const [name, setName] = React.useState('');
-  const [networkOpen, setNetworkOpen] = React.useState(false);
-  const [errorKey, setErrorKey] = React.useState<SaveErrorKey | null>(null);
-
-  // The scan screen returns here with the parsed address (and XRPL tag), so
-  // prefill the form from those params. Track the last applied address so a
-  // re-render doesn't clobber edits the user makes after the scan.
-  const scan = useLocalSearchParams<{
+  // Params seed the form two ways: an initial prefill when arriving from a
+  // payment's counterparty (address + network known, just name it), and the
+  // values the scan screen returns with (`scanned*`).
+  const params = useLocalSearchParams<{
+    address?: string;
+    chainId?: string;
+    name?: string;
     scannedAddress?: string;
     scannedTag?: string;
   }>();
+
+  const [chainId, setChainId] = React.useState<string | undefined>(params.chainId);
+  const [address, setAddress] = React.useState(params.address ?? '');
+  const [destinationTag, setDestinationTag] = React.useState('');
+  const [name, setName] = React.useState(params.name ?? '');
+  const [networkOpen, setNetworkOpen] = React.useState(false);
+  const [errorKey, setErrorKey] = React.useState<SaveErrorKey | null>(null);
+
+  // The scan screen returns here with the parsed address (and XRPL tag). Track
+  // the last applied address so a re-render doesn't clobber edits the user
+  // makes after the scan.
   const appliedScan = React.useRef<string | undefined>(undefined);
   React.useEffect(() => {
-    const scanned = scan.scannedAddress;
+    const scanned = params.scannedAddress;
     if (!scanned || scanned === appliedScan.current) return;
     appliedScan.current = scanned;
     setAddress(scanned);
-    if (scan.scannedTag) setDestinationTag(scan.scannedTag);
-  }, [scan.scannedAddress, scan.scannedTag]);
+    if (params.scannedTag) setDestinationTag(params.scannedTag);
+  }, [params.scannedAddress, params.scannedTag]);
 
   // Networks the wallet can pay on; default to the first (XRPL).
   const networks = accounts.map((account) => ({

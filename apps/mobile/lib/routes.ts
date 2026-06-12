@@ -69,6 +69,15 @@ export const buildRoute = {
     pathname: Routes.Transaction,
     params: contact ? { id, contact } : { id },
   }),
+  /** Add recipient, optionally prefilled (e.g. from a payment's counterparty). */
+  addRecipient: (prefill?: { address?: string; chainId?: string; name?: string }): Href => ({
+    pathname: Routes.AddRecipient,
+    params: {
+      ...(prefill?.address ? { address: prefill.address } : {}),
+      ...(prefill?.chainId ? { chainId: prefill.chainId } : {}),
+      ...(prefill?.name ? { name: prefill.name } : {}),
+    },
+  }),
   chatSession: (session: string): Href => ({
     pathname: Routes.ChatSession,
     params: { session },

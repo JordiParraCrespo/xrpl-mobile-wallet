@@ -42,6 +42,22 @@ describe('buildPaymentsFeed', () => {
     });
   });
 
+  it('scales the fee and carries the explorer url onto the row', () => {
+    const { recents } = buildPaymentsFeed(
+      [tx({ direction: 'out', fee: 12n, explorerUrl: 'https://x.test/tx/h1' })],
+      [],
+      { decimals: 6 },
+    );
+
+    expect(recents[0].fee).toBe(0.000012);
+    expect(recents[0].explorerUrl).toBe('https://x.test/tx/h1');
+  });
+
+  it('leaves fee undefined when the transaction has none', () => {
+    const { recents } = buildPaymentsFeed([tx({})], [], { decimals: 6 });
+    expect(recents[0].fee).toBeUndefined();
+  });
+
   it('falls back to a shortened address for unknown counterparties', () => {
     const { recents } = buildPaymentsFeed(
       [

@@ -15,13 +15,16 @@
     "postinstall": "npx tailwindcss -i ./global.css -o ./node_modules/.cache/nativewind/global.css"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
     "@better-auth/expo": "^1.6.14",
     "@expo/metro-runtime": "~6.1.2",
     "@flama/api-client": "workspace:*",
+    "@flama/chain-xrpl": "workspace:*",
     "@flama/design-system-mobile": "workspace:*",
     "@flama/frontend": "workspace:*",
     "@flama/shared": "workspace:*",
     "@flama/translations": "workspace:*",
+    "@flama/wallet-agent": "workspace:*",
     "@gorhom/bottom-sheet": "^5.2.14",
     "@react-navigation/native": "^7.0.0",
     "@rn-primitives/portal": "1.4.0",

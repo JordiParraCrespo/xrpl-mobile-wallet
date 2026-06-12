@@ -13,6 +13,7 @@ import {
   buildPaymentsFeed,
   type Contact,
   type PaymentsFeed,
+  type RecentPayment,
 } from '../modules/address-book';
 import { useFlamaApp } from './context';
 import { useAccountTransactions } from './explorer.queries';
@@ -117,4 +118,28 @@ export function usePaymentsFeed(
     isError: txQuery.isError,
     error: txQuery.error,
   };
+}
+
+export interface UsePaymentDetailResult {
+  /** The matching payment, enriched with its address-book contact, or null. */
+  payment: RecentPayment | null;
+  isLoading: boolean;
+  isError: boolean;
+  error: Error | null;
+}
+
+/**
+ * A single payment for the transaction-detail screen: the account's history
+ * (from {@link usePaymentsFeed}) narrowed to the row whose hash is `id`. Reuses
+ * the same cached query as the payments list, so opening a detail issues no
+ * extra request and the counterparty stays merged with the address book.
+ */
+export function usePaymentDetail(
+  chainId: string,
+  address: string | undefined,
+  id: string | undefined,
+): UsePaymentDetailResult {
+  const { recents, isLoading, isError, error } = usePaymentsFeed(chainId, address);
+  const payment = id ? (recents.find((row) => row.id === id) ?? null) : null;
+  return { payment, isLoading, isError, error };
 }

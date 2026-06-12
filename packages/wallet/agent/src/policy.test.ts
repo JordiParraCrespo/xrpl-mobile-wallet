@@ -1,14 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createCanUseTool, evaluatePolicy } from './policy';
-
-const SERVER = 'wallet';
-const submit = `mcp__${SERVER}__submit_payment`;
-const balance = `mcp__${SERVER}__get_balance`;
+import { createToolGate, evaluatePolicy } from './policy';
+import { SUBMIT_PAYMENT_TOOL } from './tools';
 
 describe('evaluatePolicy', () => {
   it('denies a payment above the cap', () => {
-    const decision = evaluatePolicy({ maxPaymentXrp: 50 }, { amount: '75' });
-    expect(decision.allowed).toBe(false);
+    expect(evaluatePolicy({ maxPaymentXrp: 50 }, { amount: '75' }).allowed).toBe(false);
   });
 
   it('allows a payment within the cap', () => {
@@ -26,53 +22,49 @@ describe('evaluatePolicy', () => {
   });
 });
 
-describe('createCanUseTool', () => {
-  const build = (over: { maxPaymentXrp?: number } = {}, approve = vi.fn(async () => true)) => ({
+describe('createToolGate', () => {
+  const build = (maxPaymentXrp?: number, approve = vi.fn(async () => true)) => ({
     approve,
-    canUseTool: createCanUseTool({ serverName: SERVER, policy: over, approve }),
+    gate: createToolGate({ policy: { maxPaymentXrp }, approve }),
   });
 
-  it('auto-allows read tools without asking for approval', async () => {
-    const { canUseTool, approve } = build();
-    const decision = await canUseTool(balance, {});
-    expect(decision.behavior).toBe('allow');
+  it('passes read tools without asking for approval', async () => {
+    const { gate, approve } = build();
+    expect((await gate('get_balance', {})).allowed).toBe(true);
+    expect((await gate('prepare_payment', { destination: 'rX', amount: '1' })).allowed).toBe(true);
     expect(approve).not.toHaveBeenCalled();
   });
 
-  it('denies any tool that is not a wallet tool (e.g. Bash)', async () => {
-    const { canUseTool } = build();
-    const decision = await canUseTool('Bash', { command: 'rm -rf /' });
-    expect(decision.behavior).toBe('deny');
-  });
-
   it('denies a submit above the policy cap before asking the human', async () => {
-    const { canUseTool, approve } = build({ maxPaymentXrp: 50 });
-    const decision = await canUseTool(submit, {
+    const { gate, approve } = build(50);
+    const decision = await gate(SUBMIT_PAYMENT_TOOL, {
       destination: 'rX',
       amount: '100',
     });
-    expect(decision.behavior).toBe('deny');
+    expect(decision.allowed).toBe(false);
     expect(approve).not.toHaveBeenCalled();
   });
 
   it('asks for approval on an in-policy submit and allows when approved', async () => {
     const approve = vi.fn(async () => true);
-    const { canUseTool } = build({ maxPaymentXrp: 50 }, approve);
-    const decision = await canUseTool(submit, {
+    const { gate } = build(50, approve);
+    const decision = await gate(SUBMIT_PAYMENT_TOOL, {
       destination: 'rX',
       amount: '10',
     });
     expect(approve).toHaveBeenCalledOnce();
-    expect(decision.behavior).toBe('allow');
+    expect(decision.allowed).toBe(true);
   });
 
   it('denies the submit when the human declines', async () => {
-    const approve = vi.fn(async () => false);
-    const { canUseTool } = build({ maxPaymentXrp: 50 }, approve);
-    const decision = await canUseTool(submit, {
+    const { gate } = build(
+      50,
+      vi.fn(async () => false),
+    );
+    const decision = await gate(SUBMIT_PAYMENT_TOOL, {
       destination: 'rX',
       amount: '10',
     });
-    expect(decision.behavior).toBe('deny');
+    expect(decision.allowed).toBe(false);
   });
 });

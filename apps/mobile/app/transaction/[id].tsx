@@ -1,162 +1,296 @@
+import { AmountText } from '@flama/design-system-mobile/amount-text';
 import { Button } from '@flama/design-system-mobile/button';
-import { DetailList, DetailRow } from '@flama/design-system-mobile/detail-list';
 import { Icon } from '@flama/design-system-mobile/icon';
+import { IconButton } from '@flama/design-system-mobile/icon-button';
+import { InitialsAvatar } from '@flama/design-system-mobile/initials-avatar';
+import { Separator } from '@flama/design-system-mobile/separator';
+import { Skeleton } from '@flama/design-system-mobile/skeleton';
 import { Text } from '@flama/design-system-mobile/text';
+import { cn } from '@flama/design-system-mobile/utils';
+import { shortenAddress } from '@flama/frontend';
+import type { RecentPayment } from '@flama/frontend/react';
+import { useExchangeRate, usePaymentDetail, useWalletState } from '@flama/frontend/react';
+import * as Clipboard from 'expo-clipboard';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { Download, Globe, MoreHorizontal, X } from 'lucide-react-native';
-import type { ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  getContact,
-  getTransaction,
-  TransactionActions,
-  TransactionHero,
-} from '../../components/drops/payments';
+  ArrowDownLeft,
+  ArrowUpRight,
+  Check,
+  ChevronLeft,
+  Copy,
+  ExternalLink,
+  UserPlus,
+} from 'lucide-react-native';
+import * as React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Linking, Pressable, ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { formatPaymentDateTime } from '../../components/payments/format-date';
+import { PaymentsBackdrop } from '../../components/payments/payments-backdrop';
+import { buildRoute } from '../../lib/routes';
 
-// A small white round control for the modal top bar (close / more).
-function RoundControl({
-  label,
-  onPress,
-  children,
-}: {
-  label: string;
-  onPress?: () => void;
-  children: ReactNode;
-}) {
+/** Default chain when no wallet is loaded yet, so the screen still renders. */
+const FALLBACK_CHAIN_ID = 'xrpl:testnet';
+
+function formatUsd(value: number): string {
+  return `$${value.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+/**
+ * Transaction detail — a payment opened from the payments hub
+ * (`payments/payments-screens.jsx`, Transaction detail). The row comes from
+ * {@link usePaymentDetail}, which joins the active XRPL account's history with
+ * the address book, so the counterparty already reads as a saved name where one
+ * exists. When it doesn't, a "Save recipient" action pre-fills the address book
+ * with this address — merging the payment into your contacts.
+ */
+export default function TransactionDetailScreen() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
+  const { id } = useLocalSearchParams<{ id: string }>();
+
+  const { accounts } = useWalletState();
+  const xrpl = accounts.find((account) => account.kind === 'xrpl');
+  const { payment, isLoading } = usePaymentDetail(
+    xrpl?.chainId ?? FALLBACK_CHAIN_ID,
+    xrpl?.address,
+    id,
+  );
+
+  const rate = useExchangeRate('XRP', 'usd').data;
+
+  return (
+    <View className="bg-background flex-1">
+      <PaymentsBackdrop />
+
+      <View style={{ paddingTop: insets.top + 14 }} className="px-5 pb-1">
+        <IconButton
+          variant="soft"
+          accessibilityLabel={t('payments.transaction.back')}
+          onPress={() => router.back()}
+        >
+          <Icon as={ChevronLeft} size={20} />
+        </IconButton>
+      </View>
+
+      {isLoading && !payment ? (
+        <DetailSkeleton />
+      ) : !payment ? (
+        <View className="flex-1 items-center justify-center px-8">
+          <Text className="text-muted-foreground text-center text-[15px] leading-[22px]">
+            {t('payments.transaction.notFound')}
+          </Text>
+        </View>
+      ) : (
+        <Detail payment={payment} usd={rate ? payment.amount * rate : null} />
+      )}
+    </View>
+  );
+}
+
+function Detail({ payment, usd }: { payment: RecentPayment; usd: number | null }) {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const incoming = payment.direction === 'in';
+  const DirectionIcon = incoming ? ArrowDownLeft : ArrowUpRight;
+
+  const onSaveRecipient = () => router.push(buildRoute.addRecipient({ address: payment.address }));
+
+  const openExplorer = () => {
+    if (payment.explorerUrl) Linking.openURL(payment.explorerUrl).catch(() => {});
+  };
+
+  return (
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerClassName="px-5 pb-10"
+      contentContainerStyle={{ paddingTop: 6 }}
+    >
+      {/* hero — avatar with a direction badge, then the signed amount */}
+      <View className="items-center pb-7 pt-2">
+        <View className="relative">
+          <InitialsAvatar name={payment.name} size="xl" />
+          <View
+            className={cn(
+              'border-background absolute -bottom-1 -right-1 h-7 w-7 items-center justify-center rounded-full border-2',
+              incoming ? 'bg-positive' : 'bg-foreground',
+            )}
+          >
+            <Icon as={DirectionIcon} size={15} className="text-background" />
+          </View>
+        </View>
+
+        <Text className="text-foreground mt-3.5 text-[17px] font-semibold">
+          {payment.key === 'unknown' ? t('payments.unknown') : payment.name}
+        </Text>
+        <Text className="text-muted-foreground mt-0.5 text-[13px]">
+          {t(`payments.relationship.${payment.direction}`)}
+        </Text>
+
+        <View className="mt-3.5">
+          <AmountText
+            value={incoming ? payment.amount : -payment.amount}
+            currency={payment.symbol}
+            signed
+            tone={!payment.success ? 'muted' : incoming ? 'positive' : 'default'}
+            size="xl"
+            decimals={2}
+          />
+        </View>
+        <Text className="text-muted-foreground mt-1 text-[13.5px]">
+          {formatPaymentDateTime(payment.timestamp)}
+          {usd !== null ? ` · ≈ ${formatUsd(usd)}` : ''}
+        </Text>
+      </View>
+
+      {/* details card */}
+      <View className="bg-card border-border overflow-hidden rounded-xl border">
+        <DetailRow
+          label={t('payments.transaction.status')}
+          value={
+            <View className="flex-row items-center gap-1.5">
+              <View
+                className={cn(
+                  'h-1.5 w-1.5 rounded-full',
+                  payment.success ? 'bg-positive' : 'bg-destructive',
+                )}
+              />
+              <Text className="text-foreground text-[14.5px] font-medium">
+                {payment.success
+                  ? t('payments.transaction.confirmed')
+                  : t('payments.transaction.failed')}
+              </Text>
+            </View>
+          }
+        />
+        <Separator />
+        <DetailRow
+          label={incoming ? t('payments.transaction.from') : t('payments.transaction.to')}
+          value={
+            <Text className="text-foreground max-w-[60%] text-right text-[14.5px] font-medium">
+              {payment.known ? payment.name : t('payments.transaction.notSaved')}
+            </Text>
+          }
+        />
+        {payment.address ? (
+          <>
+            <Separator />
+            <CopyRow
+              label={t('payments.transaction.address')}
+              value={payment.address}
+              display={shortenAddress(payment.address)}
+            />
+          </>
+        ) : null}
+        {payment.fee !== undefined ? (
+          <>
+            <Separator />
+            <DetailRow
+              label={t('payments.transaction.fee')}
+              value={
+                <Text className="text-foreground text-[14.5px] font-medium tabular-nums">
+                  {payment.fee} {payment.symbol}
+                </Text>
+              }
+            />
+          </>
+        ) : null}
+        <Separator />
+        <CopyRow
+          label={t('payments.transaction.hash')}
+          value={payment.id}
+          display={shortenAddress(payment.id, 8, 6)}
+        />
+      </View>
+
+      {/* actions */}
+      <View className="mt-5 gap-3">
+        {payment.address && !payment.known ? (
+          <Button variant="brand" size="lg" className="w-full" onPress={onSaveRecipient}>
+            <Icon as={UserPlus} size={18} className="text-brand-foreground" />
+            <Text className="text-brand-foreground font-semibold">
+              {t('payments.transaction.saveRecipient')}
+            </Text>
+          </Button>
+        ) : null}
+
+        {payment.explorerUrl ? (
+          <Button variant="secondary" size="lg" className="w-full" onPress={openExplorer}>
+            <Icon as={ExternalLink} size={18} className="text-foreground" />
+            <Text className="text-foreground font-semibold">
+              {t('payments.transaction.openExplorer')}
+            </Text>
+          </Button>
+        ) : null}
+      </View>
+    </ScrollView>
+  );
+}
+
+/** A label/value row inside the details card. */
+function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <View className="flex-row items-center justify-between px-4 py-3.5">
+      <Text className="text-muted-foreground text-[13.5px]">{label}</Text>
+      {value}
+    </View>
+  );
+}
+
+/** A details row whose value is a tap-to-copy mono string (address, hash). */
+function CopyRow({ label, value, display }: { label: string; value: string; display: string }) {
+  const [copied, setCopied] = React.useState(false);
+  const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  React.useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
+
+  const copy = () => {
+    Clipboard.setStringAsync(value).catch(() => {});
+    setCopied(true);
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => setCopied(false), 1600);
+  };
+
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={label}
-      onPress={onPress}
-      className="bg-card border-border h-10 w-10 items-center justify-center rounded-full border active:scale-[0.97]"
+      onPress={copy}
+      className="flex-row items-center justify-between px-4 py-3.5 active:opacity-70"
     >
-      {children}
+      <Text className="text-muted-foreground text-[13.5px]">{label}</Text>
+      <View className="flex-row items-center gap-2">
+        <Text className="text-foreground font-mono text-[13.5px]">{display}</Text>
+        <Icon
+          as={copied ? Check : Copy}
+          size={15}
+          className={copied ? 'text-positive' : 'text-muted-foreground'}
+        />
+      </View>
     </Pressable>
   );
 }
 
-/**
- * Transaction detail — the full record behind a payment bubble (design:
- * `payments.html` · `payments/payments-screens.jsx` TxDetailSheet). The
- * counterparty hero, the quick-action chips, then Status / parties, the ledger
- * timestamps and the tx hash, finishing on Open in explorer.
- *
- * Mocked: the transaction comes from `getTransaction`; the counterparty is the
- * chat contact when present (`contact` param), otherwise the transaction's own
- * default peer. Presented as a modal, so it slides up over the chat.
- */
-export default function TransactionDetailScreen() {
-  const router = useRouter();
-  const { t } = useTranslation();
-  const insets = useSafeAreaInsets();
-  const { id, contact } = useLocalSearchParams<{
-    id: string;
-    contact?: string;
-  }>();
-
-  const tx = getTransaction(id);
-  const peer = contact ? getContact(contact).name : tx.peer;
-  const incoming = tx.dir === 'in';
-
+function DetailSkeleton() {
   return (
-    <View className="bg-background flex-1">
-      <StatusBar style="dark" />
-
-      <View
-        className="flex-row items-center justify-between px-4 pb-1"
-        style={{ paddingTop: insets.top + 8 }}
-      >
-        <RoundControl label={t('payments.transaction.close')} onPress={() => router.back()}>
-          <Icon as={X} size={19} className="text-foreground" />
-        </RoundControl>
-        <RoundControl label={t('payments.transaction.more')}>
-          <Icon as={MoreHorizontal} size={19} className="text-foreground" />
-        </RoundControl>
+    <View className="items-center px-5 pt-2">
+      <Skeleton className="h-[72px] w-[72px] rounded-full" />
+      <Skeleton className="mt-3.5 h-4 w-32" />
+      <Skeleton className="mt-3 h-10 w-44" />
+      <Skeleton className="mt-2 h-3.5 w-40" />
+      <View className="mt-7 w-full gap-3">
+        <Skeleton className="h-12 w-full rounded-xl" />
+        <Skeleton className="h-12 w-full rounded-xl" />
+        <Skeleton className="h-12 w-full rounded-xl" />
       </View>
-
-      <ScrollView
-        className="flex-1"
-        showsVerticalScrollIndicator={false}
-        contentContainerClassName="px-[18px] pt-2"
-        contentContainerStyle={{ paddingBottom: insets.bottom + 28 }}
-      >
-        <TransactionHero tx={tx} peer={peer} />
-
-        <View className="mt-5">
-          <TransactionActions />
-        </View>
-
-        {/* Status + parties */}
-        <DetailList card className="mt-3">
-          <DetailRow
-            label={t('payments.transaction.status')}
-            value={
-              <View className="flex-row items-center gap-1.5">
-                <View className="bg-positive h-[7px] w-[7px] rounded-full" />
-                <Text className="text-foreground text-sm font-semibold">
-                  {t('payments.transaction.settled')}
-                </Text>
-              </View>
-            }
-          />
-          <DetailRow
-            label={incoming ? t('payments.transaction.from') : t('payments.transaction.to')}
-            value={peer}
-          />
-          <DetailRow
-            label={t('payments.transaction.account')}
-            value={t('payments.transaction.accountValue')}
-            accent
-          />
-        </DetailList>
-
-        {/* Ledger timestamps */}
-        <DetailList card className="mt-3">
-          <DetailRow label={t('payments.transaction.date')} value={tx.date} />
-          <DetailRow label={t('payments.transaction.submitted')} value={tx.submitted} mono />
-          <DetailRow label={t('payments.transaction.validated')} value={tx.validated} mono />
-          <DetailRow
-            label={t('payments.transaction.network')}
-            value={t('payments.transaction.networkValue')}
-          />
-          <DetailRow
-            label={t('payments.transaction.ledgerIndex')}
-            value={tx.ledger.toLocaleString()}
-            mono
-          />
-          <DetailRow label={t('payments.transaction.networkFee')} value={`${tx.fee} XRP`} mono />
-        </DetailList>
-
-        {/* Transaction hash + confirmation */}
-        <DetailList card className="mt-3">
-          <DetailRow label={t('payments.transaction.transaction')} value={tx.hash} mono />
-          <DetailRow
-            label={t('payments.transaction.confirmation')}
-            value={
-              <View className="flex-row items-center gap-1.5">
-                <Text className="text-brand text-sm font-semibold">
-                  {t('payments.transaction.download')}
-                </Text>
-                <Icon as={Download} size={16} className="text-brand" />
-              </View>
-            }
-          />
-        </DetailList>
-
-        <Button variant="brand" size="lg" className="mt-4 w-full">
-          <Icon as={Globe} size={18} />
-          <Text>{t('payments.transaction.openExplorer')}</Text>
-        </Button>
-
-        <Pressable accessibilityRole="button" className="mt-3 items-center py-1 active:opacity-70">
-          <Text className="text-muted-foreground text-[14px] font-semibold">
-            {t('payments.transaction.getHelp')}
-          </Text>
-        </Pressable>
-      </ScrollView>
     </View>
   );
 }

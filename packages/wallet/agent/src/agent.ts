@@ -1,16 +1,28 @@
-import { query, type SDKUserMessage } from '@anthropic-ai/claude-agent-sdk';
 import type { WalletGateway } from './gateway';
-import { buildSystemPrompt, DEFAULT_PERSONA, type Persona } from './persona';
 import {
-  type ApproveFn,
-  type CanUseTool,
-  createCanUseTool,
-  type TransactionPolicy,
-} from './policy';
-import { createWalletTools, WALLET_SERVER_NAME } from './tools';
+  AnthropicMessagesClient,
+  type AnthropicTool,
+  collectText,
+  collectToolUses,
+  type MessageParam,
+  type MessagesClient,
+  type ToolResultBlock,
+  type ToolUseBlock,
+} from './messages';
+import { buildSystemPrompt, DEFAULT_PERSONA, type Persona } from './persona';
+import { type ApproveFn, createToolGate, type ToolGate, type TransactionPolicy } from './policy';
+import { createWalletTools, type WalletTool } from './tools';
+
+/** A current, capable default model; override per deployment. */
+const DEFAULT_MODEL = 'claude-sonnet-4-6';
+const DEFAULT_MAX_TOKENS = 1024;
+/** Safety bound on tool-use iterations within a single turn. */
+const MAX_STEPS = 8;
 
 export interface WalletAgentConfig {
   gateway: WalletGateway;
+  /** Anthropic API key. On-device this ships in the app — see the mobile TODO. */
+  apiKey: string;
   /** Display name of the network, e.g. "XRPL Testnet". */
   network: string;
   /** Native asset symbol, e.g. "XRP". */
@@ -21,95 +33,54 @@ export interface WalletAgentConfig {
   policy?: TransactionPolicy;
   /** Human approval callback for gated actions (e.g. submitting a payment). */
   approve: ApproveFn;
-  /** Claude model id; falls back to the SDK default when omitted. */
+  /** Claude model id. Defaults to {@link DEFAULT_MODEL}. */
   model?: string;
-  /** Diagnostics: receives the underlying agent subprocess's stderr. */
-  onStderr?: (data: string) => void;
+  /** Max output tokens per response. Defaults to {@link DEFAULT_MAX_TOKENS}. */
+  maxTokens?: number;
+  /** Override the API base URL (proxies, gateways). */
+  baseUrl?: string;
+  /** Inject a custom fetch (RN polyfills, tests). */
+  fetchImpl?: typeof fetch;
+  /** Allow direct calls from a browser / React Native origin. Defaults true. */
+  dangerouslyAllowBrowser?: boolean;
+  /** Inject the Claude connection (tests). Defaults to the Anthropic SDK client. */
+  client?: MessagesClient;
 }
-
-/** A structured event from a single agent turn. */
-export type AgentEvent = { type: 'assistant'; text: string } | { type: 'result'; text: string };
-
-/** Minimal view of the SDK message shapes this agent consumes. */
-interface SdkMessageLike {
-  type: string;
-  subtype?: string;
-  session_id?: string;
-  result?: unknown;
-  message?: { content?: unknown };
-}
-
-type QueryStream = AsyncGenerator<unknown, void, unknown>;
 
 /**
- * A pushable async-iterable of user messages. The Agent SDK requires
- * streaming-input mode for `canUseTool` to work (permission decisions flow back
- * over the same channel), so we feed turns through this queue instead of a
- * one-shot string prompt.
- */
-function createInputStream() {
-  const buffer: SDKUserMessage[] = [];
-  let pending: ((value: SDKUserMessage | null) => void) | null = null;
-  let closed = false;
-
-  const push = (message: SDKUserMessage) => {
-    if (pending) {
-      pending(message);
-      pending = null;
-    } else {
-      buffer.push(message);
-    }
-  };
-  const close = () => {
-    closed = true;
-    if (pending) {
-      pending(null);
-      pending = null;
-    }
-  };
-  const iterator = (async function* () {
-    while (!closed) {
-      const next =
-        buffer.shift() ??
-        (await new Promise<SDKUserMessage | null>((r) => {
-          pending = r;
-        }));
-      if (next === null) {
-        return;
-      }
-      yield next;
-    }
-  })();
-
-  return { iterator, push, close };
-}
-
-const userMessage = (text: string): SDKUserMessage => ({
-  type: 'user',
-  message: { role: 'user', content: text },
-  parent_tool_use_id: null,
-});
-
-/**
- * The XRPL wallet agent: a thin, key-free wrapper around the Claude Agent SDK
- * tool-use loop. It owns the system prompt (persona + code-owned scope/safety),
- * the wallet tools, and the `canUseTool` policy/approval gate. A single
- * streaming session is kept open so the conversation has memory across turns.
+ * XRPL wallet agent that runs the Claude tool-use loop against the Anthropic SDK
+ * Messages API — so it runs in React Native, the browser, or Node with no agent
+ * framework or subprocess. It owns the system prompt (persona + code-owned
+ * scope/safety), the wallet tools, and the policy/approval gate, and keeps
+ * conversation history so turns have memory. It never holds keys: signing
+ * happens behind the {@link WalletGateway}.
  */
 export class WalletAgent {
-  private readonly canUseTool: CanUseTool;
+  private readonly client: MessagesClient;
   private readonly systemPrompt: string;
-  private readonly model: string | undefined;
-  private readonly mcpServer: ReturnType<typeof createWalletTools>;
-  private readonly onStderr: ((data: string) => void) | undefined;
-
-  private input: ReturnType<typeof createInputStream> | undefined;
-  private stream: QueryStream | undefined;
+  private readonly tools: WalletTool[];
+  private readonly anthropicTools: AnthropicTool[];
+  private readonly gate: ToolGate;
+  private readonly model: string;
+  private readonly maxTokens: number;
+  private readonly history: MessageParam[] = [];
 
   constructor(config: WalletAgentConfig) {
-    this.mcpServer = createWalletTools(config.gateway);
-    this.canUseTool = createCanUseTool({
-      serverName: WALLET_SERVER_NAME,
+    this.client =
+      config.client ??
+      new AnthropicMessagesClient({
+        apiKey: config.apiKey,
+        baseUrl: config.baseUrl,
+        fetchImpl: config.fetchImpl,
+        dangerouslyAllowBrowser: config.dangerouslyAllowBrowser,
+      });
+    this.tools = createWalletTools(config.gateway);
+    this.anthropicTools = this.tools.map((tool) => ({
+      name: tool.name,
+      description: tool.description,
+      input_schema: tool.inputSchema,
+    }));
+    this.gate = createToolGate({
       policy: config.policy ?? {},
       approve: config.approve,
     });
@@ -118,97 +89,70 @@ export class WalletAgent {
       network: config.network,
       symbol: config.symbol,
     });
-    this.model = config.model;
-    this.onStderr = config.onStderr;
+    this.model = config.model ?? DEFAULT_MODEL;
+    this.maxTokens = config.maxTokens ?? DEFAULT_MAX_TOKENS;
   }
 
-  /** Sends a user message, runs the tool loop, and returns the final reply text. */
+  /** Sends a user message, runs the tool loop to completion, returns the reply. */
   async ask(message: string): Promise<string> {
-    let finalText = '';
-    for await (const event of this.run(message)) {
-      finalText = event.text || finalText;
-    }
-    return finalText;
-  }
+    this.history.push({ role: 'user', content: message });
 
-  /** Streams structured events (assistant text, final result) for one turn. */
-  async *run(message: string): AsyncGenerator<AgentEvent> {
-    const stream = this.ensureStarted();
-    this.input?.push(userMessage(message));
+    for (let step = 0; step < MAX_STEPS; step += 1) {
+      const response = await this.client.create({
+        model: this.model,
+        max_tokens: this.maxTokens,
+        system: this.systemPrompt,
+        messages: this.history,
+        tools: this.anthropicTools,
+      });
+      this.history.push({ role: 'assistant', content: response.content });
 
-    // Read with manual .next() rather than `for await … break`, which would
-    // call the stream's .return() and close the session after a single turn.
-    while (true) {
-      const { value, done } = await stream.next();
-      if (done) {
-        return;
+      const toolUses = collectToolUses(response.content);
+      if (response.stop_reason !== 'tool_use' || toolUses.length === 0) {
+        return collectText(response.content);
       }
-      const event = this.handle(value as SdkMessageLike);
-      if (event) {
-        yield event;
-        if (event.type === 'result') {
-          return; // end of this turn; the session stays open for the next ask()
-        }
+
+      const results: ToolResultBlock[] = [];
+      for (const toolUse of toolUses) {
+        results.push(await this.runTool(toolUse));
       }
+      this.history.push({ role: 'user', content: results });
     }
+
+    return 'I had to stop after several steps without finishing. Please try rephrasing.';
   }
 
-  /** Closes the streaming session. Call when the conversation is finished. */
-  close(): void {
-    this.input?.close();
+  /** Clears the conversation history (starts a fresh session, same wallet). */
+  reset(): void {
+    this.history.length = 0;
   }
 
-  private ensureStarted(): QueryStream {
-    if (this.stream) {
-      return this.stream;
-    }
-    const input = createInputStream();
-    this.input = input;
-    this.stream = query({
-      prompt: input.iterator,
-      options: {
-        systemPrompt: this.systemPrompt,
-        mcpServers: { [WALLET_SERVER_NAME]: this.mcpServer },
-        // Streaming input mode: our 2-arg callback is structurally assignable to
-        // the SDK's CanUseTool (it ignores the extra context arg).
-        canUseTool: this.canUseTool,
-        ...(this.model ? { model: this.model } : {}),
-        ...(this.onStderr ? { stderr: this.onStderr } : {}),
-      },
-    }) as unknown as QueryStream;
-    return this.stream;
-  }
-
-  private handle(msg: SdkMessageLike): AgentEvent | undefined {
-    if (msg.type === 'assistant') {
-      const text = extractText(msg.message?.content);
-      return text ? { type: 'assistant', text } : undefined;
-    }
-    if (msg.type === 'result') {
+  private async runTool(toolUse: ToolUseBlock): Promise<ToolResultBlock> {
+    const base = { type: 'tool_result' as const, tool_use_id: toolUse.id };
+    const tool = this.tools.find((t) => t.name === toolUse.name);
+    if (!tool) {
       return {
-        type: 'result',
-        text: typeof msg.result === 'string' ? msg.result : '',
+        ...base,
+        content: `Unknown tool: ${toolUse.name}`,
+        is_error: true,
       };
     }
-    return undefined;
-  }
-}
 
-/** Concatenates the text blocks of an assistant message's content array. */
-function extractText(content: unknown): string {
-  if (!Array.isArray(content)) {
-    return '';
-  }
-  let text = '';
-  for (const block of content) {
-    if (
-      block &&
-      typeof block === 'object' &&
-      (block as { type?: unknown }).type === 'text' &&
-      typeof (block as { text?: unknown }).text === 'string'
-    ) {
-      text += (block as { text: string }).text;
+    const decision = await this.gate(toolUse.name, toolUse.input);
+    if (!decision.allowed) {
+      return {
+        ...base,
+        content: decision.message ?? 'Denied.',
+        is_error: true,
+      };
+    }
+
+    try {
+      const result = await tool.run(toolUse.input);
+      return { ...base, content: result.text, is_error: result.isError };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return { ...base, content: `Tool error: ${message}`, is_error: true };
     }
   }
-  return text;
 }

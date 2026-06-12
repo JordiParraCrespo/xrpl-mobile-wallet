@@ -3,6 +3,7 @@ import {
   type ChainAdapter,
   type ChainRegistry,
   parseUnits,
+  type Signer,
   type TxResult,
 } from '@flama/chain-core';
 import type { CreateWalletOptions, KeyringManager, WalletMeta } from '@flama/wallet-keyring';
@@ -133,6 +134,18 @@ export class WalletService {
   async getBalance(chainId: string): Promise<Balance> {
     const { adapter, account } = this.getActiveAccount(chainId);
     return adapter.getBalance(account.address);
+  }
+
+  /**
+   * Returns the active wallet's signer for a chain. Exposed so on-device callers
+   * (e.g. the wallet agent) can build a signing gateway. Keys never leave the
+   * keyring — this hands back a `Signer`, not key material.
+   */
+  getSigner(chainId: string): Signer {
+    const { adapter, wallet } = this.getActiveAccount(chainId);
+    return this.wrapSync(() =>
+      this.keyring.getSigner(wallet.id, adapter.config.kind),
+    );
   }
 
   /**

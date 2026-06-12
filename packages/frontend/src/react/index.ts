@@ -9,10 +9,12 @@ export type {
 } from '../modules/address-book';
 export {
   addressBookKeys,
+  type UsePaymentDetailResult,
   type UsePaymentsFeedResult,
   useAddContact,
   useAddressBookRestore,
   useContacts,
+  usePaymentDetail,
   usePaymentsFeed,
   useRemoveContact,
 } from './address-book.queries';
