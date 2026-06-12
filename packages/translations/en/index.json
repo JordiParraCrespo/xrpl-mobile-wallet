@@ -386,5 +386,41 @@
     },
     "notify": "Notify me when it's ready",
     "notified": "We'll let you know"
+  },
+  "payments": {
+    "chat": {
+      "received": "You received",
+      "sent": "You sent",
+      "split": "Split",
+      "request": "Request",
+      "send": "Send",
+      "messagePlaceholder": "Type a message…"
+    },
+    "transaction": {
+      "actions": {
+        "send": "Send",
+        "request": "Request",
+        "schedule": "Schedule",
+        "split": "Split"
+      },
+      "status": "Status",
+      "settled": "Settled",
+      "from": "From",
+      "to": "To",
+      "account": "Account",
+      "accountValue": "Personal · XRP",
+      "date": "Date",
+      "submitted": "Submitted",
+      "validated": "Validated",
+      "network": "Network",
+      "networkValue": "XRP Ledger",
+      "ledgerIndex": "Ledger index",
+      "networkFee": "Network fee",
+      "transaction": "Transaction",
+      "confirmation": "Confirmation",
+      "download": "Download",
+      "openExplorer": "Open in explorer",
+      "getHelp": "Get help with this payment"
+    }
   }
 }

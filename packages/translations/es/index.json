@@ -386,5 +386,41 @@
     },
     "notify": "Avísame cuando esté listo",
     "notified": "Te avisaremos"
+  },
+  "payments": {
+    "chat": {
+      "received": "Recibiste",
+      "sent": "Enviaste",
+      "split": "Dividir",
+      "request": "Solicitar",
+      "send": "Enviar",
+      "messagePlaceholder": "Escribe un mensaje…"
+    },
+    "transaction": {
+      "actions": {
+        "send": "Enviar",
+        "request": "Solicitar",
+        "schedule": "Programar",
+        "split": "Dividir"
+      },
+      "status": "Estado",
+      "settled": "Liquidado",
+      "from": "De",
+      "to": "Para",
+      "account": "Cuenta",
+      "accountValue": "Personal · XRP",
+      "date": "Fecha",
+      "submitted": "Enviada",
+      "validated": "Validada",
+      "network": "Red",
+      "networkValue": "XRP Ledger",
+      "ledgerIndex": "Índice del ledger",
+      "networkFee": "Comisión de red",
+      "transaction": "Transacción",
+      "confirmation": "Confirmación",
+      "download": "Descargar",
+      "openExplorer": "Abrir en el explorador",
+      "getHelp": "Obtener ayuda con este pago"
+    }
   }
 }

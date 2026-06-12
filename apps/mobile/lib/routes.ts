@@ -63,9 +63,9 @@ export const buildRoute = {
     pathname: Routes.PaymentChat,
     params: { contact },
   }),
-  transaction: (id: string): Href => ({
+  transaction: (id: string, contact?: string): Href => ({
     pathname: Routes.Transaction,
-    params: { id },
+    params: contact ? { id, contact } : { id },
   }),
   chatSession: (session: string): Href => ({
     pathname: Routes.ChatSession,
