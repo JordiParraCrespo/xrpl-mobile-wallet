@@ -354,5 +354,15 @@
     "wipeMessage": "Esto elimina la cartera de este dispositivo. Solo podrás restaurarla con tu frase de recuperación, semilla familiar o números secretos.",
     "wipeConfirm": "Eliminar cartera",
     "wipeCancel": "Cancelar"
+  },
+  "flows": {
+    "addMoney": {
+      "title": "Añadir dinero",
+      "destination": "A {{ledger}} · {{balance}}",
+      "noFee": "Sin comisión",
+      "arrivingLabel": "Llega",
+      "arrivingValue": "Normalmente al instante",
+      "submit": "Añadir dinero de forma segura"
+    }
   }
 }

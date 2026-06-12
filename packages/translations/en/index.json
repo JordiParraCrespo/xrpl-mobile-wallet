@@ -354,5 +354,15 @@
     "wipeMessage": "This deletes the wallet from this device. You can only restore it with your recovery phrase, family seed or secret numbers.",
     "wipeConfirm": "Delete wallet",
     "wipeCancel": "Cancel"
+  },
+  "flows": {
+    "addMoney": {
+      "title": "Add money",
+      "destination": "To {{ledger}} · {{balance}}",
+      "noFee": "No fee",
+      "arrivingLabel": "Arriving",
+      "arrivingValue": "Usually instantly",
+      "submit": "Add money securely"
+    }
   }
 }

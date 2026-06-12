@@ -10,25 +10,31 @@ import { View } from 'react-native';
  * Feature-specific to Add money (the "instant / no-fee top-up" framing).
  */
 type AddMoneySubmitProps = {
-  /** Reassurance for how fast the money lands. */
-  arriving?: string;
+  /** The quiet "Arriving" lead-in for the reassurance line. */
+  arrivingLabel: string;
+  /** Reassurance for how fast the money lands (e.g. "Usually instantly"). */
+  arrivingValue: string;
+  /** The money-action label. */
+  submitLabel: string;
   /** Disabled until the entered amount is greater than zero. */
   disabled?: boolean;
   onPress?: () => void;
 };
 
 export function AddMoneySubmit({
-  arriving = 'Usually instantly',
+  arrivingLabel,
+  arrivingValue,
+  submitLabel,
   disabled,
   onPress,
 }: AddMoneySubmitProps) {
   return (
     <View className="px-5 pb-2.5">
       <Text className="text-muted-foreground mb-3 text-center text-[13.5px]">
-        Arriving · <Text className="text-foreground font-semibold">{arriving}</Text>
+        {arrivingLabel} · <Text className="text-foreground font-semibold">{arrivingValue}</Text>
       </Text>
       <Button variant="brand" size="lg" disabled={disabled} onPress={onPress} className="h-[54px]">
-        <Text>Add money securely</Text>
+        <Text>{submitLabel}</Text>
       </Button>
     </View>
   );

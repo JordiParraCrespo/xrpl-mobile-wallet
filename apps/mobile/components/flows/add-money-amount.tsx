@@ -18,14 +18,14 @@ type AddMoneyAmountProps = {
   /** The label of the funding source, e.g. "Bankinter · USD". */
   sourceLabel: string;
   /** Quiet line under the amount — the on-ramp charges no fee. */
-  feeNote?: string;
+  feeNote: string;
   onPressSource?: () => void;
 };
 
 export function AddMoneyAmount({
   amount,
   sourceLabel,
-  feeNote = 'No fee',
+  feeNote,
   onPressSource,
 }: AddMoneyAmountProps) {
   return (
