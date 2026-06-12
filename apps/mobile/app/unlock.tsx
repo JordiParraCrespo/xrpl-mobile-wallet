@@ -1,3 +1,4 @@
+import { PasscodeDots, type PasscodeDotsHandle } from '@flama/design-system-mobile/passcode-dots';
 import { PasscodeKeypad } from '@flama/design-system-mobile/passcode-keypad';
 import { Text } from '@flama/design-system-mobile/text';
 import { AppError, PASSCODE_LENGTH, SecurityErrors } from '@flama/frontend';
@@ -13,7 +14,6 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ImageBackground, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PasscodeDots, type PasscodeDotsHandle } from '../components/drops/unlock/passcode-dots';
 import { UnlockIdentity } from '../components/drops/unlock/unlock-identity';
 import { UNLOCK_LIGHT } from '../components/drops/unlock/unlock-theme';
 import { Routes } from '../lib/routes';
@@ -114,7 +114,7 @@ export default function UnlockScreen() {
           </View>
 
           <View style={{ marginTop: 58 }}>
-            <PasscodeDots ref={dotsRef} length={PASSCODE_LENGTH} filled={pin.length} />
+            <PasscodeDots onDark ref={dotsRef} length={PASSCODE_LENGTH} filled={pin.length} />
           </View>
 
           {/* Failure feedback — fixed height so the layout never jumps. */}

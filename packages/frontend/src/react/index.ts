@@ -21,7 +21,7 @@ export {
   useSecurityState,
   useWalletState,
 } from './hooks';
-export { pricesKeys, useExchangeRate } from './prices.queries';
+export { pricesKeys, useExchangeRate, useMarkets } from './prices.queries';
 export {
   profileKeys,
   useProfileRestore,

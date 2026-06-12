@@ -40,11 +40,11 @@ export function useSetDisplayName(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: (name: string) => app.profile.setName(name),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: profileKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
