@@ -298,5 +298,9 @@
       "errorImport": "Something went wrong creating your wallet. Please try again.",
       "reassurance": "Almost there. Confirming proves your phrase is safely written down."
     }
+  },
+  "unlock": {
+    "welcomeBack": "Welcome back",
+    "forgotPasscode": "Forgot your passcode?"
   }
 }

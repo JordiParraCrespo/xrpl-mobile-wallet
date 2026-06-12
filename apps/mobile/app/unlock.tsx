@@ -1,17 +1,15 @@
-import { PasscodeKeypad } from "@flama/design-system-mobile/passcode-keypad";
-import { Text } from "@flama/design-system-mobile/text";
-import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import * as React from "react";
-import { ImageBackground, Pressable, StyleSheet, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  PasscodeDots,
-  type PasscodeDotsHandle,
-} from "../components/drops/unlock/passcode-dots";
-import { UnlockIdentity } from "../components/drops/unlock/unlock-identity";
-import { UNLOCK_LIGHT } from "../components/drops/unlock/unlock-theme";
-import { Routes } from "../lib/routes";
+import { PasscodeKeypad } from '@flama/design-system-mobile/passcode-keypad';
+import { Text } from '@flama/design-system-mobile/text';
+import { useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import * as React from 'react';
+import { useTranslation } from 'react-i18next';
+import { ImageBackground, Pressable, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { PasscodeDots, type PasscodeDotsHandle } from '../components/drops/unlock/passcode-dots';
+import { UnlockIdentity } from '../components/drops/unlock/unlock-identity';
+import { UNLOCK_LIGHT } from '../components/drops/unlock/unlock-theme';
+import { Routes } from '../lib/routes';
 
 /**
  * Passcode / Face ID gate for an initialized-but-locked vault — the light
@@ -28,7 +26,8 @@ const PIN_LEN = 6;
 export default function UnlockScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [pin, setPin] = React.useState("");
+  const { t } = useTranslation();
+  const [pin, setPin] = React.useState('');
   const dotsRef = React.useRef<PasscodeDotsHandle>(null);
 
   const press = React.useCallback((d: string) => {
@@ -40,7 +39,7 @@ export default function UnlockScreen() {
       if (next.length === PIN_LEN) {
         setTimeout(() => {
           dotsRef.current?.shake();
-          setTimeout(() => setPin(""), 420);
+          setTimeout(() => setPin(''), 420);
         }, 180);
       }
       return next;
@@ -54,14 +53,14 @@ export default function UnlockScreen() {
     <View className="flex-1 bg-[#3a1f5c]">
       <StatusBar style="light" />
       <ImageBackground
-        source={require("../assets/unlock-watercolor.png")}
+        source={require('../assets/unlock-watercolor.png')}
         resizeMode="cover"
         style={StyleSheet.absoluteFill}
       >
         <View
           style={{
             flex: 1,
-            alignItems: "center",
+            alignItems: 'center',
             paddingTop: insets.top,
             paddingBottom: insets.bottom + 16,
           }}
@@ -87,9 +86,9 @@ export default function UnlockScreen() {
           <Pressable className="active:opacity-70" style={{ marginTop: 18 }}>
             <Text
               className="font-sans font-semibold"
-              style={{ fontSize: 16, color: UNLOCK_LIGHT.fg }}
+              style={{ fontSize: 16, lineHeight: 22, color: UNLOCK_LIGHT.fg }}
             >
-              Forgot your passcode?
+              {t('unlock.forgotPasscode')}
             </Text>
           </Pressable>
         </View>
