@@ -19,6 +19,7 @@ export {
   useAuthState,
   useProfileState,
   useSecurityState,
+  useSettingsState,
   useWalletState,
 } from './hooks';
 export { pricesKeys, useExchangeRate } from './prices.queries';
@@ -32,6 +33,7 @@ export {
   useChangePasscode,
   useDisableBiometrics,
   useEnableBiometrics,
+  useLock,
   useSecurityRestore,
   useSetAutoLockTimeout,
   useSetupPasscode,
@@ -39,6 +41,13 @@ export {
   useUnlockWithBiometrics,
   useWipeWallet,
 } from './security.queries';
+export {
+  settingsKeys,
+  useSetAppearance,
+  useSetDisplayCurrency,
+  useSetNotificationsEnabled,
+  useSettingsRestore,
+} from './settings.queries';
 export {
   type RegisterTokenInput,
   type SendTokenInput,

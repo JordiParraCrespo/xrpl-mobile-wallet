@@ -5,6 +5,7 @@ export * from './explorer';
 export * from './prices';
 export * from './profile';
 export * from './security';
+export * from './settings';
 export * from './tokens';
 export * from './users';
 export * from './wallet';

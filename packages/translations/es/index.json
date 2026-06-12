@@ -347,5 +347,41 @@
     "wipeMessage": "Esto elimina la cartera de este dispositivo. Solo podrás restaurarla con tu frase de recuperación, semilla familiar o números secretos.",
     "wipeConfirm": "Eliminar cartera",
     "wipeCancel": "Cancelar"
+  },
+  "profile": {
+    "defaultName": "Jordan Pierce",
+    "upgrade": "Mejorar",
+    "editProfile": "Editar perfil",
+    "sections": {
+      "account": "Cuenta",
+      "preferences": "Preferencias",
+      "support": "Soporte"
+    },
+    "account": {
+      "wallets": "Billeteras",
+      "noWallet": "Sin billetera",
+      "recovery": "Frase de recuperación y seguridad",
+      "networks": "Redes",
+      "networksActive": "{{count}} activas"
+    },
+    "preferences": {
+      "displayCurrency": "Moneda de visualización",
+      "appearanceLabel": "Apariencia",
+      "appearance": {
+        "system": "Sistema",
+        "light": "Claro",
+        "dark": "Oscuro"
+      },
+      "notifications": "Notificaciones",
+      "faceId": "Desbloqueo con Face ID"
+    },
+    "support": {
+      "help": "Centro de ayuda",
+      "about": "Acerca de Drops"
+    },
+    "danger": {
+      "lock": "Bloquear billetera",
+      "signOut": "Cerrar sesión"
+    }
   }
 }

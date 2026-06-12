@@ -347,5 +347,41 @@
     "wipeMessage": "This deletes the wallet from this device. You can only restore it with your recovery phrase, family seed or secret numbers.",
     "wipeConfirm": "Delete wallet",
     "wipeCancel": "Cancel"
+  },
+  "profile": {
+    "defaultName": "Jordan Pierce",
+    "upgrade": "Upgrade",
+    "editProfile": "Edit profile",
+    "sections": {
+      "account": "Account",
+      "preferences": "Preferences",
+      "support": "Support"
+    },
+    "account": {
+      "wallets": "Wallets",
+      "noWallet": "No wallet",
+      "recovery": "Recovery phrase & security",
+      "networks": "Networks",
+      "networksActive": "{{count}} active"
+    },
+    "preferences": {
+      "displayCurrency": "Display currency",
+      "appearanceLabel": "Appearance",
+      "appearance": {
+        "system": "System",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "notifications": "Notifications",
+      "faceId": "Face ID unlock"
+    },
+    "support": {
+      "help": "Help center",
+      "about": "About Drops"
+    },
+    "danger": {
+      "lock": "Lock wallet",
+      "signOut": "Sign out"
+    }
   }
 }

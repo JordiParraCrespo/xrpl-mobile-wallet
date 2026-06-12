@@ -193,5 +193,6 @@ export {
   TooltipContent,
   TooltipTrigger,
 } from './components/ui/tooltip';
+export { WalletBackground } from './components/ui/wallet-background';
 
 export { cn } from './lib/utils';

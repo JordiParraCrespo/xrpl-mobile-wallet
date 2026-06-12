@@ -12,6 +12,7 @@ import {
   useSecurityRestore,
   useSecurityState,
   useSessionRestore,
+  useSettingsRestore,
   useWalletRestore,
 } from '@flama/frontend/react';
 import { ThemeProvider } from '@react-navigation/native';
@@ -73,8 +74,13 @@ function SessionGate() {
   const wallet = useWalletRestore();
   const security = useSecurityRestore();
   const profile = useProfileRestore();
+  const settings = useSettingsRestore();
   const isLoading =
-    session.isLoading || wallet.isLoading || security.isLoading || profile.isLoading;
+    session.isLoading ||
+    wallet.isLoading ||
+    security.isLoading ||
+    profile.isLoading ||
+    settings.isLoading;
 
   React.useEffect(() => {
     if (!isLoading) SplashScreen.hideAsync();

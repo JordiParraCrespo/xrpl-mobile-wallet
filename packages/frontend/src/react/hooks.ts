@@ -3,6 +3,7 @@ import { useStore } from 'zustand';
 import type { AuthState } from '../modules/auth/auth.state';
 import type { ProfileState } from '../modules/profile/profile.state';
 import type { SecurityState } from '../modules/security/security.state';
+import type { SettingsState } from '../modules/settings/settings.state';
 import type { WalletState } from '../modules/wallet/wallet.state';
 import { useFlamaApp } from './context';
 
@@ -24,4 +25,9 @@ export function useSecurityState(): SecurityState {
 export function useProfileState(): ProfileState {
   const profile = useFlamaApp().profile;
   return useStore(profile.store);
+}
+
+export function useSettingsState(): SettingsState {
+  const settings = useFlamaApp().settings;
+  return useStore(settings.store);
 }
