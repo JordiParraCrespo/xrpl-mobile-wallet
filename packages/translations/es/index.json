@@ -419,5 +419,54 @@
     },
     "notify": "Avísame cuando esté listo",
     "notified": "Te avisaremos"
+  },
+  "payments": {
+    "title": "Pagos",
+    "search": "Buscar",
+    "openProfile": "Abrir perfil",
+    "newPayment": "Nuevo pago",
+    "you": "Tú",
+    "send": "Enviar",
+    "request": "Solicitar",
+    "split": "Dividir",
+    "people": "Personas",
+    "new": "Nuevo",
+    "recent": "Recientes",
+    "seeAll": "Ver todo",
+    "emptyTitle": "Aún no hay pagos",
+    "emptyDescription": "El dinero que envíes y recibas aparecerá aquí.",
+    "relationship": {
+      "in": "Te envió",
+      "out": "Enviaste",
+      "self": "Moviste"
+    },
+    "unknown": "Desconocido",
+    "addRecipient": {
+      "back": "Atrás",
+      "title": "Añadir destinatario",
+      "network": "Red",
+      "address": "Dirección",
+      "addressPlaceholder": "r… o 0x…",
+      "paste": "Pegar",
+      "destinationTag": "Etiqueta de destino (opcional)",
+      "destinationTagPlaceholder": "p. ej. 584213",
+      "recipientName": "Nombre del destinatario",
+      "namePlaceholder": "Nombre para guardar",
+      "securityNote": "Comprueba bien la dirección. Las transacciones XRPL no se pueden revertir una vez enviadas.",
+      "save": "Guardar destinatario",
+      "saving": "Guardando…",
+      "errors": {
+        "invalidName": "Introduce un nombre de al menos 2 caracteres.",
+        "invalidAddress": "Introduce una dirección de destinatario válida.",
+        "duplicate": "Ya existe un contacto con esta dirección.",
+        "generic": "No se pudo guardar el destinatario. Inténtalo de nuevo."
+      },
+      "networkSubtitle": "La red de la dirección del destinatario. Determina el formato de la dirección.",
+      "networkHint": {
+        "xrp": "Direcciones clásicas r…",
+        "evm": "Direcciones 0x…"
+      },
+      "done": "Hecho"
+    }
   }
 }

@@ -1,3 +1,21 @@
+export type {
+  AddContactInput,
+  Contact,
+  ContactKind,
+  PaymentParty,
+  PaymentPerson,
+  PaymentsFeed,
+  RecentPayment,
+} from '../modules/address-book';
+export {
+  addressBookKeys,
+  type UsePaymentsFeedResult,
+  useAddContact,
+  useAddressBookRestore,
+  useContacts,
+  usePaymentsFeed,
+  useRemoveContact,
+} from './address-book.queries';
 export {
   authKeys,
   useChangePassword,
@@ -16,6 +34,7 @@ export {
   useRecentBlocks,
 } from './explorer.queries';
 export {
+  useAddressBookState,
   useAuthState,
   useProfileState,
   useSecurityState,

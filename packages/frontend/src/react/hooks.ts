@@ -1,5 +1,6 @@
 'use client';
 import { useStore } from 'zustand';
+import type { AddressBookState } from '../modules/address-book/address-book.state';
 import type { AuthState } from '../modules/auth/auth.state';
 import type { ProfileState } from '../modules/profile/profile.state';
 import type { SecurityState } from '../modules/security/security.state';
@@ -24,4 +25,9 @@ export function useSecurityState(): SecurityState {
 export function useProfileState(): ProfileState {
   const profile = useFlamaApp().profile;
   return useStore(profile.store);
+}
+
+export function useAddressBookState(): AddressBookState {
+  const addressBook = useFlamaApp().addressBook;
+  return useStore(addressBook.store);
 }

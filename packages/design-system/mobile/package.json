@@ -16,6 +16,7 @@
     "./asset-icon": "./src/components/ui/asset-icon.tsx",
     "./assistant-avatar": "./src/components/ui/assistant-avatar.tsx",
     "./avatar": "./src/components/ui/avatar.tsx",
+    "./avatar-tile": "./src/components/ui/avatar-tile.tsx",
     "./badge": "./src/components/ui/badge.tsx",
     "./bottom-sheet": "./src/components/ui/bottom-sheet.tsx",
     "./button": "./src/components/ui/button.tsx",

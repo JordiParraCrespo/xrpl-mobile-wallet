@@ -13,6 +13,8 @@ export const TOKENS = {
   WalletStore: Symbol.for('WalletStore'),
   WalletService: Symbol.for('WalletService'),
   ExplorerService: Symbol.for('ExplorerService'),
+  AddressBookStore: Symbol.for('AddressBookStore'),
+  AddressBookService: Symbol.for('AddressBookService'),
   BiometricProvider: Symbol.for('BiometricProvider'),
   SecurityStore: Symbol.for('SecurityStore'),
   SecurityService: Symbol.for('SecurityService'),
