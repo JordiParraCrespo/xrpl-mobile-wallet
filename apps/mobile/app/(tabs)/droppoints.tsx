@@ -48,7 +48,7 @@ export default function DropPointsScreen() {
 
         <Text
           className="font-display text-foreground mt-4 text-center"
-          style={{ fontSize: 38, lineHeight: 40, letterSpacing: -0.6 }}
+          style={{ fontSize: 38, lineHeight: 44, letterSpacing: -0.6 }}
         >
           {t('droppoints.title')}
         </Text>
