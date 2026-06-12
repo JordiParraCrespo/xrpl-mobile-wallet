@@ -151,6 +151,36 @@
       "import": "Importar una cartera existente",
       "legal": "Al continuar aceptas los Términos y la Política de privacidad."
     },
+    "backupInfo": {
+      "title": "Configura un código",
+      "subtitle": "Bloquea Drops en este dispositivo y aprueba cada pago.",
+      "cta": "Continuar",
+      "points": {
+        "unlock": {
+          "title": "Desbloquea Drops",
+          "description": "Lo introducirás para abrir la app y aprobar cada pago."
+        },
+        "device": {
+          "title": "Se queda en este dispositivo",
+          "description": "Tu código nunca sale de este teléfono; no podemos verlo."
+        },
+        "noReset": {
+          "title": "No se puede restablecer",
+          "description": "No podemos recuperarlo por ti. Tu frase de recuperación es la única copia."
+        }
+      }
+    },
+    "setPasscode": {
+      "title": "Crea un código de acceso",
+      "subtitle": "Elige seis dígitos que recuerdes.",
+      "confirmTitle": "Confirma tu código",
+      "confirmSubtitle": "Introduce los mismos seis dígitos otra vez para confirmar.",
+      "doneTitle": "Código creado",
+      "doneSubtitle": "Tu cartera ya está protegida en este dispositivo.",
+      "mismatch": "Los códigos no coinciden. Inténtalo de nuevo.",
+      "error": "No se pudo configurar tu código. Inténtalo de nuevo.",
+      "note": "Tu código nunca sale de este dispositivo. No podemos verlo ni restablecerlo por ti."
+    },
     "secureIntro": {
       "title": "Haz una copia de tu nueva cartera",
       "subtitle": "Estás a punto de crear una frase de recuperación. Tres cosas que debes saber antes.",
@@ -236,6 +266,26 @@
       "footnoteXrpl": "La sidechain XRPL EVM no está disponible para este método de importación. Importa una frase de recuperación para añadirla.",
       "defaultWalletName": "Cuenta 1",
       "cta": "Abrir mi cartera"
+    },
+    "notifications": {
+      "title": "Mantente al tanto de tu dinero",
+      "subtitle": "Recibe un aviso en cuanto se mueva tu dinero, sin tener que estar mirando.",
+      "points": {
+        "alerts": {
+          "title": "Alertas de pago al instante",
+          "description": "Entérate en el momento en que XRP o stablecoins entran — o salen — de tu cartera."
+        },
+        "security": {
+          "title": "Seguridad de confianza",
+          "description": "Te avisaremos de nuevos inicios de sesión y de cualquier cosa que requiera un vistazo."
+        },
+        "noise": {
+          "title": "Solo lo importante",
+          "description": "Sin ruido. Silencia cualquier tipo de alerta más adelante en ajustes."
+        }
+      },
+      "enable": "Activar notificaciones",
+      "skip": "Ahora no"
     },
     "backupQuiz": {
       "title": "Confirma tu copia de seguridad",

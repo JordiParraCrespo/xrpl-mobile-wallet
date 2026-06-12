@@ -53,7 +53,7 @@ export default function ImportPickerScreen() {
 
   return (
     <OnboardingStepScreen
-      step={1}
+      step={2}
       title={t('onboarding.import.title')}
       subtitle={t('onboarding.import.subtitle')}
       cta={{
