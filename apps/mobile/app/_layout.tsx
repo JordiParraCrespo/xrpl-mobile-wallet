@@ -14,6 +14,7 @@ import {
   useSessionRestore,
   useWalletRestore,
 } from '@flama/frontend/react';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -22,6 +23,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useColorScheme, vars } from 'nativewind';
 import * as React from 'react';
 import { View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { app } from '../lib/flama';
 import { queryClient } from '../lib/query';
 import { Routes } from '../lib/routes';
@@ -41,26 +43,32 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <FlamaProvider app={app}>
-        <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-          <View
-            style={vars(theme)}
-            // Every touch re-arms the security auto-lock timer; returning
-            // false leaves the touch for whoever actually owns it.
-            onStartShouldSetResponderCapture={() => {
-              app.security.touch();
-              return false;
-            }}
-            className={isDark ? 'dark flex-1 bg-background' : 'flex-1 bg-background'}
-          >
-            <StatusBar style={isDark ? 'light' : 'dark'} />
-            <SessionGate />
-            <PortalHost />
-          </View>
-        </ThemeProvider>
-      </FlamaProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <FlamaProvider app={app}>
+          <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+            <View
+              style={vars(theme)}
+              // Every touch re-arms the security auto-lock timer; returning
+              // false leaves the touch for whoever actually owns it.
+              onStartShouldSetResponderCapture={() => {
+                app.security.touch();
+                return false;
+              }}
+              className={isDark ? 'dark flex-1 bg-background' : 'flex-1 bg-background'}
+            >
+              {/* Sheets portal into this provider, so it sits inside the
+                  themed View to inherit the NativeWind CSS vars. */}
+              <BottomSheetModalProvider>
+                <StatusBar style={isDark ? 'light' : 'dark'} />
+                <SessionGate />
+                <PortalHost />
+              </BottomSheetModalProvider>
+            </View>
+          </ThemeProvider>
+        </FlamaProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }
 

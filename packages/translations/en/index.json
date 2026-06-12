@@ -97,7 +97,30 @@
     "reset": "Reset",
     "signOut": "Sign out",
     "signingOut": "Signing out...",
-    "openWallet": "Open wallet"
+    "openWallet": "Open wallet",
+    "more": {
+      "title": "More",
+      "buy": {
+        "label": "Buy XRP",
+        "sub": "Card or bank transfer"
+      },
+      "request": {
+        "label": "Request money",
+        "sub": "Ask someone to pay you"
+      },
+      "convert": {
+        "label": "Convert",
+        "sub": "Between your tokens"
+      },
+      "statements": {
+        "label": "Statements",
+        "sub": "Export your activity"
+      },
+      "rewards": {
+        "label": "Rewards",
+        "sub": "DropPoints · coming soon"
+      }
+    }
   },
   "notifications": {
     "title": "Notifications",

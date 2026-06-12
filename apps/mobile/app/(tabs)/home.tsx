@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
+import * as React from 'react';
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -12,6 +13,7 @@ import {
   HOME_ACTIVITY,
   HomeBackground,
   HomeHeader,
+  MoreMenu,
   totalUsd,
 } from '../../components/drops/home';
 import { Routes } from '../../lib/routes';
@@ -29,6 +31,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const dark = useColorScheme().colorScheme === 'dark';
+  const [moreOpen, setMoreOpen] = React.useState(false);
 
   return (
     <View className="flex-1 bg-background">
@@ -54,7 +57,7 @@ export default function HomeScreen() {
           onAddMoney={() => router.push(Routes.AddMoney)}
           onReceive={() => router.push(Routes.Receive)}
           onSwap={() => router.push(Routes.Swap)}
-          onMore={() => {}}
+          onMore={() => setMoreOpen(true)}
         />
 
         <AccountsSection
@@ -65,6 +68,8 @@ export default function HomeScreen() {
 
         <ActivitySection activity={HOME_ACTIVITY} onSeeAll={() => {}} />
       </ScrollView>
+
+      <MoreMenu open={moreOpen} onClose={() => setMoreOpen(false)} />
     </View>
   );
 }
