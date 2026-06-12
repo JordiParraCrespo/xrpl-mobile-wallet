@@ -22,7 +22,8 @@ import { Routes } from '../../lib/routes';
  * activity, in both design themes: the light lavender "Glow" (default) and
  * the indigo→ink "Dark" gradient, following the system color scheme. The
  * theme tokens come from the root layout; data is mocked for now (see
- * `home-data.ts`); search, notifications and More are follow-up overlays.
+ * `home-data.ts`). The bell opens the notifications centre; search and More
+ * are follow-up overlays.
  */
 export default function HomeScreen() {
   const router = useRouter();
@@ -38,7 +39,7 @@ export default function HomeScreen() {
         <HomeHeader
           onProfile={() => router.push(Routes.Profile)}
           onSearch={() => {}}
-          onNotifications={() => {}}
+          onNotifications={() => router.push(Routes.Notifications)}
         />
       </View>
 
