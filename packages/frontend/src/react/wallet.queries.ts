@@ -5,6 +5,7 @@ import {
   type UseMutationOptions,
   type UseQueryOptions,
   useMutation,
+  useQueries,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
@@ -198,6 +199,24 @@ export function useChainBalance(
     queryFn: () => app.wallet.getBalance(chainId),
     refetchInterval: 15_000,
     ...options,
+  });
+}
+
+/**
+ * Fetches the native balance for several chains at once, keeping the results
+ * aligned with the input `chainIds` order. Useful for a multi-chain overview
+ * (e.g. the home balance) where the set of chains is dynamic and Rules of
+ * Hooks rule out calling {@link useChainBalance} in a loop.
+ */
+export function useChainBalances(chainIds: string[]) {
+  const app = useFlamaApp();
+
+  return useQueries({
+    queries: chainIds.map((chainId) => ({
+      queryKey: walletKeys.balance(chainId),
+      queryFn: () => app.wallet.getBalance(chainId),
+      refetchInterval: 15_000,
+    })),
   });
 }
 
