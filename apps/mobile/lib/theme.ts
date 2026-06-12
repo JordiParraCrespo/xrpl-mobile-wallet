@@ -45,10 +45,10 @@ export const NAV_THEME: Record<'light' | 'dark', Theme> = {
   },
 };
 
-// NativeWind CSS-variable themes — the single source of truth for the
-// semantic design tokens, applied with `vars(...)` at the root layout (and
-// on any subtree that needs to force a theme, e.g. the dark money flows).
-// Keep in sync with global.css.
+// Drops design tokens as NativeWind CSS-variable maps — fed to `vars()` so a
+// subtree resolves `hsl(var(--token))` utilities. Applied at the app root, and
+// reused to pin an always-dark surface (e.g. the gradient Home). Keep in sync
+// with global.css.
 export const lightVars = {
   '--background': '0 0% 100%',
   '--foreground': '220 13% 9%',
