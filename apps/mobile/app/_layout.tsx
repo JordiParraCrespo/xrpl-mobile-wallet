@@ -46,6 +46,12 @@ export default function RootLayout() {
         <ThemeProvider value={NAV_THEME[colorScheme ?? "light"]}>
           <View
             style={vars(theme)}
+            // Every touch re-arms the security auto-lock timer; returning
+            // false leaves the touch for whoever actually owns it.
+            onStartShouldSetResponderCapture={() => {
+              app.security.touch();
+              return false;
+            }}
             className={
               isDark ? "dark flex-1 bg-background" : "flex-1 bg-background"
             }

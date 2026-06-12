@@ -29,7 +29,7 @@ function memoryStorage(): SecureStorage {
 
 async function testSigner() {
   // Light KDF params: these tests exercise the adapter, not the vault.
-  const keyring = new KeyringManager(memoryStorage(), { n: 1024, r: 8, p: 1 });
+  const keyring = new KeyringManager(memoryStorage());
   await keyring.initialize('123456');
   const wallet = await keyring.importMnemonic(MNEMONIC);
   return keyring.getSigner(wallet.id, 'xrpl');
@@ -309,5 +309,296 @@ describe('XrplAdapter token signing', () => {
     const digest = sha512(hexToBytes(encodeForSigning(decoded))).slice(0, 32);
     const signature = secp256k1.Signature.fromDER(decoded.TxnSignature as string);
     expect(secp256k1.verify(signature, digest, signer.publicKey)).toBe(true);
+  });
+});
+
+describe('XrplAdapter.getAccountTransactions', () => {
+  const ACCOUNT = 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe';
+  const PEER = 'rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH';
+  // Ripple date for a known unix timestamp: 2021-01-01T00:00:00Z = unix
+  // 1609459200, ripple-seconds 1609459200 - 946684800 = 662774400.
+  const RIPPLE_DATE = 662_774_400;
+  const UNIX_SECONDS = RIPPLE_DATE + 946_684_800;
+
+  /** Stubs the adapter's RPC client so we can assert request shape per call. */
+  function withRpc(adapter: XrplAdapter): ReturnType<typeof vi.fn> {
+    const request = vi.fn();
+    (adapter as unknown as { rpc: { request: unknown } }).rpc.request = request;
+    return request;
+  }
+
+  it('maps an incoming native payment using delivered_amount', async () => {
+    const adapter = new XrplAdapter(XRPL_TESTNET);
+    const request = withRpc(adapter);
+    request.mockResolvedValue({
+      transactions: [
+        {
+          tx: {
+            hash: 'ABC',
+            TransactionType: 'Payment',
+            Account: PEER,
+            Destination: ACCOUNT,
+            Amount: '5000000',
+            Fee: '12',
+            date: RIPPLE_DATE,
+          },
+          meta: {
+            TransactionResult: 'tesSUCCESS',
+            delivered_amount: '4999999',
+          },
+          validated: true,
+        },
+      ],
+    });
+
+    const page = await adapter.getAccountTransactions(ACCOUNT);
+
+    expect(request).toHaveBeenCalledExactlyOnceWith('account_tx', {
+      account: ACCOUNT,
+      ledger_index_min: -1,
+      ledger_index_max: -1,
+      binary: false,
+      forward: false,
+      limit: 20,
+    });
+    expect(page.nextCursor).toBeUndefined();
+    expect(page.transactions).toHaveLength(1);
+    const [tx] = page.transactions;
+    expect(tx).toMatchObject({
+      hash: 'ABC',
+      kind: 'payment',
+      direction: 'in',
+      success: true,
+      symbol: 'XRP',
+      counterparty: PEER,
+    });
+    // delivered_amount is preferred over Amount.
+    expect(tx.amount).toBe(4_999_999n);
+    expect(tx.fee).toBe(12n);
+    // ripple date -> unix seconds.
+    expect(tx.timestamp).toBe(UNIX_SECONDS);
+    expect(tx.explorerUrl).toBe(`https://testnet.xrpl.org/transactions/ABC`);
+  });
+
+  it('maps an outgoing native payment and parses the fee', async () => {
+    const adapter = new XrplAdapter(XRPL_TESTNET);
+    const request = withRpc(adapter);
+    request.mockResolvedValue({
+      transactions: [
+        {
+          tx: {
+            hash: 'DEF',
+            TransactionType: 'Payment',
+            Account: ACCOUNT,
+            Destination: PEER,
+            Amount: '2000000',
+            Fee: '15',
+            date: RIPPLE_DATE,
+          },
+          meta: { TransactionResult: 'tesSUCCESS' },
+          validated: true,
+        },
+      ],
+    });
+
+    const [tx] = (await adapter.getAccountTransactions(ACCOUNT)).transactions;
+
+    expect(tx).toMatchObject({
+      direction: 'out',
+      symbol: 'XRP',
+      counterparty: PEER,
+      success: true,
+    });
+    // No delivered_amount -> falls back to Amount.
+    expect(tx.amount).toBe(2_000_000n);
+    expect(tx.fee).toBe(15n);
+  });
+
+  it('maps an issued-currency payment scaled by 15 decimals', async () => {
+    const adapter = new XrplAdapter(XRPL_TESTNET);
+    const request = withRpc(adapter);
+    request.mockResolvedValue({
+      transactions: [
+        {
+          tx: {
+            hash: 'IOU',
+            TransactionType: 'Payment',
+            Account: PEER,
+            Destination: ACCOUNT,
+            Amount: { currency: 'USD', issuer: PEER, value: '1.5' },
+            Fee: '12',
+            date: RIPPLE_DATE,
+          },
+          meta: { TransactionResult: 'tesSUCCESS' },
+          validated: true,
+        },
+      ],
+    });
+
+    const [tx] = (await adapter.getAccountTransactions(ACCOUNT)).transactions;
+
+    expect(tx.kind).toBe('token-payment');
+    expect(tx.symbol).toBe('USD');
+    expect(tx.direction).toBe('in');
+    // 1.5 scaled by 15 decimals.
+    expect(tx.amount).toBe(1_500_000_000_000_000n);
+  });
+
+  it('marks a non-tesSUCCESS result as failed', async () => {
+    const adapter = new XrplAdapter(XRPL_TESTNET);
+    const request = withRpc(adapter);
+    request.mockResolvedValue({
+      transactions: [
+        {
+          tx: {
+            hash: 'FAIL',
+            TransactionType: 'Payment',
+            Account: ACCOUNT,
+            Destination: PEER,
+            Amount: '1000000',
+            Fee: '12',
+            date: RIPPLE_DATE,
+          },
+          meta: { TransactionResult: 'tecUNFUNDED_PAYMENT' },
+          validated: true,
+        },
+      ],
+    });
+
+    const [tx] = (await adapter.getAccountTransactions(ACCOUNT)).transactions;
+    expect(tx.success).toBe(false);
+  });
+
+  it('maps a TrustSet to a zero-amount trustset kind', async () => {
+    const adapter = new XrplAdapter(XRPL_TESTNET);
+    const request = withRpc(adapter);
+    request.mockResolvedValue({
+      transactions: [
+        {
+          tx: {
+            hash: 'TRUST',
+            TransactionType: 'TrustSet',
+            Account: ACCOUNT,
+            Fee: '12',
+            date: RIPPLE_DATE,
+          },
+          meta: { TransactionResult: 'tesSUCCESS' },
+          validated: true,
+        },
+      ],
+    });
+
+    const [tx] = (await adapter.getAccountTransactions(ACCOUNT)).transactions;
+    expect(tx.kind).toBe('trustset');
+    expect(tx.amount).toBe(0n);
+    expect(tx.symbol).toBe('XRP');
+    // Account is the queried address, no Destination -> not 'in'/'self'.
+    expect(tx.direction).toBe('out');
+  });
+
+  it('reads the tx_json/sibling-hash shape from newer rippled', async () => {
+    const adapter = new XrplAdapter(XRPL_TESTNET);
+    const request = withRpc(adapter);
+    request.mockResolvedValue({
+      transactions: [
+        {
+          tx_json: {
+            TransactionType: 'Payment',
+            Account: PEER,
+            Destination: ACCOUNT,
+            Amount: '3000000',
+            Fee: '12',
+            date: RIPPLE_DATE,
+          },
+          hash: 'NEWHASH',
+          meta: { TransactionResult: 'tesSUCCESS' },
+          validated: true,
+        },
+      ],
+    });
+
+    const [tx] = (await adapter.getAccountTransactions(ACCOUNT)).transactions;
+    expect(tx.hash).toBe('NEWHASH');
+    expect(tx.amount).toBe(3_000_000n);
+    expect(tx.timestamp).toBe(UNIX_SECONDS);
+  });
+
+  it('filters out entries with no usable tx body', async () => {
+    const adapter = new XrplAdapter(XRPL_TESTNET);
+    const request = withRpc(adapter);
+    request.mockResolvedValue({
+      transactions: [
+        { meta: { TransactionResult: 'tesSUCCESS' }, validated: true },
+        {
+          tx: {
+            hash: 'OK',
+            TransactionType: 'Payment',
+            Account: PEER,
+            Destination: ACCOUNT,
+            Amount: '1000000',
+            Fee: '12',
+            date: RIPPLE_DATE,
+          },
+          meta: { TransactionResult: 'tesSUCCESS' },
+        },
+      ],
+    });
+
+    const page = await adapter.getAccountTransactions(ACCOUNT);
+    expect(page.transactions).toHaveLength(1);
+    expect(page.transactions[0].hash).toBe('OK');
+  });
+
+  it('round-trips the marker through nextCursor and the next request', async () => {
+    const adapter = new XrplAdapter(XRPL_TESTNET);
+    const request = withRpc(adapter);
+    const marker = { ledger: 12345, seq: 7 };
+    request.mockResolvedValueOnce({
+      transactions: [
+        {
+          tx: {
+            hash: 'P1',
+            TransactionType: 'Payment',
+            Account: PEER,
+            Destination: ACCOUNT,
+            Amount: '1000000',
+            Fee: '12',
+            date: RIPPLE_DATE,
+          },
+          meta: { TransactionResult: 'tesSUCCESS' },
+        },
+      ],
+      marker,
+    });
+
+    const page1 = await adapter.getAccountTransactions(ACCOUNT, { limit: 5 });
+    expect(page1.nextCursor).toBe(JSON.stringify(marker));
+    expect(request).toHaveBeenLastCalledWith('account_tx', expect.objectContaining({ limit: 5 }));
+
+    request.mockResolvedValueOnce({ transactions: [] });
+    const page2 = await adapter.getAccountTransactions(ACCOUNT, {
+      cursor: page1.nextCursor,
+    });
+    expect(request).toHaveBeenLastCalledWith('account_tx', expect.objectContaining({ marker }));
+    expect(page2.nextCursor).toBeUndefined();
+  });
+
+  it('caps the limit at 100', async () => {
+    const adapter = new XrplAdapter(XRPL_TESTNET);
+    const request = withRpc(adapter);
+    request.mockResolvedValue({ transactions: [] });
+
+    await adapter.getAccountTransactions(ACCOUNT, { limit: 500 });
+    expect(request).toHaveBeenLastCalledWith('account_tx', expect.objectContaining({ limit: 100 }));
+  });
+
+  it('returns an empty page for an unfunded account', async () => {
+    const adapter = new XrplAdapter(XRPL_TESTNET);
+    const request = withRpc(adapter);
+    request.mockResolvedValue({ error: 'actNotFound' });
+
+    const page = await adapter.getAccountTransactions(ACCOUNT);
+    expect(page.transactions).toEqual([]);
+    expect(page.nextCursor).toBeUndefined();
   });
 });

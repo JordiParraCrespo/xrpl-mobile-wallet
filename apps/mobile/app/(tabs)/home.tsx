@@ -1,3 +1,6 @@
+import { Button } from "@flama/design-system-mobile/button";
+import { Text } from "@flama/design-system-mobile/text";
+import { useWipeWallet } from "@flama/frontend/react";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { vars } from "nativewind";
@@ -30,6 +33,12 @@ import { darkVars } from "../../lib/theme";
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
+  // TEMPORARY (dev): wipes the vault + security state so onboarding can be
+  // re-tested without clearing Expo Go's storage. Remove before release.
+  const wipe = useWipeWallet({
+    onSuccess: () => router.replace(Routes.Root),
+  });
 
   return (
     <View style={vars(darkVars)} className="dark flex-1 bg-[#08080b]">
@@ -65,6 +74,18 @@ export default function HomeScreen() {
         />
 
         <ActivitySection activity={HOME_ACTIVITY} onSeeAll={() => {}} />
+
+        {/* TEMPORARY (dev): wipe + restart onboarding. Remove before release. */}
+        <View className="mt-6">
+          <Button
+            variant="destructive"
+            className="w-full"
+            disabled={wipe.isPending}
+            onPress={() => wipe.mutate()}
+          >
+            <Text>{wipe.isPending ? "Wiping…" : "Wipe wallet data (dev)"}</Text>
+          </Button>
+        </View>
       </ScrollView>
     </View>
   );
