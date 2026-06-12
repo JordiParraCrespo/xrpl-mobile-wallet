@@ -89,6 +89,7 @@
     "tailwind-merge": "^3.5.0"
   },
   "peerDependencies": {
+    "@gorhom/bottom-sheet": ">=5.2.0",
     "@rn-primitives/accordion": "1.4.0",
     "@rn-primitives/alert-dialog": "1.4.0",
     "@rn-primitives/aspect-ratio": "1.4.0",
@@ -126,6 +127,7 @@
     "react-native-worklets": ">=0.5.0"
   },
   "devDependencies": {
+    "@gorhom/bottom-sheet": "5.2.14",
     "@rn-primitives/accordion": "1.4.0",
     "@rn-primitives/alert-dialog": "1.4.0",
     "@rn-primitives/aspect-ratio": "1.4.0",

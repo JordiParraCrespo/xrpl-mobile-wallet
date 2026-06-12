@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
+import * as React from 'react';
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -12,6 +13,7 @@ import {
   HOME_ACTIVITY,
   HomeBackground,
   HomeHeader,
+  MoreMenu,
   totalUsd,
 } from '../../components/drops/home';
 import { Routes } from '../../lib/routes';
@@ -22,12 +24,14 @@ import { Routes } from '../../lib/routes';
  * activity, in both design themes: the light lavender "Glow" (default) and
  * the indigo→ink "Dark" gradient, following the system color scheme. The
  * theme tokens come from the root layout; data is mocked for now (see
- * `home-data.ts`); search, notifications and More are follow-up overlays.
+ * `home-data.ts`). The bell opens the notifications centre; search and More
+ * are follow-up overlays.
  */
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const dark = useColorScheme().colorScheme === 'dark';
+  const [moreOpen, setMoreOpen] = React.useState(false);
 
   return (
     <View className="flex-1 bg-background">
@@ -38,7 +42,7 @@ export default function HomeScreen() {
         <HomeHeader
           onProfile={() => router.push(Routes.Profile)}
           onSearch={() => {}}
-          onNotifications={() => {}}
+          onNotifications={() => router.push(Routes.Notifications)}
         />
       </View>
 
@@ -53,7 +57,7 @@ export default function HomeScreen() {
           onAddMoney={() => router.push(Routes.AddMoney)}
           onReceive={() => router.push(Routes.Receive)}
           onSwap={() => router.push(Routes.Swap)}
-          onMore={() => {}}
+          onMore={() => setMoreOpen(true)}
         />
 
         <AccountsSection
@@ -64,6 +68,8 @@ export default function HomeScreen() {
 
         <ActivitySection activity={HOME_ACTIVITY} onSeeAll={() => {}} />
       </ScrollView>
+
+      <MoreMenu open={moreOpen} onClose={() => setMoreOpen(false)} />
     </View>
   );
 }
