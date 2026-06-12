@@ -97,7 +97,54 @@
     "reset": "Reiniciar",
     "signOut": "Cerrar sesión",
     "signingOut": "Cerrando sesión...",
-    "openWallet": "Abrir cartera"
+    "openWallet": "Abrir cartera",
+    "hub": {
+      "search": "Buscar",
+      "testnet": "TESTNET",
+      "addMoney": "Añadir dinero",
+      "receive": "Recibir",
+      "swap": "Intercambiar",
+      "more": "Más",
+      "accounts": "Cuentas",
+      "addAccount": "Añadir cuenta",
+      "activity": "Actividad",
+      "seeAll": "Ver todo",
+      "profile": "Perfil",
+      "notifications": "Notificaciones"
+    },
+    "more": {
+      "title": "Más",
+      "buy": {
+        "label": "Comprar XRP",
+        "sub": "Tarjeta o transferencia bancaria"
+      },
+      "request": {
+        "label": "Solicitar dinero",
+        "sub": "Pide a alguien que te pague"
+      },
+      "convert": {
+        "label": "Convertir",
+        "sub": "Entre tus tokens"
+      },
+      "statements": {
+        "label": "Extractos",
+        "sub": "Exporta tu actividad"
+      },
+      "rewards": {
+        "label": "Recompensas",
+        "sub": "DropPoints · muy pronto"
+      }
+    }
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "close": "Cerrar notificaciones",
+    "markAllRead": "Marcar todo como leído",
+    "groups": {
+      "today": "Hoy",
+      "earlier": "Anterior"
+    },
+    "empty": "Estás al día."
   },
   "wallet": {
     "title": "Cartera",
@@ -411,5 +458,54 @@
     },
     "notify": "Avísame cuando esté listo",
     "notified": "Te avisaremos"
+  },
+  "payments": {
+    "title": "Pagos",
+    "search": "Buscar",
+    "openProfile": "Abrir perfil",
+    "newPayment": "Nuevo pago",
+    "you": "Tú",
+    "send": "Enviar",
+    "request": "Solicitar",
+    "split": "Dividir",
+    "people": "Personas",
+    "new": "Nuevo",
+    "recent": "Recientes",
+    "seeAll": "Ver todo",
+    "emptyTitle": "Aún no hay pagos",
+    "emptyDescription": "El dinero que envíes y recibas aparecerá aquí.",
+    "relationship": {
+      "in": "Te envió",
+      "out": "Enviaste",
+      "self": "Moviste"
+    },
+    "unknown": "Desconocido",
+    "addRecipient": {
+      "back": "Atrás",
+      "title": "Añadir destinatario",
+      "network": "Red",
+      "address": "Dirección",
+      "addressPlaceholder": "r… o 0x…",
+      "paste": "Pegar",
+      "destinationTag": "Etiqueta de destino (opcional)",
+      "destinationTagPlaceholder": "p. ej. 584213",
+      "recipientName": "Nombre del destinatario",
+      "namePlaceholder": "Nombre para guardar",
+      "securityNote": "Comprueba bien la dirección. Las transacciones XRPL no se pueden revertir una vez enviadas.",
+      "save": "Guardar destinatario",
+      "saving": "Guardando…",
+      "errors": {
+        "invalidName": "Introduce un nombre de al menos 2 caracteres.",
+        "invalidAddress": "Introduce una dirección de destinatario válida.",
+        "duplicate": "Ya existe un contacto con esta dirección.",
+        "generic": "No se pudo guardar el destinatario. Inténtalo de nuevo."
+      },
+      "networkSubtitle": "La red de la dirección del destinatario. Determina el formato de la dirección.",
+      "networkHint": {
+        "xrp": "Direcciones clásicas r…",
+        "evm": "Direcciones 0x…"
+      },
+      "done": "Hecho"
+    }
   }
 }

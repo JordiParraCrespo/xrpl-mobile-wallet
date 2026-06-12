@@ -1,18 +1,13 @@
 import { ChainBadge } from '@flama/design-system-mobile/chain-badge';
 import { Icon } from '@flama/design-system-mobile/icon';
+import { Skeleton } from '@flama/design-system-mobile/skeleton';
 import { Text } from '@flama/design-system-mobile/text';
 import { ChevronRight } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 import { HomeCard } from './home-card';
-import {
-  accountUsd,
-  type ChainBadgeKind,
-  formatUsd,
-  formatXrp,
-  type HomeAccount,
-} from './home-data';
+import { type ChainBadgeKind, formatUsd, formatXrp, type HomeAccount } from './home-data';
 
-/** Maps a mocked badge descriptor onto the design-system `ChainBadge`. */
+/** Maps a badge descriptor onto the design-system `ChainBadge`. */
 export function AccountBadge({ badge, size }: { badge: ChainBadgeKind; size: number }) {
   if (badge.kind === 'letter') {
     return <ChainBadge kind="letter" label={badge.label} color={badge.color} size={size} />;
@@ -37,7 +32,7 @@ export function AccountTile({ account, onPress }: { account: HomeAccount; onPres
             {account.name}
           </Text>
           <Text className="font-mono text-[22px] font-semibold tracking-[-0.4px] text-foreground">
-            {formatUsd(accountUsd(account))}
+            {formatUsd(account.usd)}
           </Text>
           <Text className="font-mono text-xs text-muted-foreground">
             {formatXrp(account.amount)} {account.unit}
@@ -45,5 +40,24 @@ export function AccountTile({ account, onPress }: { account: HomeAccount; onPres
         </View>
       </HomeCard>
     </Pressable>
+  );
+}
+
+/**
+ * The loading placeholder for an account tile (home-parts.jsx `HAccountTile`
+ * with `loading`): a skeleton badge disc and the name / fiat value lines.
+ */
+export function AccountTileSkeleton() {
+  return (
+    <View className="flex-1">
+      <HomeCard className="min-h-[134px] justify-between rounded-xl p-4">
+        <Skeleton style={{ width: 38, height: 38, borderRadius: 19 }} />
+        <View className="mt-4 gap-1.5">
+          <Skeleton style={{ width: 70, height: 11 }} />
+          <Skeleton style={{ width: 96, height: 20 }} />
+          <Skeleton style={{ width: 56, height: 12 }} />
+        </View>
+      </HomeCard>
+    </View>
   );
 }
