@@ -145,6 +145,10 @@ export {
 export { MnemonicGrid, MnemonicWord } from './components/ui/mnemonic-grid';
 export { MnemonicInput } from './components/ui/mnemonic-input';
 export { NotificationRow } from './components/ui/notification-row';
+export {
+  PasscodeDots,
+  type PasscodeDotsHandle,
+} from './components/ui/passcode-dots';
 export { PasscodeKeypad } from './components/ui/passcode-keypad';
 export {
   Popover,

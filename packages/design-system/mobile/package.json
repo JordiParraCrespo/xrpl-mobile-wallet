@@ -50,7 +50,6 @@
     "./notification-row": "./src/components/ui/notification-row.tsx",
     "./passcode-dots": "./src/components/ui/passcode-dots.tsx",
     "./passcode-keypad": "./src/components/ui/passcode-keypad.tsx",
-    "./pin-keypad": "./src/components/ui/pin-keypad.tsx",
     "./popover": "./src/components/ui/popover.tsx",
     "./price-change": "./src/components/ui/price-change.tsx",
     "./progress": "./src/components/ui/progress.tsx",
