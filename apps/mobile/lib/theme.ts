@@ -134,3 +134,8 @@ export const darkVars = {
   '--inverse': '0 0% 100%',
   '--inverse-foreground': '220 13% 9%',
 } as const;
+
+// The full-screen money flows (add money · receive · swap · send) paint on a
+// near-black base — darker than the app's dark `--background` — matching the
+// Drops money-flow design (`flow-kit.jsx`).
+export const FLOW_BG = '#08080b';
