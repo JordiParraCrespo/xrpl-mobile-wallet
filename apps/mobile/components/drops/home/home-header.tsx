@@ -1,15 +1,17 @@
-import { GlassPanel } from "@flama/design-system-mobile/glass-panel";
-import { Icon } from "@flama/design-system-mobile/icon";
-import { IconButton } from "@flama/design-system-mobile/icon-button";
-import { InitialsAvatar } from "@flama/design-system-mobile/initials-avatar";
-import { Text } from "@flama/design-system-mobile/text";
-import { Bell, Search } from "lucide-react-native";
-import { Pressable, View } from "react-native";
+import { GlassPanel } from '@flama/design-system-mobile/glass-panel';
+import { Icon } from '@flama/design-system-mobile/icon';
+import { IconButton } from '@flama/design-system-mobile/icon-button';
+import { InitialsAvatar } from '@flama/design-system-mobile/initials-avatar';
+import { Text } from '@flama/design-system-mobile/text';
+import { cn } from '@flama/design-system-mobile/utils';
+import { Bell, Search } from 'lucide-react-native';
+import { useColorScheme } from 'nativewind';
+import { Pressable, View } from 'react-native';
 
 /**
- * Home header: avatar (→ profile), a frosted search pill (→ search) and the
- * notifications bell with its unread dot. Glass controls sit over the gradient
- * hero, per the Drops "Dark" home.
+ * Home header: avatar (→ profile), a search pill (→ search) and the
+ * notifications bell with its unread dot. Frosted glass controls over the
+ * dark gradient, soft ink-tinted ones on the light "Glow".
  */
 export function HomeHeader({
   onProfile,
@@ -20,6 +22,17 @@ export function HomeHeader({
   onSearch: () => void;
   onNotifications: () => void;
 }) {
+  const dark = useColorScheme().colorScheme === 'dark';
+
+  const searchInner = (
+    <>
+      <Icon as={Search} size={18} className={dark ? 'text-white/60' : 'text-muted-foreground'} />
+      <Text className={cn('text-[15px]', dark ? 'text-white/60' : 'text-muted-foreground')}>
+        Search
+      </Text>
+    </>
+  );
+
   return (
     <View className="flex-row items-center gap-3 px-5">
       <Pressable
@@ -37,23 +50,33 @@ export function HomeHeader({
         onPress={onSearch}
         className="h-11 flex-1 active:opacity-80"
       >
-        <GlassPanel
-          variant="on-dark"
-          padded={false}
-          className="h-11 flex-row items-center gap-2.5 rounded-full px-4"
-        >
-          <Icon as={Search} size={18} className="text-white/60" />
-          <Text className="text-[15px] text-white/60">Search</Text>
-        </GlassPanel>
+        {dark ? (
+          <GlassPanel
+            variant="on-dark"
+            padded={false}
+            className="h-11 flex-row items-center gap-2.5 rounded-full px-4"
+          >
+            {searchInner}
+          </GlassPanel>
+        ) : (
+          <View className="h-11 flex-row items-center gap-2.5 rounded-full bg-secondary px-4">
+            {searchInner}
+          </View>
+        )}
       </Pressable>
 
       <IconButton
-        variant="glass"
+        variant={dark ? 'glass' : 'soft'}
         accessibilityLabel="Notifications"
         onPress={onNotifications}
       >
         <Icon as={Bell} size={20} />
-        <View className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full border-[1.5px] border-[#3a2a86] bg-destructive" />
+        <View
+          className={cn(
+            'absolute right-2.5 top-2.5 h-2 w-2 rounded-full border-[1.5px] bg-destructive',
+            dark ? 'border-[#3a2a86]' : 'border-secondary',
+          )}
+        />
       </IconButton>
     </View>
   );

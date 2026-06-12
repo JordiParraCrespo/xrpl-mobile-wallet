@@ -7,9 +7,9 @@
 export const XRP_USD_RATE = 0.6184;
 
 export type ChainBadgeKind =
-  | { kind: "xrp" }
-  | { kind: "evm" }
-  | { kind: "letter"; color: string; label: string };
+  | { kind: 'xrp' }
+  | { kind: 'evm' }
+  | { kind: 'letter'; color: string; label: string };
 
 export type HomeAccount = {
   id: string;
@@ -24,58 +24,58 @@ export type HomeAccount = {
 
 export type HomeActivity = {
   id: string;
-  kind: "in" | "out" | "pending";
+  kind: 'in' | 'out' | 'pending';
   name: string;
   sub: string;
   xrp: number;
   time: string;
-  media: { avatar: string } | { glyph: "coffee" } | { asset: string };
+  media: { avatar: string } | { glyph: 'coffee' } | { asset: string };
 };
 
 export const HOME_ACCOUNTS: HomeAccount[] = [
   {
-    id: "xrpl",
-    name: "XRP Ledger",
+    id: 'xrpl',
+    name: 'XRP Ledger',
     amount: 1204.5072,
-    unit: "XRP",
-    badge: { kind: "xrp" },
+    unit: 'XRP',
+    badge: { kind: 'xrp' },
   },
   {
-    id: "evm",
-    name: "XRPL EVM",
+    id: 'evm',
+    name: 'XRPL EVM',
     amount: 320,
-    unit: "XRP",
-    badge: { kind: "evm" },
+    unit: 'XRP',
+    badge: { kind: 'evm' },
   },
 ];
 
 export const HOME_ACTIVITY: HomeActivity[] = [
   {
-    id: "1",
-    kind: "in",
-    name: "Maria Gutiérrez",
-    sub: "Received",
+    id: '1',
+    kind: 'in',
+    name: 'Maria Gutiérrez',
+    sub: 'Received',
     xrp: 60,
-    time: "2h ago",
-    media: { avatar: "Maria Gutiérrez" },
+    time: '2h ago',
+    media: { avatar: 'Maria Gutiérrez' },
   },
   {
-    id: "2",
-    kind: "out",
-    name: "Coffee Collective",
-    sub: "Card payment",
+    id: '2',
+    kind: 'out',
+    name: 'Coffee Collective',
+    sub: 'Card payment',
     xrp: 4.2,
-    time: "5h ago",
-    media: { glyph: "coffee" },
+    time: '5h ago',
+    media: { glyph: 'coffee' },
   },
   {
-    id: "3",
-    kind: "pending",
-    name: "Swap to RLUSD",
-    sub: "Swapping",
+    id: '3',
+    kind: 'pending',
+    name: 'Swap to RLUSD',
+    sub: 'Swapping',
     xrp: 100,
-    time: "Just now",
-    media: { asset: "RLUSD" },
+    time: 'Just now',
+    media: { asset: 'RLUSD' },
   },
 ];
 
@@ -90,14 +90,14 @@ export function totalUsd(accounts: HomeAccount[]): number {
 }
 
 export function formatUsd(value: number): string {
-  return `$${Math.abs(value).toLocaleString("en-US", {
+  return `$${Math.abs(value).toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
 }
 
 export function formatXrp(value: number): string {
-  return Math.abs(value).toLocaleString("en-US", {
+  return Math.abs(value).toLocaleString('en-US', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   });

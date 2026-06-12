@@ -1,30 +1,19 @@
-import { AmountText } from "@flama/design-system-mobile/amount-text";
-import { AssetIcon } from "@flama/design-system-mobile/asset-icon";
-import { Icon } from "@flama/design-system-mobile/icon";
-import { InitialsAvatar } from "@flama/design-system-mobile/initials-avatar";
-import { ListRow } from "@flama/design-system-mobile/list-row";
-import { Text } from "@flama/design-system-mobile/text";
-import { Coffee } from "lucide-react-native";
-import { ActivityIndicator, View } from "react-native";
-import {
-  type HomeActivity,
-  XRP_USD_RATE,
-  formatUsd,
-  formatXrp,
-} from "./home-data";
+import { AmountText } from '@flama/design-system-mobile/amount-text';
+import { AssetIcon } from '@flama/design-system-mobile/asset-icon';
+import { Icon } from '@flama/design-system-mobile/icon';
+import { InitialsAvatar } from '@flama/design-system-mobile/initials-avatar';
+import { ListRow } from '@flama/design-system-mobile/list-row';
+import { Text } from '@flama/design-system-mobile/text';
+import { Coffee } from 'lucide-react-native';
+import { ActivityIndicator, View } from 'react-native';
+import { formatUsd, formatXrp, type HomeActivity, XRP_USD_RATE } from './home-data';
 
 /** Leading media for an activity row — contact avatar, asset icon or a glyph. */
-function ActivityMedia({
-  media,
-  pending,
-}: {
-  media: HomeActivity["media"];
-  pending: boolean;
-}) {
+function ActivityMedia({ media, pending }: { media: HomeActivity['media']; pending: boolean }) {
   const inner =
-    "avatar" in media ? (
+    'avatar' in media ? (
       <InitialsAvatar name={media.avatar} size="md" />
-    ) : "asset" in media ? (
+    ) : 'asset' in media ? (
       <AssetIcon symbol={media.asset} size={40} />
     ) : (
       <View className="h-10 w-10 items-center justify-center rounded-full bg-muted">
@@ -47,8 +36,8 @@ function ActivityMedia({
  * `AmountText`; a pending transfer shows its amount with a spinner instead.
  */
 export function ActivityRow({ activity }: { activity: HomeActivity }) {
-  const pending = activity.kind === "pending";
-  const incoming = activity.kind === "in";
+  const pending = activity.kind === 'pending';
+  const incoming = activity.kind === 'in';
   const usd = activity.xrp * XRP_USD_RATE;
 
   return (
@@ -70,11 +59,11 @@ export function ActivityRow({ activity }: { activity: HomeActivity }) {
             currency="XRP"
             signed
             mono
-            tone={incoming ? "positive" : "default"}
+            tone={incoming ? 'positive' : 'default'}
           />
         )
       }
-      meta={pending ? undefined : `${incoming ? "+" : "−"}${formatUsd(usd)}`}
+      meta={pending ? undefined : `${incoming ? '+' : '−'}${formatUsd(usd)}`}
     />
   );
 }

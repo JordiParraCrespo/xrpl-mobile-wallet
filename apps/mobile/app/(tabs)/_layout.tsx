@@ -3,6 +3,7 @@ import { TabBar, type TabBarItem } from '@flama/design-system-mobile/tab-bar';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Tabs, useRouter } from 'expo-router';
 import { ArrowLeftRight, ChartColumn, House, Sparkle } from 'lucide-react-native';
+import { useColorScheme } from 'nativewind';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -17,13 +18,23 @@ const TAB_ICONS = {
 
 type TabKey = keyof typeof TAB_ICONS;
 
-// The design's nav shadow: 0 12px 36px rgba(8,6,20,0.45).
+// The design's nav shadows per theme (home-app.jsx --h-nav-shadow):
+// dark 0 12px 36px rgba(8,6,20,0.45) · light 0 8px 30px rgba(15,17,21,0.12).
 const NAV_SHADOW = {
-  shadowColor: '#080614',
-  shadowOffset: { width: 0, height: 12 },
-  shadowRadius: 18,
-  shadowOpacity: 0.45,
-  elevation: 16,
+  dark: {
+    shadowColor: '#080614',
+    shadowOffset: { width: 0, height: 12 },
+    shadowRadius: 18,
+    shadowOpacity: 0.45,
+    elevation: 16,
+  },
+  light: {
+    shadowColor: '#0f1115',
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 15,
+    shadowOpacity: 0.12,
+    elevation: 10,
+  },
 } as const;
 
 /**
@@ -36,6 +47,7 @@ function FloatingTabBar({ state, navigation }: BottomTabBarProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const dark = useColorScheme().colorScheme === 'dark';
 
   const items: TabBarItem[] = state.routes
     .filter((route) => route.name in TAB_ICONS)
@@ -55,14 +67,16 @@ function FloatingTabBar({ state, navigation }: BottomTabBarProps) {
         left: 14,
         right: 14,
         bottom: insets.bottom + 8,
-        ...NAV_SHADOW,
+        ...NAV_SHADOW[dark ? 'dark' : 'light'],
       }}
     >
       <TabBar
         items={items}
         activeKey={activeKey}
         onChange={(key) => navigation.navigate(key)}
-        glass={activeKey === 'home'}
+        // Frosted only over the dark home gradient; the light Glow and the
+        // light tab surfaces use the solid card capsule.
+        glass={dark && activeKey === 'home'}
         accessory={
           <Pressable
             accessibilityRole="button"

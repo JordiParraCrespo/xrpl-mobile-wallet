@@ -1,8 +1,8 @@
-import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { vars } from "nativewind";
-import { ScrollView, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useColorScheme } from 'nativewind';
+import { ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   AccountsSection,
   ActionsRow,
@@ -13,28 +13,26 @@ import {
   HomeBackground,
   HomeHeader,
   totalUsd,
-} from "../../components/drops/home";
-import { Routes } from "../../lib/routes";
-import { darkVars } from "../../lib/theme";
+} from '../../components/drops/home';
+import { Routes } from '../../lib/routes';
 
 /**
- * Home — the signed-in hub (design: `home.html`, the "Dark" gradient theme).
- * Fiat-first balance hero, the four core action circles, account tiles per
- * XRPL chain and recent activity, all on the indigo→ink gradient.
- *
- * The screen is pinned to dark tokens (`darkVars` + the `dark` class) so the
- * design-system components resolve white-on-glass regardless of the system
- * theme — the gradient home is always dark. Data is mocked for now (see
+ * Home — the signed-in hub (design: `home.html`). Fiat-first balance hero,
+ * the four core action circles, account tiles per XRPL chain and recent
+ * activity, in both design themes: the light lavender "Glow" (default) and
+ * the indigo→ink "Dark" gradient, following the system color scheme. The
+ * theme tokens come from the root layout; data is mocked for now (see
  * `home-data.ts`); search, notifications and More are follow-up overlays.
  */
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const dark = useColorScheme().colorScheme === 'dark';
 
   return (
-    <View style={vars(darkVars)} className="dark flex-1 bg-[#08080b]">
-      <StatusBar style="light" />
-      <HomeBackground />
+    <View className="flex-1 bg-background">
+      <StatusBar style={dark ? 'light' : 'dark'} />
+      <HomeBackground dark={dark} />
 
       <View style={{ paddingTop: insets.top + 8 }}>
         <HomeHeader
