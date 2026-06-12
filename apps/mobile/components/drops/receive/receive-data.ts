@@ -13,24 +13,12 @@ export type ReceiveAccount = {
   /** Surfaced only for XRPL accounts that require one (a common footgun). */
   tag: string | null;
   network: string;
-  /** Keeps the faux QR module grid stable per account. */
-  seed: number;
 };
 
 // XRP black for the Ledger, brand indigo for the EVM sidechain — mirrors the
 // AssetIcon defaults and the design's account pills.
 function chainColor(kind: WalletAccount['kind']): string {
   return kind === 'evm' ? '#5b41dd' : '#14161a';
-}
-
-// A stable, address-derived seed so each account's faux QR pattern is
-// deterministic (and distinct between chains) without a real encoder.
-function seedFromAddress(address: string): number {
-  let hash = 0;
-  for (let i = 0; i < address.length; i++) {
-    hash = (hash * 31 + address.charCodeAt(i)) & 0x7fffffff;
-  }
-  return hash || 1;
 }
 
 /** Map a domain wallet account onto the shape the Receive screen renders. */
@@ -44,7 +32,6 @@ export function toReceiveAccount(account: WalletAccount): ReceiveAccount {
     // domain doesn't issue one, so it stays hidden.
     tag: null,
     network: account.chainName,
-    seed: seedFromAddress(account.address),
   };
 }
 

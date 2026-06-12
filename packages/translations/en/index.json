@@ -354,5 +354,16 @@
     "wipeMessage": "This deletes the wallet from this device. You can only restore it with your recovery phrase, family seed or secret numbers.",
     "wipeConfirm": "Delete wallet",
     "wipeCancel": "Cancel"
+  },
+  "receive": {
+    "title": "Receive",
+    "yourAddress": "Your {{name}} address",
+    "destinationTag": "Destination tag",
+    "warning": "Only send assets on the <network>{{network}}</network>. Sending from another network may lose your funds.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "share": "Share",
+    "locked": "Unlock your wallet to receive.",
+    "empty": "No receiving account is available yet."
   }
 }

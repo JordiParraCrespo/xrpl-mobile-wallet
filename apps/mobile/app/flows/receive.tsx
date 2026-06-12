@@ -2,6 +2,7 @@ import { Text } from '@flama/design-system-mobile/text';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { vars } from 'nativewind';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import {
   AccountSwitcher,
@@ -27,13 +28,14 @@ import {
  */
 export default function ReceiveScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { account, status, copied, cycle, copy, share } = useReceive();
 
   return (
     <View style={vars(FLOW_DARK_VARS)} className="dark flex-1 bg-[#08080b]">
       <StatusBar style="light" />
 
-      <ReceiveHeader title="Receive" onBack={() => router.back()} />
+      <ReceiveHeader title={t('receive.title')} onBack={() => router.back()} />
 
       {account ? (
         <>
@@ -43,7 +45,7 @@ export default function ReceiveScreen() {
             contentContainerStyle={{ paddingBottom: 24 }}
           >
             <AccountSwitcher account={account} onCycle={cycle} />
-            <ReceiveQr seed={account.seed} />
+            <ReceiveQr value={account.address} />
             <AddressCard account={account} copied={copied} onCopy={copy} />
             {account.tag ? <DestinationTag tag={account.tag} /> : null}
             <NetworkWarning network={account.network} />
@@ -54,9 +56,7 @@ export default function ReceiveScreen() {
       ) : (
         <View className="flex-1 items-center justify-center px-8">
           <Text className="text-center text-[15px] leading-[22px] text-white/60">
-            {status === 'locked'
-              ? 'Unlock your wallet to receive.'
-              : 'No receiving account is available yet.'}
+            {status === 'locked' ? t('receive.locked') : t('receive.empty')}
           </Text>
         </View>
       )}

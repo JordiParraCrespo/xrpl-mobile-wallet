@@ -2,6 +2,7 @@ import { Button } from '@flama/design-system-mobile/button';
 import { Icon } from '@flama/design-system-mobile/icon';
 import { Text } from '@flama/design-system-mobile/text';
 import { Check, Copy, Share2 } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -18,15 +19,16 @@ export function ReceiveActions({
   onShare: () => void;
 }) {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   return (
     <View className="flex-row gap-2.5 px-5 pt-2" style={{ paddingBottom: insets.bottom + 16 }}>
       <Button variant="secondary" size="lg" className="flex-1" onPress={onCopy}>
         <Icon as={copied ? Check : Copy} size={18} />
-        <Text>{copied ? 'Copied' : 'Copy'}</Text>
+        <Text>{copied ? t('receive.copied') : t('receive.copy')}</Text>
       </Button>
       <Button variant="brand" size="lg" className="flex-1" onPress={onShare}>
         <Icon as={Share2} size={18} />
-        <Text>Share</Text>
+        <Text>{t('receive.share')}</Text>
       </Button>
     </View>
   );

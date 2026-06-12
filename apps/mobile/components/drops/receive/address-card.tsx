@@ -1,6 +1,7 @@
 import { Icon } from '@flama/design-system-mobile/icon';
 import { Text } from '@flama/design-system-mobile/text';
 import { Check, Copy } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import type { ReceiveAccount } from './receive-data';
 
@@ -16,9 +17,12 @@ export function AddressCard({
   copied: boolean;
   onCopy: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <View className="mt-[18px] items-center">
-      <Text className="text-muted-foreground mb-1.5 text-[13px]">Your {account.name} address</Text>
+      <Text className="text-muted-foreground mb-1.5 text-[13px]">
+        {t('receive.yourAddress', { name: account.name })}
+      </Text>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Copy address"
