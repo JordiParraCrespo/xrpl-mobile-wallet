@@ -53,6 +53,38 @@
     --info-soft-foreground: 218 74.1% 53.1%;
     --inverse: 220 13% 9%;
     --inverse-foreground: 0 0% 100%;
+
+    /*
+     * Dewy assistant (chat.html) — a self-contained surface palette. Light
+     * theme: solid white cards on neutral ink hairlines. The card/result/error
+     * tints are fixed (theme-independent); --chat-brand is brand-600 in both
+     * modes (the design uses the money-action indigo, never the dark-shifted
+     * brand). See chat-message.tsx and components/chat/*.
+     */
+    --chat-bg: #ffffff;
+    --chat-fg: #14161a;
+    --chat-dim: #6b7681;
+    --chat-faint: #8d969e;
+    --chat-bubble: #f4f4f7;
+    --chat-bubble-line: #e9eaee;
+    --chat-card: #ffffff;
+    --chat-border: #e3e4e8;
+    --chat-hairline: #e9eaee;
+    --chat-line: #ebebf0;
+    --chat-chip: #ffffff;
+    --chat-chip-line: #e3e4e8;
+    --chat-input: #ffffff;
+    --chat-opt: #c9c9cd;
+    --chat-opt-dim: #8d969e;
+    --chat-brand: #5b41dd;
+    --chat-positive: #12b886;
+    --chat-positive-fg: #0ca678;
+    --chat-negative: #f0444b;
+    --chat-negative-strong: #e03131;
+    --chat-result-bg: rgba(18, 184, 134, 0.12);
+    --chat-result-line: rgba(18, 184, 134, 0.32);
+    --chat-error-bg: rgba(240, 68, 75, 0.1);
+    --chat-error-line: rgba(240, 68, 75, 0.34);
   }
 
   .dark:root {
@@ -95,5 +127,31 @@
     --info-soft-foreground: 215 90% 80%;
     --inverse: 0 0% 100%;
     --inverse-foreground: 220 13% 9%;
+
+    /* Dewy assistant — dark theme: translucent-white surfaces over #0b0b0f. */
+    --chat-bg: #0b0b0f;
+    --chat-fg: #ffffff;
+    --chat-dim: rgba(255, 255, 255, 0.6);
+    --chat-faint: rgba(255, 255, 255, 0.45);
+    --chat-bubble: rgba(255, 255, 255, 0.07);
+    --chat-bubble-line: transparent;
+    --chat-card: rgba(255, 255, 255, 0.06);
+    --chat-border: rgba(255, 255, 255, 0.14);
+    --chat-hairline: rgba(255, 255, 255, 0.08);
+    --chat-line: rgba(255, 255, 255, 0.07);
+    --chat-chip: rgba(255, 255, 255, 0.05);
+    --chat-chip-line: rgba(255, 255, 255, 0.16);
+    --chat-input: rgba(255, 255, 255, 0.07);
+    --chat-opt: rgba(255, 255, 255, 0.18);
+    --chat-opt-dim: rgba(255, 255, 255, 0.4);
+    --chat-brand: #5b41dd;
+    --chat-positive: #12b886;
+    --chat-positive-fg: #0ca678;
+    --chat-negative: #f0444b;
+    --chat-negative-strong: #e03131;
+    --chat-result-bg: rgba(18, 184, 134, 0.12);
+    --chat-result-line: rgba(18, 184, 134, 0.32);
+    --chat-error-bg: rgba(240, 68, 75, 0.1);
+    --chat-error-line: rgba(240, 68, 75, 0.34);
   }
 }
