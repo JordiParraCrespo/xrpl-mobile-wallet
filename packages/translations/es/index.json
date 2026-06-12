@@ -305,5 +305,15 @@
     "payments": "Pagos",
     "droppoints": "DropPoints",
     "dewy": "Abrir Dewy, tu asistente"
+  },
+  "unlock": {
+    "welcomeBack": "Hola de nuevo",
+    "forgotPasscode": "¿Has olvidado tu código?",
+    "wrongPasscode": "Código incorrecto. Inténtalo de nuevo.",
+    "lockedOut": "Demasiados intentos. Vuelve a intentarlo en un momento.",
+    "wipeTitle": "¿Restablecer la cartera?",
+    "wipeMessage": "Esto elimina la cartera de este dispositivo. Solo podrás restaurarla con tu frase de recuperación, semilla familiar o números secretos.",
+    "wipeConfirm": "Eliminar cartera",
+    "wipeCancel": "Cancelar"
   }
 }
