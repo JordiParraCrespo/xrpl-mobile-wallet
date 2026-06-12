@@ -32,8 +32,8 @@ export default function RevealPhraseScreen() {
 
   return (
     <OnboardingStepScreen
-      step={3}
-      totalSteps={4}
+      step={4}
+      totalSteps={5}
       title={t('onboarding.revealPhrase.title')}
       subtitle={t('onboarding.revealPhrase.subtitle')}
       cta={{

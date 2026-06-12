@@ -151,6 +151,20 @@
       "import": "Import existing wallet",
       "legal": "By continuing you agree to the Terms & Privacy Policy."
     },
+    "name": {
+      "title": "What should we call you?",
+      "subtitle": "We'll use this on your profile and when you chat with Dewy, your wallet assistant. You can change it any time.",
+      "label": "Your name",
+      "fieldPlaceholder": "e.g. Jordan Pierce",
+      "preview": "Preview",
+      "placeholderName": "Your name",
+      "greeting": {
+        "before": "Hi ",
+        "after": " — I'm Dewy, your wallet assistant. What would you like to do first?"
+      },
+      "cta": "Continue",
+      "ctaEmpty": "Enter your name"
+    },
     "backupInfo": {
       "title": "Set a passcode",
       "subtitle": "It locks Drops on this device and approves every payment.",
