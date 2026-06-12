@@ -6,19 +6,20 @@ import { InitialsAvatar } from '@flama/design-system-mobile/initials-avatar';
 import { PriceChange } from '@flama/design-system-mobile/price-change';
 import { SegmentedControl } from '@flama/design-system-mobile/segmented-control';
 import { Text } from '@flama/design-system-mobile/text';
+import { splitMovers, useMarkets } from '@flama/frontend';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Search } from 'lucide-react-native';
 import * as React from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LightWashBackground } from '../../components/drops/light-wash-background';
 import {
+  buildAssetList,
+  buildHeroes,
+  buildMovers,
   formatPrice,
-  MARKET_ALL_ASSETS,
-  MARKET_GAINERS,
-  MARKET_HEROES,
-  MARKET_LOSERS,
+  MARKET_SYMBOLS,
 } from '../../components/drops/market/market-data';
 import { MarketEarnSheet } from '../../components/drops/market/market-earn-sheet';
 import { MarketHeroCard } from '../../components/drops/market/market-hero-card';
@@ -45,7 +46,14 @@ export default function MarketScreen() {
   const [movers, setMovers] = React.useState('gainers');
   const [earnOpen, setEarnOpen] = React.useState(false);
 
-  const tiles = movers === 'gainers' ? MARKET_GAINERS : MARKET_LOSERS;
+  // Live prices from CoinGecko (free, no API key) via the prices module.
+  const { data, isLoading, isError, refetch, isRefetching } = useMarkets(MARKET_SYMBOLS);
+  const markets = React.useMemo(() => data ?? [], [data]);
+
+  const heroes = React.useMemo(() => buildHeroes(markets), [markets]);
+  const assets = React.useMemo(() => buildAssetList(markets), [markets]);
+  const { gainers, losers } = React.useMemo(() => splitMovers(markets), [markets]);
+  const tiles = buildMovers(movers === 'gainers' ? gainers : losers);
 
   return (
     <View className="bg-background flex-1">
@@ -74,6 +82,7 @@ export default function MarketScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} />}
       >
         <View className="px-5 pb-1.5 pt-[22px]">
           <Text
@@ -84,10 +93,27 @@ export default function MarketScreen() {
           </Text>
         </View>
 
-        {/* hero card */}
-        <View className="px-4 pt-2.5">
-          <MarketHeroCard asset={MARKET_HEROES[0]} chartHeight={42} />
-        </View>
+        {/* hero cards — live prices, or a status while they load */}
+        {isLoading ? (
+          <View className="items-center px-4 py-10">
+            <ActivityIndicator />
+          </View>
+        ) : isError ? (
+          <Pressable
+            onPress={() => refetch()}
+            className="mx-4 mt-2.5 items-center rounded-xl border border-border bg-card px-4 py-8 active:opacity-80"
+          >
+            <Text className="text-muted-foreground text-[14px]">
+              Couldn't load market prices. Tap to retry.
+            </Text>
+          </Pressable>
+        ) : (
+          heroes.map((hero) => (
+            <View key={hero.symbol} className="px-4 pt-2.5">
+              <MarketHeroCard asset={hero} chartHeight={42} />
+            </View>
+          ))
+        )}
 
         {/* top movers */}
         <View className="px-4 pt-5">
@@ -127,7 +153,7 @@ export default function MarketScreen() {
             </Text>
           </View>
           <View className="bg-card border-border overflow-hidden rounded-xl border">
-            {MARKET_ALL_ASSETS.map((asset) => (
+            {assets.map((asset) => (
               <Pressable
                 key={asset.symbol}
                 className="flex-row items-center gap-[13px] px-4 py-[13px] active:bg-accent"
