@@ -135,7 +135,13 @@ export function useWipeWallet(options?: Omit<UseMutationOptions<void, Error, voi
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => app.security.wipe(),
+    // The whole teardown lives in the mutation: delete the vault, then settle
+    // the wallet store to 'no_wallet' before onSuccess fires — otherwise a
+    // navigation on success races the stale 'ready' wallet state back to Home.
+    mutationFn: async () => {
+      await app.security.wipe();
+      await app.wallet.restore();
+    },
     onSuccess: (...args) => {
       queryClient.removeQueries({ queryKey: walletKeys.all });
       queryClient.invalidateQueries({ queryKey: securityKeys.all });
