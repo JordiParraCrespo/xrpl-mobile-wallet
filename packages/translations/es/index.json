@@ -365,5 +365,26 @@
     "share": "Compartir",
     "locked": "Desbloquea tu cartera para recibir.",
     "empty": "Todavía no hay ninguna cuenta disponible para recibir."
+  },
+  "droppoints": {
+    "comingSoon": "MUY PRONTO",
+    "title": "DropPoints",
+    "subtitle": "Un programa de recompensas que te devuelve algo cada vez que mueves dinero en Drops. Le estamos dando los últimos retoques.",
+    "perks": {
+      "earn": {
+        "title": "Gana con cada movimiento",
+        "description": "Acumula puntos cuando envías, recibes o intercambias."
+      },
+      "rebates": {
+        "title": "Descuentos en comisiones",
+        "description": "Canjea puntos para reducir tus comisiones de red."
+      },
+      "perks": {
+        "title": "Ventajas de miembro",
+        "description": "Desbloquea mejoras, funciones anticipadas y sorpresas."
+      }
+    },
+    "notify": "Avísame cuando esté listo",
+    "notified": "Te avisaremos"
   }
 }

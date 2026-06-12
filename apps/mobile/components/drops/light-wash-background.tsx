@@ -1,11 +1,12 @@
 import { StyleSheet } from 'react-native';
 import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from 'react-native-svg';
 
-// The DropPoints immersive backdrop — the light indigo→violet→white wash from
-// drops.html (DP_BG): a soft white base under four faint colour blooms across
-// the top. The viewBox is stretched to fill the screen (preserveAspectRatio
-// none), so each bloom's rx/ry map to %-of-width / %-of-height just like the
-// design's `radial-gradient(rx ry at cx cy)` stack.
+// The light gradient wash shared by the "light theme" Drops screens (Market,
+// DropPoints): the indigo→violet→white base from the design (DP_BG / MK_BG)
+// with four faint colour blooms across the top. The viewBox is stretched to
+// fill the screen (preserveAspectRatio none), so each bloom's rx/ry map to
+// %-of-width / %-of-height just like the design's `radial-gradient(rx ry at
+// cx cy)` stack.
 type Bloom = {
   id: string;
   color: string;
@@ -22,7 +23,7 @@ type Bloom = {
 
 const BLOOMS: Bloom[] = [
   {
-    id: 'dp-bloom-1',
+    id: 'wash-bloom-1',
     color: '#7b6ff2',
     opacity: 0.34,
     cx: 14,
@@ -32,7 +33,7 @@ const BLOOMS: Bloom[] = [
     stop: 0.6,
   },
   {
-    id: 'dp-bloom-2',
+    id: 'wash-bloom-2',
     color: '#b06bff',
     opacity: 0.34,
     cx: 100,
@@ -42,7 +43,7 @@ const BLOOMS: Bloom[] = [
     stop: 0.58,
   },
   {
-    id: 'dp-bloom-3',
+    id: 'wash-bloom-3',
     color: '#ff945c',
     opacity: 0.3,
     cx: 58,
@@ -52,7 +53,7 @@ const BLOOMS: Bloom[] = [
     stop: 0.6,
   },
   {
-    id: 'dp-bloom-4',
+    id: 'wash-bloom-4',
     color: '#e896ff',
     opacity: 0.32,
     cx: 106,
@@ -63,8 +64,8 @@ const BLOOMS: Bloom[] = [
   },
 ];
 
-/** Full-bleed gradient backdrop for the DropPoints "coming soon" screen. */
-export function DroppointsBackground() {
+/** Full-bleed light gradient backdrop for the light-theme Drops screens. */
+export function LightWashBackground() {
   return (
     <Svg
       style={StyleSheet.absoluteFill}
@@ -73,7 +74,7 @@ export function DroppointsBackground() {
       pointerEvents="none"
     >
       <Defs>
-        <LinearGradient id="dp-base" x1="0" y1="0" x2="0" y2="1">
+        <LinearGradient id="wash-base" x1="0" y1="0" x2="0" y2="1">
           <Stop offset="0" stopColor="#efeafe" />
           <Stop offset="0.18" stopColor="#f3eefb" />
           <Stop offset="0.42" stopColor="#ffffff" />
@@ -94,7 +95,7 @@ export function DroppointsBackground() {
           </RadialGradient>
         ))}
       </Defs>
-      <Rect x="0" y="0" width="100" height="100" fill="url(#dp-base)" />
+      <Rect x="0" y="0" width="100" height="100" fill="url(#wash-base)" />
       {BLOOMS.map((bloom) => (
         <Rect key={bloom.id} x="0" y="0" width="100" height="100" fill={`url(#${bloom.id})`} />
       ))}

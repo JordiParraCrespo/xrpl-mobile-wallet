@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Modal, Pressable, View } from "react-native";
-import Animated, { SlideInDown } from "react-native-reanimated";
+import Animated, { Easing, SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { cn } from "../../lib/utils";
 
@@ -34,7 +34,12 @@ function BottomSheet({ open, onClose, children, className }: BottomSheetProps) {
           accessibilityLabel="Close"
         />
         <Animated.View
-          entering={SlideInDown.springify().damping(28).stiffness(260)}
+          // Glide up on the design's emphasis curve (340ms · cubic-bezier(0.2,
+          // 0.8, 0.2, 1)) — a settle with no spring overshoot, so the sheet
+          // arrives smooth instead of bouncing at the top of its travel.
+          entering={SlideInDown.duration(340).easing(
+            Easing.bezier(0.2, 0.8, 0.2, 1),
+          )}
           className={cn("rounded-t-3xl bg-card px-6 pt-3", className)}
           style={{ paddingBottom: insets.bottom + 24 }}
         >
