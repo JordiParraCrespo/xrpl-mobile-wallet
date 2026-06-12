@@ -1,4 +1,6 @@
+import type { WalletAgent } from '@flama/wallet-agent';
 import * as React from 'react';
+import { createWalletAgent } from '../../lib/agent';
 import { GREETING, newSession, SESSION_SEEDS } from './chat-seeds';
 import type { ChatPayload, Msg, Session } from './types';
 
@@ -25,6 +27,38 @@ export function useChatFlow() {
     to?: string;
   }>({});
   const pendingRef = React.useRef<string | null>(null);
+  const agentRef = React.useRef<WalletAgent | null>(null);
+
+  /**
+   * The on-device wallet agent (Claude + the XRPL tool loop), built lazily on
+   * first use. Reads (balance, ledgers) never trigger approval; payment flows
+   * will wire `approve` to an approve/decline card — for now any payment attempt
+   * is declined so nothing can move funds from the chat yet.
+   */
+  const getAgent = (): WalletAgent => {
+    if (!agentRef.current) {
+      agentRef.current = createWalletAgent({ approve: async () => false });
+    }
+    return agentRef.current;
+  };
+
+  /** Answers a read-only question with the real on-chain agent (e.g. balance). */
+  const runAgent = async (text: string) => {
+    const typingId = add({ role: 'bot', kind: 'typing' });
+    try {
+      const reply = await getAgent().ask(text);
+      remove(typingId);
+      add({ role: 'bot', kind: 'text', text: reply });
+    } catch (error) {
+      remove(typingId);
+      add({
+        role: 'bot',
+        kind: 'error',
+        title: 'Something went wrong',
+        text: error instanceof Error ? error.message : 'Please try again in a moment.',
+      });
+    }
+  };
 
   const [sessions, setSessions] = React.useState<Session[]>(() => [
     {
@@ -196,31 +230,6 @@ export function useChatFlow() {
       ],
     });
   };
-  const showBalance = () => {
-    add({ role: 'bot', kind: 'text', text: 'Here’s your balance right now:' });
-    add({
-      role: 'bot',
-      kind: 'balance',
-      total: 942.76,
-      rows: [
-        {
-          symbol: 'XRP',
-          name: 'XRP Ledger',
-          xrp: 1204.51,
-          usd: 744.87,
-          color: '#14161a',
-        },
-        {
-          symbol: 'XRP',
-          name: 'XRPL EVM',
-          xrp: 320,
-          usd: 197.89,
-          color: '#5b41dd',
-        },
-      ],
-    });
-  };
-
   const routeUser = (text: string) => {
     const lc = text.toLowerCase();
     if (pendingRef.current === 'amount') {
@@ -229,7 +238,10 @@ export function useChatFlow() {
       flowRef.current.amount = Number.isNaN(n) ? 25 : n;
       return think(flowRef.current.name === 'swap' ? askSwapTo : askNetwork);
     }
-    if (/balance|how much do i|what.*have/.test(lc)) return think(showBalance);
+    if (/balance|how much do i|what.*have/.test(lc)) {
+      void runAgent(text);
+      return;
+    }
     if (/swap|convert|exchange/.test(lc)) {
       flowRef.current = { name: 'swap' };
       return think(() => {

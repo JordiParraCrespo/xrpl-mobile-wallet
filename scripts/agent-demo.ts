@@ -10,18 +10,18 @@
  * terminal and are capped by policy. Personality is loaded from a markdown file
  * (scripts/persona.example.md or $PERSONA_FILE) — edit it to change the agent.
  */
-import { existsSync, readFileSync } from 'node:fs';
-import { stdin, stdout } from 'node:process';
-import { createInterface } from 'node:readline/promises';
-import { XRPL_TESTNET, XrplAdapter } from '@flama/chain-xrpl';
+import { existsSync, readFileSync } from "node:fs";
+import { stdin, stdout } from "node:process";
+import { createInterface } from "node:readline/promises";
+import { XRPL_TESTNET, XrplAdapter } from "@flama/chain-xrpl";
 import {
   DEFAULT_PERSONA,
   type Persona,
   personaFromMarkdown,
   WalletAgent,
   XrplWalletGateway,
-} from '@flama/wallet-agent';
-import { KeyringManager, type SecureStorage } from '@flama/wallet-keyring';
+} from "@flama/wallet-agent";
+import { KeyringManager, type SecureStorage } from "@flama/wallet-keyring";
 
 function memoryStorage(): SecureStorage {
   const data = new Map<string, string>();
@@ -46,29 +46,31 @@ async function fund(adapter: XrplAdapter, address: string): Promise<void> {
       return;
     }
   }
-  throw new Error('Faucet funding timed out');
+  throw new Error("Faucet funding timed out");
 }
 
 function loadPersona(): Persona {
-  const path = process.env.PERSONA_FILE ?? 'scripts/persona.example.md';
-  return existsSync(path) ? personaFromMarkdown(readFileSync(path, 'utf8')) : DEFAULT_PERSONA;
+  const path = process.env.PERSONA_FILE ?? "scripts/persona.example.md";
+  return existsSync(path)
+    ? personaFromMarkdown(readFileSync(path, "utf8"))
+    : DEFAULT_PERSONA;
 }
 
 async function main(): Promise<void> {
   if (!process.env.ANTHROPIC_API_KEY) {
-    console.error('Set ANTHROPIC_API_KEY to run the agent demo.');
+    console.error("Set ANTHROPIC_API_KEY to run the agent demo.");
     process.exit(1);
   }
 
   const adapter = new XrplAdapter(XRPL_TESTNET);
   const keyring = new KeyringManager(memoryStorage(), { n: 1024, r: 8, p: 1 });
-  await keyring.initialize('demo-passcode');
-  const wallet = await keyring.createWallet({ name: 'Agent wallet' });
-  const signer = keyring.getSigner(wallet.id, 'xrpl');
+  await keyring.initialize("demo-passcode");
+  const wallet = await keyring.createWallet({ name: "Agent wallet" });
+  const signer = keyring.getSigner(wallet.id, "xrpl");
   const address = adapter.deriveAddress(signer.publicKey);
 
   console.log(`Wallet: ${address}`);
-  console.log('Funding from the testnet faucet (~10s)…');
+  console.log("Funding from the testnet faucet (~10s)…");
   await fund(adapter, address);
 
   const persona = loadPersona();
@@ -77,18 +79,17 @@ async function main(): Promise<void> {
   const gateway = new XrplWalletGateway(adapter, address, signer);
   const agent = new WalletAgent({
     gateway,
+    apiKey: process.env.ANTHROPIC_API_KEY ?? "",
     network: XRPL_TESTNET.name,
     symbol: XRPL_TESTNET.nativeCurrency.symbol,
     persona,
     policy: { maxPaymentXrp: 50 },
     model: process.env.MODEL,
-    // Set DEBUG=1 to surface the underlying agent subprocess's stderr.
-    onStderr: process.env.DEBUG ? (data) => process.stderr.write(data) : undefined,
     approve: async ({ input }) => {
       const answer = await rl.question(
         `\n⚠️  Approve this transaction?\n   ${JSON.stringify(input)}\n   (y/N) `,
       );
-      return answer.trim().toLowerCase() === 'y';
+      return answer.trim().toLowerCase() === "y";
     },
   });
 
@@ -98,9 +99,9 @@ async function main(): Promise<void> {
   console.log(`"send 1 XRP to <address> tag 42". Type "exit" to quit.\n`);
 
   for (;;) {
-    const message = await rl.question('you › ');
+    const message = await rl.question("you › ");
     const trimmed = message.trim();
-    if (!trimmed || trimmed === 'exit') {
+    if (!trimmed || trimmed === "exit") {
       break;
     }
     try {
@@ -108,10 +109,9 @@ async function main(): Promise<void> {
       const reply = await agent.ask(trimmed);
       console.log(`\r${persona.name} › ${reply}\n`);
     } catch (error) {
-      console.error('\nError:', error instanceof Error ? error.message : error);
+      console.error("\nError:", error instanceof Error ? error.message : error);
     }
   }
-  agent.close();
   rl.close();
 }
 
