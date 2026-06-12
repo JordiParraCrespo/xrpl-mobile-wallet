@@ -491,6 +491,21 @@
         "evm": "Direcciones 0x…"
       },
       "done": "Hecho"
+    },
+    "transaction": {
+      "back": "Volver",
+      "notFound": "No se encontró esta transacción.",
+      "status": "Estado",
+      "confirmed": "Confirmada",
+      "failed": "Fallida",
+      "from": "De",
+      "to": "Para",
+      "notSaved": "No está en tu agenda",
+      "address": "Dirección",
+      "fee": "Comisión de red",
+      "hash": "Transacción",
+      "saveRecipient": "Guardar en la agenda",
+      "openExplorer": "Abrir en el explorador"
     }
   }
 }

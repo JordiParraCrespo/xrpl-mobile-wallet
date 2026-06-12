@@ -491,6 +491,21 @@
         "evm": "0x… addresses"
       },
       "done": "Done"
+    },
+    "transaction": {
+      "back": "Back",
+      "notFound": "We couldn't find this transaction.",
+      "status": "Status",
+      "confirmed": "Confirmed",
+      "failed": "Failed",
+      "from": "From",
+      "to": "To",
+      "notSaved": "Not in your address book",
+      "address": "Address",
+      "fee": "Network fee",
+      "hash": "Transaction",
+      "saveRecipient": "Save to address book",
+      "openExplorer": "Open in explorer"
     }
   }
 }

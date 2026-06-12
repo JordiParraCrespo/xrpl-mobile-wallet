@@ -10,7 +10,7 @@ import { cn } from '@flama/design-system-mobile/utils';
 import { AddressBookErrors, AppError } from '@flama/frontend';
 import { useAddContact, useWalletState } from '@flama/frontend/react';
 import * as Clipboard from 'expo-clipboard';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Check, ChevronDown, ChevronLeft, ShieldCheck } from 'lucide-react-native';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -88,10 +88,18 @@ export default function AddRecipientScreen() {
   const { t } = useTranslation();
   const { accounts } = useWalletState();
 
-  const [chainId, setChainId] = React.useState<string | undefined>(undefined);
-  const [address, setAddress] = React.useState('');
+  // Optional prefill when arriving from a payment's counterparty: the address
+  // and network are known, so the user only has to name the contact.
+  const prefill = useLocalSearchParams<{
+    address?: string;
+    chainId?: string;
+    name?: string;
+  }>();
+
+  const [chainId, setChainId] = React.useState<string | undefined>(prefill.chainId);
+  const [address, setAddress] = React.useState(prefill.address ?? '');
   const [destinationTag, setDestinationTag] = React.useState('');
-  const [name, setName] = React.useState('');
+  const [name, setName] = React.useState(prefill.name ?? '');
   const [networkOpen, setNetworkOpen] = React.useState(false);
   const [errorKey, setErrorKey] = React.useState<SaveErrorKey | null>(null);
 
