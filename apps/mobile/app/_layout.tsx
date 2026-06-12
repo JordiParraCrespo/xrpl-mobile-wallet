@@ -143,6 +143,7 @@ function DropsStack() {
       <Stack.Screen name="flows/send" options={{ presentation: 'modal' }} />
       <Stack.Screen name="add-recipient" options={{ presentation: 'modal' }} />
       <Stack.Screen name="transaction/[id]" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="notifications" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }
