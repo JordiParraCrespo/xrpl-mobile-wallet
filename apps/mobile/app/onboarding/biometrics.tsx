@@ -18,7 +18,7 @@ import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BiometricScanTarget, type ScanState } from '../../components/auth/biometric-scan-target';
 import { type BiometricMethod, getBiometricModalities } from '../../lib/biometrics';
-import { buildRoute, type OnboardingPath } from '../../lib/routes';
+import { type OnboardingPath, Routes } from '../../lib/routes';
 
 const BENEFITS: { key: 'instant' | 'approve' | 'enclave'; icon: LucideIcon }[] = [
   { key: 'instant', icon: Zap },
@@ -27,8 +27,9 @@ const BENEFITS: { key: 'instant' | 'approve' | 'enclave'; icon: LucideIcon }[] =
 ];
 
 /**
- * Biometric enrollment — sits between the passcode and the notifications ask,
- * while the vault is freshly unlocked (enrolling needs an unlocked keyring).
+ * Biometric enrollment — closes the device-security block right after the
+ * passcode, while the vault is freshly unlocked (enrolling needs an unlocked
+ * keyring).
  * Enabling runs the real OS prompt through the security domain
  * (`security.enableBiometrics`) and only flips to the success state once the
  * device actually authorizes. Devices without enrolled biometrics skip the
@@ -61,8 +62,10 @@ export default function BiometricsScreen() {
     };
   }, []);
 
-  const path: OnboardingPath = next === 'import' ? 'import' : 'create';
-  const goNext = () => router.replace(buildRoute.onboardingNotifications(path));
+  const isImport = next === 'import';
+  // Closes the device-security block; the paths diverge into their keys block.
+  const destination = isImport ? Routes.OnboardingImport : Routes.OnboardingSecureIntro;
+  const goNext = () => router.replace(destination);
 
   const enableBiometrics = useEnableBiometrics();
   const enable = () => {
@@ -80,9 +83,8 @@ export default function BiometricsScreen() {
   };
 
   // No usable biometric hardware (or it's already enrolled) — nothing to ask.
-  // Carry the path through so the notifications step still routes correctly.
   if (!biometricsAvailable || biometricsEnabled) {
-    return <Redirect href={buildRoute.onboardingNotifications(path)} />;
+    return <Redirect href={destination} />;
   }
 
   const isFace = method === 'face';
@@ -102,7 +104,7 @@ export default function BiometricsScreen() {
   return (
     <View className="flex-1 bg-background">
       <View style={{ paddingTop: insets.top + 8 }} className="px-6">
-        <ScreenHeader step={3} total={3} onBack={scanning ? undefined : goNext} />
+        <ScreenHeader step={3} total={isImport ? 4 : 5} onBack={scanning ? undefined : goNext} />
       </View>
 
       {/* hero target + heading */}

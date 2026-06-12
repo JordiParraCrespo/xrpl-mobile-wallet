@@ -1,46 +1,69 @@
-import { Button } from '@flama/design-system-mobile/button';
-import { Text } from '@flama/design-system-mobile/text';
-import { useWipeWallet } from '@flama/frontend/react';
 import { useRouter } from 'expo-router';
-import { View } from 'react-native';
-import { ScreenStub } from '../../components/drops/screen-stub';
+import { StatusBar } from 'expo-status-bar';
+import { useColorScheme } from 'nativewind';
+import { ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  AccountsSection,
+  ActionsRow,
+  ActivitySection,
+  BalanceHero,
+  HOME_ACCOUNTS,
+  HOME_ACTIVITY,
+  HomeBackground,
+  HomeHeader,
+  totalUsd,
+} from '../../components/drops/home';
 import { Routes } from '../../lib/routes';
 
+/**
+ * Home — the signed-in hub (design: `home.html`). Fiat-first balance hero,
+ * the four core action circles, account tiles per XRPL chain and recent
+ * activity, in both design themes: the light lavender "Glow" (default) and
+ * the indigo→ink "Dark" gradient, following the system color scheme. The
+ * theme tokens come from the root layout; data is mocked for now (see
+ * `home-data.ts`); search, notifications and More are follow-up overlays.
+ */
 export default function HomeScreen() {
   const router = useRouter();
-
-  // TEMPORARY (dev): wipes the vault + security state so onboarding can be
-  // re-tested without clearing Expo Go's storage. Remove before release.
-  const wipe = useWipeWallet({
-    onSuccess: () => router.replace(Routes.Root),
-  });
+  const insets = useSafeAreaInsets();
+  const dark = useColorScheme().colorScheme === 'dark';
 
   return (
-    <View className="flex-1">
-      <ScreenStub
-        eyebrow="$942.76 · Wallet 1"
-        title="Home"
-        blurb="The hub: fiat-first balance hero, action circles, account tiles per chain, and recent activity. Search, notifications and More open as glass overlays."
-        design="home.html · home/home-app.jsx (+ home-parts.jsx, home-parts2.jsx)"
-        showBack={false}
-        links={[
-          { label: 'Add money', href: Routes.AddMoney },
-          { label: 'Receive', href: Routes.Receive, variant: 'secondary' },
-          { label: 'Swap', href: Routes.Swap, variant: 'secondary' },
-          { label: 'Profile', href: Routes.Profile, variant: 'outline' },
-          { label: 'Ask Dewy', href: Routes.Chat, variant: 'outline' },
-        ]}
-      />
-      <View className="px-6 pb-3">
-        <Button
-          variant="destructive"
-          className="w-full"
-          disabled={wipe.isPending}
-          onPress={() => wipe.mutate()}
-        >
-          <Text>{wipe.isPending ? 'Wiping…' : 'Wipe wallet data (dev)'}</Text>
-        </Button>
+    <View className="flex-1 bg-background">
+      <StatusBar style={dark ? 'light' : 'dark'} />
+      <HomeBackground dark={dark} />
+
+      <View style={{ paddingTop: insets.top + 8 }}>
+        <HomeHeader
+          onProfile={() => router.push(Routes.Profile)}
+          onSearch={() => {}}
+          onNotifications={() => {}}
+        />
       </View>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerClassName="px-4"
+        contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
+      >
+        <BalanceHero usd={totalUsd(HOME_ACCOUNTS)} />
+
+        <ActionsRow
+          onAddMoney={() => router.push(Routes.AddMoney)}
+          onReceive={() => router.push(Routes.Receive)}
+          onSwap={() => router.push(Routes.Swap)}
+          onMore={() => {}}
+        />
+
+        <AccountsSection
+          accounts={HOME_ACCOUNTS}
+          onAccountPress={() => router.push(Routes.Receive)}
+          onAddAccount={() => {}}
+        />
+
+        <ActivitySection activity={HOME_ACTIVITY} onSeeAll={() => {}} />
+      </ScrollView>
     </View>
   );
 }

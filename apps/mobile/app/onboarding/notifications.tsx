@@ -3,13 +3,13 @@ import { Icon } from '@flama/design-system-mobile/icon';
 import { ScreenHeader } from '@flama/design-system-mobile/screen-header';
 import { Text } from '@flama/design-system-mobile/text';
 import * as Notifications from 'expo-notifications';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Bell, type LucideIcon, ShieldCheck, Zap } from 'lucide-react-native';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { type OnboardingPath, Routes } from '../../lib/routes';
+import { Routes } from '../../lib/routes';
 
 const POINTS: { key: 'alerts' | 'security' | 'noise'; icon: LucideIcon }[] = [
   { key: 'alerts', icon: Zap },
@@ -18,19 +18,19 @@ const POINTS: { key: 'alerts' | 'security' | 'noise'; icon: LucideIcon }[] = [
 ];
 
 /**
- * Notifications permission ask — right after the passcode is set, before the
- * wallet steps. Sells the value first; "Not now" is always an equal exit, and
- * both continue into the path's next step. Design: onboarding-notifications.html.
+ * Notifications permission ask — the last onboarding beat, after the success
+ * screen showed the wallet exists and before the hub. It's the one screen
+ * about the app rather than the wallet, so it sits outside the security and
+ * keys blocks; "Not now" is always an equal exit. Design:
+ * onboarding-notifications.html.
  */
 export default function NotificationsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const { next } = useLocalSearchParams<{ next?: OnboardingPath }>();
   const [requesting, setRequesting] = React.useState(false);
 
-  const destination = next === 'import' ? Routes.OnboardingImport : Routes.OnboardingRevealPhrase;
-  const finish = () => router.replace(destination);
+  const finish = () => router.replace(Routes.Home);
 
   const enable = async () => {
     if (requesting) return;

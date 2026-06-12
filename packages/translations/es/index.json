@@ -338,6 +338,13 @@
       "reassurance": "Ya casi está. Confirmar demuestra que tu frase está bien anotada."
     }
   },
+  "tabs": {
+    "home": "Inicio",
+    "market": "Mercado",
+    "payments": "Pagos",
+    "droppoints": "DropPoints",
+    "dewy": "Abrir Dewy, tu asistente"
+  },
   "unlock": {
     "welcomeBack": "Hola de nuevo",
     "forgotPasscode": "¿Has olvidado tu código?",
