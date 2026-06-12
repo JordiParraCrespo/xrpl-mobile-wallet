@@ -1,21 +1,26 @@
-import { BottomSheet } from '@flama/design-system-mobile/bottom-sheet';
-import { Button } from '@flama/design-system-mobile/button';
-import { Callout } from '@flama/design-system-mobile/callout';
-import { Chip } from '@flama/design-system-mobile/chip';
-import { GlassBackdrop } from '@flama/design-system-mobile/glass-panel';
-import { Icon } from '@flama/design-system-mobile/icon';
-import { Text } from '@flama/design-system-mobile/text';
-import { cn } from '@flama/design-system-mobile/utils';
-import { AddressBookErrors, AppError } from '@flama/frontend';
-import { useAddContact, useWalletState } from '@flama/frontend/react';
-import * as Clipboard from 'expo-clipboard';
-import { useRouter } from 'expo-router';
-import { Check, ChevronDown, ChevronLeft, ShieldCheck } from 'lucide-react-native';
-import * as React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, TextInput, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PaymentsBackdrop } from '../components/payments/payments-backdrop';
+import { BottomSheet } from "@flama/design-system-mobile/bottom-sheet";
+import { Button } from "@flama/design-system-mobile/button";
+import { Callout } from "@flama/design-system-mobile/callout";
+import { Chip } from "@flama/design-system-mobile/chip";
+import { GlassBackdrop } from "@flama/design-system-mobile/glass-panel";
+import { Icon } from "@flama/design-system-mobile/icon";
+import { Text } from "@flama/design-system-mobile/text";
+import { cn } from "@flama/design-system-mobile/utils";
+import { AddressBookErrors, AppError } from "@flama/frontend";
+import { useAddContact, useWalletState } from "@flama/frontend/react";
+import * as Clipboard from "expo-clipboard";
+import { useRouter } from "expo-router";
+import {
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ShieldCheck,
+} from "lucide-react-native";
+import * as React from "react";
+import { useTranslation } from "react-i18next";
+import { Pressable, ScrollView, TextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { PaymentsBackdrop } from "../components/payments/payments-backdrop";
 
 /**
  * The design's PField: a white hairline card with the small label INSIDE,
@@ -36,10 +41,10 @@ function Field({
   return (
     <Wrapper
       onPress={onPress}
-      accessibilityRole={onPress ? 'button' : undefined}
+      accessibilityRole={onPress ? "button" : undefined}
       className={cn(
-        'border-hairline border-border bg-card flex-row items-center gap-2.5 rounded-lg px-4 py-[11px]',
-        onPress && 'active:scale-[0.99] active:opacity-90',
+        "border-border bg-card flex-row items-center gap-2.5 rounded-lg border px-4 py-[11px]",
+        onPress && "active:scale-[0.99] active:opacity-90",
       )}
     >
       <View className="min-w-0 flex-1 gap-[3px]">
@@ -52,14 +57,14 @@ function Field({
 }
 
 const fieldInputClass =
-  'text-foreground min-w-0 p-0 text-base placeholder:text-muted-foreground/50';
+  "text-foreground min-w-0 p-0 text-base placeholder:text-muted-foreground/50";
 
 /** Map address-book error codes to the screen's translated messages. */
-type SaveErrorKey = 'invalidName' | 'invalidAddress' | 'duplicate' | 'generic';
+type SaveErrorKey = "invalidName" | "invalidAddress" | "duplicate" | "generic";
 const ERROR_KEYS: Record<string, SaveErrorKey> = {
-  [AddressBookErrors.INVALID_NAME.code]: 'invalidName',
-  [AddressBookErrors.INVALID_ADDRESS.code]: 'invalidAddress',
-  [AddressBookErrors.DUPLICATE_CONTACT.code]: 'duplicate',
+  [AddressBookErrors.INVALID_NAME.code]: "invalidName",
+  [AddressBookErrors.INVALID_ADDRESS.code]: "invalidAddress",
+  [AddressBookErrors.DUPLICATE_CONTACT.code]: "duplicate",
 };
 
 /**
@@ -76,9 +81,9 @@ export default function AddRecipientScreen() {
   const { accounts } = useWalletState();
 
   const [chainId, setChainId] = React.useState<string | undefined>(undefined);
-  const [address, setAddress] = React.useState('');
-  const [destinationTag, setDestinationTag] = React.useState('');
-  const [name, setName] = React.useState('');
+  const [address, setAddress] = React.useState("");
+  const [destinationTag, setDestinationTag] = React.useState("");
+  const [name, setName] = React.useState("");
   const [networkOpen, setNetworkOpen] = React.useState(false);
   const [errorKey, setErrorKey] = React.useState<SaveErrorKey | null>(null);
 
@@ -87,18 +92,21 @@ export default function AddRecipientScreen() {
     chainId: account.chainId,
     name: account.chainName,
   }));
-  const selected = networks.find((network) => network.chainId === chainId) ?? networks[0];
+  const selected =
+    networks.find((network) => network.chainId === chainId) ?? networks[0];
 
   const addContact = useAddContact({
     onSuccess: () => router.back(),
     onError: (error) => {
-      const key = error instanceof AppError ? ERROR_KEYS[error.code] : undefined;
-      setErrorKey(key ?? 'generic');
+      const key =
+        error instanceof AppError ? ERROR_KEYS[error.code] : undefined;
+      setErrorKey(key ?? "generic");
     },
   });
   const { mutate: saveContact, isPending } = addContact;
 
-  const canSave = name.trim().length >= 2 && address.trim().length > 0 && !!selected;
+  const canSave =
+    name.trim().length >= 2 && address.trim().length > 0 && !!selected;
 
   const save = () => {
     if (!canSave || isPending) return;
@@ -123,7 +131,7 @@ export default function AddRecipientScreen() {
       <View style={{ paddingTop: insets.top + 14 }} className="px-5">
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={t('payments.addRecipient.back')}
+          accessibilityLabel={t("payments.addRecipient.back")}
           onPress={() => router.back()}
           className="h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-white/60 bg-white/[0.42] active:scale-[0.97]"
         >
@@ -131,7 +139,7 @@ export default function AddRecipientScreen() {
           <Icon as={ChevronLeft} size={20} className="text-foreground" />
         </Pressable>
         <Text className="font-display text-foreground mt-[18px] text-[32px] leading-[36px] tracking-[-0.5px]">
-          {t('payments.addRecipient.title')}
+          {t("payments.addRecipient.title")}
         </Text>
       </View>
 
@@ -141,52 +149,60 @@ export default function AddRecipientScreen() {
         contentContainerClassName="gap-3.5 px-5 pb-2 pt-5"
       >
         <Field
-          label={t('payments.addRecipient.network')}
+          label={t("payments.addRecipient.network")}
           onPress={networks.length > 1 ? () => setNetworkOpen(true) : undefined}
           trailing={
             networks.length > 1 ? (
-              <Icon as={ChevronDown} size={18} className="text-muted-foreground" />
+              <Icon
+                as={ChevronDown}
+                size={18}
+                className="text-muted-foreground"
+              />
             ) : undefined
           }
         >
-          <Text className="text-foreground text-base font-medium">{selected?.name ?? '—'}</Text>
+          <Text className="text-foreground text-base font-medium">
+            {selected?.name ?? "—"}
+          </Text>
         </Field>
 
         <Field
-          label={t('payments.addRecipient.address')}
+          label={t("payments.addRecipient.address")}
           trailing={
             <Chip size="sm" onPress={pasteAddress}>
-              {t('payments.addRecipient.paste')}
+              {t("payments.addRecipient.paste")}
             </Chip>
           }
         >
           <TextInput
             value={address}
             onChangeText={setAddress}
-            placeholder={t('payments.addRecipient.addressPlaceholder')}
+            placeholder={t("payments.addRecipient.addressPlaceholder")}
             autoCapitalize="none"
             autoCorrect={false}
             autoComplete="off"
             spellCheck={false}
-            className={cn(fieldInputClass, 'font-mono')}
+            className={cn(fieldInputClass, "font-mono")}
           />
         </Field>
 
-        <Field label={t('payments.addRecipient.destinationTag')}>
+        <Field label={t("payments.addRecipient.destinationTag")}>
           <TextInput
             value={destinationTag}
-            onChangeText={(value) => setDestinationTag(value.replace(/[^0-9]/g, ''))}
-            placeholder={t('payments.addRecipient.destinationTagPlaceholder')}
+            onChangeText={(value) =>
+              setDestinationTag(value.replace(/[^0-9]/g, ""))
+            }
+            placeholder={t("payments.addRecipient.destinationTagPlaceholder")}
             keyboardType="number-pad"
-            className={cn(fieldInputClass, 'font-mono')}
+            className={cn(fieldInputClass, "font-mono")}
           />
         </Field>
 
-        <Field label={t('payments.addRecipient.recipientName')}>
+        <Field label={t("payments.addRecipient.recipientName")}>
           <TextInput
             value={name}
             onChangeText={setName}
-            placeholder={t('payments.addRecipient.namePlaceholder')}
+            placeholder={t("payments.addRecipient.namePlaceholder")}
             autoCapitalize="words"
             autoCorrect={false}
             className={fieldInputClass}
@@ -194,14 +210,20 @@ export default function AddRecipientScreen() {
         </Field>
 
         <View className="flex-row items-start gap-2.5 px-1 pt-1">
-          <Icon as={ShieldCheck} size={16} className="text-muted-foreground mt-px shrink-0" />
+          <Icon
+            as={ShieldCheck}
+            size={16}
+            className="text-muted-foreground mt-px shrink-0"
+          />
           <Text className="text-muted-foreground flex-1 text-[13px] leading-[19px]">
-            {t('payments.addRecipient.securityNote')}
+            {t("payments.addRecipient.securityNote")}
           </Text>
         </View>
 
         {errorKey ? (
-          <Callout variant="negative">{t(`payments.addRecipient.errors.${errorKey}`)}</Callout>
+          <Callout variant="negative">
+            {t(`payments.addRecipient.errors.${errorKey}`)}
+          </Callout>
         ) : null}
       </ScrollView>
 
@@ -214,14 +236,16 @@ export default function AddRecipientScreen() {
           onPress={save}
         >
           <Text>
-            {isPending ? t('payments.addRecipient.saving') : t('payments.addRecipient.save')}
+            {isPending
+              ? t("payments.addRecipient.saving")
+              : t("payments.addRecipient.save")}
           </Text>
         </Button>
       </View>
 
       <BottomSheet open={networkOpen} onClose={() => setNetworkOpen(false)}>
         <Text className="font-display text-foreground mb-1 text-[22px] tracking-[-0.3px]">
-          {t('payments.addRecipient.network')}
+          {t("payments.addRecipient.network")}
         </Text>
         {networks.map((network) => (
           <Pressable
@@ -233,7 +257,9 @@ export default function AddRecipientScreen() {
             }}
             className="border-border flex-row items-center justify-between border-t py-3.5 active:opacity-70"
           >
-            <Text className="text-foreground text-[15px] font-semibold">{network.name}</Text>
+            <Text className="text-foreground text-[15px] font-semibold">
+              {network.name}
+            </Text>
             {network.chainId === selected?.chainId ? (
               <Icon as={Check} size={18} className="text-brand" />
             ) : null}
