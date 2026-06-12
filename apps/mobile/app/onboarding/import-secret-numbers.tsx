@@ -42,7 +42,7 @@ export default function ImportSecretNumbersScreen() {
 
   return (
     <OnboardingStepScreen
-      step={2}
+      step={3}
       title={t('onboarding.importSecretNumbers.title')}
       titleBadge={
         <Badge variant="secondary">

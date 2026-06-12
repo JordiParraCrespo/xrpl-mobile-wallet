@@ -1,10 +1,14 @@
 import {
+  type AccountTxPage,
+  type AccountTxQuery,
   type Balance,
   type Block,
   type ChainAdapter,
   ChainError,
   ChainErrors,
   formatUnits,
+  type LedgerTransaction,
+  type LedgerTxKind,
   type NetworkConfig,
   parseUnits,
   type RegisterTokenParams,
@@ -14,23 +18,27 @@ import {
   type TokenTransferParams,
   type TransferParams,
   type TxContext,
+  type TxDirection,
   type TxResult,
-} from '@flama/chain-core';
-import { secp256k1 } from '@noble/curves/secp256k1';
-import { sha512 } from '@noble/hashes/sha512';
-import { bytesToHex, concatBytes, hexToBytes } from '@noble/hashes/utils';
-import { isValidClassicAddress } from 'ripple-address-codec';
-import { encode, encodeForSigning } from 'ripple-binary-codec';
-import { deriveAddress } from 'ripple-keypairs';
-import { xrplResultToError, xrplRpcError } from './errors';
-import { XrplRpcClient } from './rpc';
+} from "@flama/chain-core";
+import { secp256k1 } from "@noble/curves/secp256k1";
+import { sha512 } from "@noble/hashes/sha512";
+import { bytesToHex, concatBytes, hexToBytes } from "@noble/hashes/utils";
+import { isValidClassicAddress } from "ripple-address-codec";
+import { encode, encodeForSigning } from "ripple-binary-codec";
+import { deriveAddress } from "ripple-keypairs";
+import { xrplResultToError, xrplRpcError } from "./errors";
+import { XrplRpcClient } from "./rpc";
 
 /** 'TXN\0' — prefix used to compute the hash of a signed transaction. */
 const TXN_HASH_PREFIX = new Uint8Array([0x54, 0x58, 0x4e, 0x00]);
-const BASE_FEE_DROPS = '12';
+const BASE_FEE_DROPS = "12";
 const LEDGER_BUFFER = 20;
 const POLL_INTERVAL_MS = 2_000;
 const DEFAULT_RECENT_BLOCKS = 10;
+/** Default and maximum page size for {@link XrplAdapter.getAccountTransactions}. */
+const DEFAULT_TX_LIMIT = 20;
+const MAX_TX_LIMIT = 100;
 /** Seconds between the unix epoch (1970) and the XRPL/Ripple epoch (2000). */
 const RIPPLE_EPOCH_OFFSET = 946_684_800;
 /**
@@ -45,7 +53,7 @@ const XRPL_TOKEN_DECIMALS = 15;
  * account is willing to hold. A large default avoids capping incoming
  * transfers; callers can override it (e.g. "0" to remove the line).
  */
-const DEFAULT_TRUST_LIMIT = '1000000000000000';
+const DEFAULT_TRUST_LIMIT = "1000000000000000";
 
 const sha512half = (data: Uint8Array): Uint8Array => sha512(data).slice(0, 32);
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -70,7 +78,7 @@ function decodeCurrency(currency: string): string | undefined {
     return undefined;
   }
   const bytes = hexToBytes(currency);
-  const ascii = new TextDecoder().decode(bytes).replace(/\0+$/, '').trim();
+  const ascii = new TextDecoder().decode(bytes).replace(/\0+$/, "").trim();
   return ascii || undefined;
 }
 
@@ -141,6 +149,44 @@ interface TxLookupResult {
   meta?: { TransactionResult?: string };
 }
 
+/** The opaque {@link AccountTxQuery.cursor} decodes to an XRPL ledger marker. */
+interface AccountTxMarker {
+  ledger: number;
+  seq: number;
+}
+
+/** A single Payment/TrustSet body as returned inside an `account_tx` entry. */
+interface AccountTxBody {
+  hash?: string;
+  TransactionType?: string;
+  Account?: string;
+  Destination?: string;
+  Amount?: string | IouAmount;
+  Fee?: string;
+  date?: number;
+}
+
+interface AccountTxEntry {
+  /** Older rippled nests the tx under `tx`; newer builds use `tx_json`. */
+  tx?: AccountTxBody;
+  tx_json?: AccountTxBody;
+  /** `tx_json` builds surface the hash and date as siblings of `tx_json`. */
+  hash?: string;
+  date?: number;
+  meta?: {
+    TransactionResult?: string;
+    delivered_amount?: string | IouAmount;
+  };
+  validated?: boolean;
+}
+
+interface AccountTxResult {
+  error?: string;
+  error_message?: string;
+  transactions?: AccountTxEntry[];
+  marker?: AccountTxMarker;
+}
+
 export class XrplAdapter implements ChainAdapter {
   private readonly rpc: XrplRpcClient;
 
@@ -158,17 +204,17 @@ export class XrplAdapter implements ChainAdapter {
 
   async getBalance(address: string): Promise<Balance> {
     const { symbol, decimals } = this.config.nativeCurrency;
-    const result = await this.rpc.request<AccountInfoResult>('account_info', {
+    const result = await this.rpc.request<AccountInfoResult>("account_info", {
       account: address,
-      ledger_index: 'validated',
+      ledger_index: "validated",
     });
-    if (result.error === 'actNotFound') {
+    if (result.error === "actNotFound") {
       // Unfunded accounts do not exist on ledger yet.
-      return { symbol, decimals, amount: 0n, formatted: '0' };
+      return { symbol, decimals, amount: 0n, formatted: "0" };
     }
     if (result.error || !result.account_data) {
       throw xrplRpcError(
-        result.error ?? 'account_info failed',
+        result.error ?? "account_info failed",
         result.error_message,
         this.config.chainId,
       );
@@ -184,8 +230,8 @@ export class XrplAdapter implements ChainAdapter {
 
   async getRecentBlocks(limit = DEFAULT_RECENT_BLOCKS): Promise<Block[]> {
     const count = Math.max(1, Math.floor(limit));
-    const latest = await this.rpc.request<LedgerResult>('ledger', {
-      ledger_index: 'validated',
+    const latest = await this.rpc.request<LedgerResult>("ledger", {
+      ledger_index: "validated",
       transactions: true,
     });
     const newest = latest.ledger_index;
@@ -193,7 +239,7 @@ export class XrplAdapter implements ChainAdapter {
       Array.from({ length: count - 1 }, (_, i) => newest - i - 1)
         .filter((index) => index > 0)
         .map((index) =>
-          this.rpc.request<LedgerResult>('ledger', {
+          this.rpc.request<LedgerResult>("ledger", {
             ledger_index: index,
             transactions: true,
           }),
@@ -202,23 +248,78 @@ export class XrplAdapter implements ChainAdapter {
     return [latest, ...older].map((result) => this.toBlock(result));
   }
 
+  /**
+   * Account history via the XRPL `account_tx` method. Returns newest-first
+   * (`forward: false`) and paginates through the ledger `marker`, which we
+   * serialize into the opaque {@link AccountTxQuery.cursor}.
+   */
+  async getAccountTransactions(
+    address: string,
+    query?: AccountTxQuery,
+  ): Promise<AccountTxPage> {
+    const limit = Math.min(
+      MAX_TX_LIMIT,
+      Math.max(1, Math.floor(query?.limit ?? DEFAULT_TX_LIMIT)),
+    );
+    const params: Record<string, unknown> = {
+      account: address,
+      ledger_index_min: -1,
+      ledger_index_max: -1,
+      binary: false,
+      forward: false,
+      limit,
+    };
+    if (query?.cursor) {
+      params.marker = JSON.parse(query.cursor) as AccountTxMarker;
+    }
+
+    const result = await this.rpc.request<AccountTxResult>(
+      "account_tx",
+      params,
+    );
+    if (result.error === "actNotFound") {
+      // Unfunded accounts have no history yet.
+      return { transactions: [] };
+    }
+    if (result.error) {
+      throw xrplRpcError(
+        result.error,
+        result.error_message,
+        this.config.chainId,
+      );
+    }
+
+    const transactions = (result.transactions ?? [])
+      .map((entry) => this.toLedgerTransaction(entry, address))
+      .filter((tx): tx is LedgerTransaction => tx !== undefined);
+    return {
+      transactions,
+      nextCursor: result.marker ? JSON.stringify(result.marker) : undefined,
+    };
+  }
+
   async transfer(params: TransferParams, signer: Signer): Promise<TxResult> {
     // Native XRP: `Amount` is a string count of drops.
-    return this.sendPayment(params.from, params.to, params.amount.toString(), signer);
+    return this.sendPayment(
+      params.from,
+      params.to,
+      params.amount.toString(),
+      signer,
+    );
   }
 
   async listTokens(address: string): Promise<TokenBalance[]> {
-    const result = await this.rpc.request<AccountLinesResult>('account_lines', {
+    const result = await this.rpc.request<AccountLinesResult>("account_lines", {
       account: address,
-      ledger_index: 'validated',
+      ledger_index: "validated",
     });
-    if (result.error === 'actNotFound') {
+    if (result.error === "actNotFound") {
       // Unfunded accounts hold no trustlines yet.
       return [];
     }
     if (result.error || !result.lines) {
       throw xrplRpcError(
-        result.error ?? 'account_lines failed',
+        result.error ?? "account_lines failed",
         result.error_message,
         this.config.chainId,
       );
@@ -226,36 +327,44 @@ export class XrplAdapter implements ChainAdapter {
     return (
       result.lines
         // A holder's balance is positive; negative lines are the issuer side.
-        .filter((line) => !line.balance.startsWith('-') && line.balance !== '0')
-        .map((line) => this.toTokenBalance(line.currency, line.account, line.balance))
+        .filter((line) => !line.balance.startsWith("-") && line.balance !== "0")
+        .map((line) =>
+          this.toTokenBalance(line.currency, line.account, line.balance),
+        )
     );
   }
 
-  async getTokenBalance(address: string, token: TokenInfo): Promise<TokenBalance> {
-    const result = await this.rpc.request<AccountLinesResult>('account_lines', {
+  async getTokenBalance(
+    address: string,
+    token: TokenInfo,
+  ): Promise<TokenBalance> {
+    const result = await this.rpc.request<AccountLinesResult>("account_lines", {
       account: address,
       peer: token.issuer,
-      ledger_index: 'validated',
+      ledger_index: "validated",
     });
-    const zero = this.toTokenBalance(token.symbol, token.issuer, '0');
-    if (result.error === 'actNotFound') {
+    const zero = this.toTokenBalance(token.symbol, token.issuer, "0");
+    if (result.error === "actNotFound") {
       return zero;
     }
     if (result.error || !result.lines) {
       throw xrplRpcError(
-        result.error ?? 'account_lines failed',
+        result.error ?? "account_lines failed",
         result.error_message,
         this.config.chainId,
       );
     }
     const line = result.lines.find((l) => l.currency === token.symbol);
-    if (!line || line.balance.startsWith('-')) {
+    if (!line || line.balance.startsWith("-")) {
       return zero;
     }
     return this.toTokenBalance(line.currency, line.account, line.balance);
   }
 
-  async transferToken(params: TokenTransferParams, signer: Signer): Promise<TxResult> {
+  async transferToken(
+    params: TokenTransferParams,
+    signer: Signer,
+  ): Promise<TxResult> {
     const amount: IouAmount = {
       currency: params.token.symbol,
       issuer: params.token.issuer,
@@ -270,14 +379,17 @@ export class XrplAdapter implements ChainAdapter {
    * issued currency. `limit` is the maximum the account is willing to hold;
    * passing "0" removes the line once its balance is zero.
    */
-  async registerToken(params: RegisterTokenParams, signer: Signer): Promise<TxResult> {
+  async registerToken(
+    params: RegisterTokenParams,
+    signer: Signer,
+  ): Promise<TxResult> {
     const limit: IouAmount = {
       currency: params.token.symbol,
       issuer: params.token.issuer,
       value: params.limit ?? DEFAULT_TRUST_LIMIT,
     };
     return this.submitTransaction(
-      { TransactionType: 'TrustSet', LimitAmount: limit },
+      { TransactionType: "TrustSet", LimitAmount: limit },
       params.from,
       signer,
     );
@@ -294,7 +406,7 @@ export class XrplAdapter implements ChainAdapter {
     signer: Signer,
   ): Promise<TxResult> {
     return this.submitTransaction(
-      { TransactionType: 'Payment', Destination: to, Amount: amount },
+      { TransactionType: "Payment", Destination: to, Amount: amount },
       from,
       signer,
     );
@@ -311,18 +423,22 @@ export class XrplAdapter implements ChainAdapter {
     from: string,
     signer: Signer,
   ): Promise<TxResult> {
-    const accountInfo = await this.rpc.request<AccountInfoResult>('account_info', {
-      account: from,
-      ledger_index: 'current',
-    });
+    const accountInfo = await this.rpc.request<AccountInfoResult>(
+      "account_info",
+      {
+        account: from,
+        ledger_index: "current",
+      },
+    );
     if (accountInfo.error || !accountInfo.account_data) {
       throw xrplRpcError(
-        accountInfo.error ?? 'account_info failed',
+        accountInfo.error ?? "account_info failed",
         accountInfo.error_message,
         this.config.chainId,
       );
     }
-    const ledger = await this.rpc.request<LedgerCurrentResult>('ledger_current');
+    const ledger =
+      await this.rpc.request<LedgerCurrentResult>("ledger_current");
     const lastLedgerSequence = ledger.ledger_current_index + LEDGER_BUFFER;
 
     const tx = {
@@ -342,7 +458,10 @@ export class XrplAdapter implements ChainAdapter {
    * the on-device wallet, so the exact transaction the user approved is the one
    * that gets signed.
    */
-  async signAndSubmit(tx: Record<string, unknown>, signer: Signer): Promise<TxResult> {
+  async signAndSubmit(
+    tx: Record<string, unknown>,
+    signer: Signer,
+  ): Promise<TxResult> {
     let blob: string;
     try {
       blob = await this.signTransaction({ ...tx }, signer);
@@ -356,19 +475,23 @@ export class XrplAdapter implements ChainAdapter {
       sha512half(concatBytes(TXN_HASH_PREFIX, hexToBytes(blob))),
     ).toUpperCase();
 
-    const submit = await this.rpc.request<SubmitResult>('submit', {
+    const submit = await this.rpc.request<SubmitResult>("submit", {
       tx_blob: blob,
     });
     if (submit.error) {
-      throw xrplRpcError(submit.error, submit.error_message, this.config.chainId);
+      throw xrplRpcError(
+        submit.error,
+        submit.error_message,
+        this.config.chainId,
+      );
     }
-    const engineResult = submit.engine_result ?? '';
+    const engineResult = submit.engine_result ?? "";
     // tes = applied to open ledger; ter = retriable, may still make it in.
-    if (engineResult !== 'tesSUCCESS' && !engineResult.startsWith('ter')) {
+    if (engineResult !== "tesSUCCESS" && !engineResult.startsWith("ter")) {
       return {
         hash,
         success: false,
-        error: `${engineResult}: ${submit.engine_result_message ?? ''}`.trim(),
+        error: `${engineResult}: ${submit.engine_result_message ?? ""}`.trim(),
         code: xrplResultToError(engineResult).code,
         explorerUrl: this.explorerUrl(hash),
       };
@@ -383,18 +506,19 @@ export class XrplAdapter implements ChainAdapter {
    * transaction layer turns this into a canonical tx; nothing here signs.
    */
   async buildContext(account: string): Promise<TxContext> {
-    const info = await this.rpc.request<AccountInfoResult>('account_info', {
+    const info = await this.rpc.request<AccountInfoResult>("account_info", {
       account,
-      ledger_index: 'current',
+      ledger_index: "current",
     });
     if (info.error || !info.account_data) {
       throw xrplRpcError(
-        info.error ?? 'account_info failed',
+        info.error ?? "account_info failed",
         info.error_message,
         this.config.chainId,
       );
     }
-    const ledger = await this.rpc.request<LedgerCurrentResult>('ledger_current');
+    const ledger =
+      await this.rpc.request<LedgerCurrentResult>("ledger_current");
     return {
       account,
       sequence: info.account_data.Sequence,
@@ -407,7 +531,7 @@ export class XrplAdapter implements ChainAdapter {
 
   /** Current reserve requirement in drops: base + per-owned-object increment. */
   private async reserveDrops(ownerCount: number): Promise<bigint> {
-    const server = await this.rpc.request<ServerInfoResult>('server_info');
+    const server = await this.rpc.request<ServerInfoResult>("server_info");
     const ledger = server.info?.validated_ledger;
     const toDrops = (xrp: number) => BigInt(Math.round(xrp * 1_000_000));
     // Fall back to current testnet defaults if server_info omits the figures.
@@ -427,17 +551,17 @@ export class XrplAdapter implements ChainAdapter {
     let response: Response;
     try {
       response = await fetch(faucetUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ destination: address }),
       });
     } catch (cause) {
       throw new ChainError(ChainErrors.NETWORK, {
         chainId,
-        detail: 'Faucet request failed',
+        detail: "Faucet request failed",
         cause,
       });
     }
@@ -449,8 +573,12 @@ export class XrplAdapter implements ChainAdapter {
     }
   }
 
-  private toTokenBalance(currency: string, issuer: string, balance: string): TokenBalance {
-    const value = balance.startsWith('-') ? balance.slice(1) : balance;
+  private toTokenBalance(
+    currency: string,
+    issuer: string,
+    balance: string,
+  ): TokenBalance {
+    const value = balance.startsWith("-") ? balance.slice(1) : balance;
     const amount = parseUnits(value, XRPL_TOKEN_DECIMALS);
     return {
       symbol: currency,
@@ -472,59 +600,149 @@ export class XrplAdapter implements ChainAdapter {
    * prefix-included payload bytes directly (no pre-hash) and uses the raw
    * 64-byte signature.
    */
-  private async signTransaction(tx: Record<string, unknown>, signer: Signer): Promise<string> {
+  private async signTransaction(
+    tx: Record<string, unknown>,
+    signer: Signer,
+  ): Promise<string> {
     tx.SigningPubKey = toXrplPublicKeyHex(signer.publicKey);
     const payload = hexToBytes(encodeForSigning(tx));
-    if (signer.curve === 'ed25519') {
+    if (signer.curve === "ed25519") {
       if (!signer.signMessage) {
         throw new ChainError(ChainErrors.SIGNING_FAILED, {
           chainId: this.config.chainId,
-          detail: 'ed25519 signer does not implement signMessage',
+          detail: "ed25519 signer does not implement signMessage",
         });
       }
       const { signature } = await signer.signMessage(payload);
       tx.TxnSignature = bytesToHex(signature).toUpperCase();
     } else {
       const { signature } = await signer.signDigest(sha512half(payload));
-      tx.TxnSignature = secp256k1.Signature.fromCompact(signature).toDERHex().toUpperCase();
+      tx.TxnSignature = secp256k1.Signature.fromCompact(signature)
+        .toDERHex()
+        .toUpperCase();
     }
     return encode(tx);
   }
 
-  private async waitForValidation(hash: string, lastLedgerSequence: number): Promise<TxResult> {
+  private async waitForValidation(
+    hash: string,
+    lastLedgerSequence: number,
+  ): Promise<TxResult> {
     const explorerUrl = this.explorerUrl(hash);
     for (;;) {
       await sleep(POLL_INTERVAL_MS);
-      const tx = await this.rpc.request<TxLookupResult>('tx', {
+      const tx = await this.rpc.request<TxLookupResult>("tx", {
         transaction: hash,
       });
       if (tx.validated) {
         const code = tx.meta?.TransactionResult;
-        if (code === 'tesSUCCESS') {
+        if (code === "tesSUCCESS") {
           return { hash, success: true, explorerUrl };
         }
         return {
           hash,
           success: false,
           error: code,
-          code: (code ? xrplResultToError(code) : ChainErrors.TRANSACTION_FAILED).code,
+          code: (code
+            ? xrplResultToError(code)
+            : ChainErrors.TRANSACTION_FAILED
+          ).code,
           explorerUrl,
         };
       }
-      if (tx.error && tx.error !== 'txnNotFound') {
+      if (tx.error && tx.error !== "txnNotFound") {
         throw xrplRpcError(tx.error, tx.error_message, this.config.chainId);
       }
-      const ledger = await this.rpc.request<LedgerCurrentResult>('ledger_current');
+      const ledger =
+        await this.rpc.request<LedgerCurrentResult>("ledger_current");
       if (ledger.ledger_current_index > lastLedgerSequence) {
         return {
           hash,
           success: false,
-          error: 'Transaction expired without being validated',
+          error: "Transaction expired without being validated",
           code: ChainErrors.TRANSACTION_EXPIRED.code,
           explorerUrl,
         };
       }
     }
+  }
+
+  /**
+   * Maps a single `account_tx` entry to the normalized {@link LedgerTransaction}.
+   * Returns undefined for entries with no usable transaction body so the caller
+   * can filter them out.
+   */
+  private toLedgerTransaction(
+    entry: AccountTxEntry,
+    address: string,
+  ): LedgerTransaction | undefined {
+    // Older rippled returns `tx`; newer builds nest the body under `tx_json`
+    // and surface hash/date as siblings.
+    const tx = entry.tx ?? entry.tx_json;
+    const hash = tx?.hash ?? entry.hash;
+    if (!tx || !hash) {
+      return undefined;
+    }
+    const date = tx.date ?? entry.date ?? 0;
+    const result = entry.meta?.TransactionResult;
+    const nativeSymbol = this.config.nativeCurrency.symbol;
+
+    let kind: LedgerTxKind;
+    if (tx.TransactionType === "Payment") {
+      // A string `Amount` is drops (native); an object is an issued currency.
+      kind = typeof tx.Amount === "string" ? "payment" : "token-payment";
+    } else if (tx.TransactionType === "TrustSet") {
+      kind = "trustset";
+    } else {
+      kind = "other";
+    }
+
+    let direction: TxDirection;
+    if (tx.Account === address && tx.Destination === address) {
+      direction = "self";
+    } else if (tx.Account === address) {
+      direction = "out";
+    } else {
+      direction = "in";
+    }
+
+    let amount = 0n;
+    let symbol = nativeSymbol;
+    if (kind === "payment") {
+      // Prefer the actually delivered amount (partial payments deliver less).
+      const delivered = entry.meta?.delivered_amount;
+      const drops =
+        typeof delivered === "string" ? delivered : (tx.Amount as string);
+      amount = BigInt(drops);
+    } else if (kind === "token-payment") {
+      const iou = (
+        typeof entry.meta?.delivered_amount === "object"
+          ? entry.meta.delivered_amount
+          : tx.Amount
+      ) as IouAmount;
+      symbol = iou.currency;
+      amount = parseUnits(iou.value, XRPL_TOKEN_DECIMALS);
+    }
+
+    let counterparty: string | undefined;
+    if (direction === "out") {
+      counterparty = tx.Destination;
+    } else if (direction === "in") {
+      counterparty = tx.Account;
+    }
+
+    return {
+      hash,
+      timestamp: date + RIPPLE_EPOCH_OFFSET,
+      kind,
+      direction,
+      success: result === "tesSUCCESS",
+      amount,
+      symbol,
+      counterparty,
+      fee: tx.Fee !== undefined ? BigInt(tx.Fee) : undefined,
+      explorerUrl: this.explorerUrl(hash),
+    };
   }
 
   private toBlock(result: LedgerResult): Block {
@@ -537,6 +755,8 @@ export class XrplAdapter implements ChainAdapter {
   }
 
   private explorerUrl(hash: string): string | undefined {
-    return this.config.explorerUrl ? `${this.config.explorerUrl}/transactions/${hash}` : undefined;
+    return this.config.explorerUrl
+      ? `${this.config.explorerUrl}/transactions/${hash}`
+      : undefined;
   }
 }

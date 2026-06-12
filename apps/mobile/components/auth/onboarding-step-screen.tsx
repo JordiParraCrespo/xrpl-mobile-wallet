@@ -11,6 +11,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 type OnboardingStepScreenProps = {
   /** 1-based position in the create-wallet flow's step dots. */
   step: number;
+  /** Total step-dot count for this path (defaults to ScreenHeader's 3). */
+  totalSteps?: number;
   title: string;
   subtitle: string;
   /** Optional hero icon rendered in a brand-tinted disc above the title. */
@@ -28,6 +30,7 @@ type OnboardingStepScreenProps = {
  */
 export function OnboardingStepScreen({
   step,
+  totalSteps,
   title,
   subtitle,
   icon,
@@ -41,22 +44,29 @@ export function OnboardingStepScreen({
   return (
     <View className="flex-1 bg-background">
       <View style={{ paddingTop: insets.top + 8 }} className="px-6">
-        <ScreenHeader step={step} onBack={() => router.back()} />
+        <ScreenHeader
+          step={step}
+          total={totalSteps}
+          onBack={() => router.back()}
+        />
       </View>
 
       <ScrollView className="flex-1" contentContainerClassName="px-6 pb-2 pt-3">
-        {icon ? (
-          <View className="mb-5 h-14 w-14 items-center justify-center rounded-[18px] bg-brand-soft">
-            <Icon as={icon} size={28} className="text-brand" />
-          </View>
-        ) : null}
+        <View className="flex flex-col gap-4">
+          {icon ? (
+            <View className="h-14 w-14 items-center justify-center rounded-[18px] bg-brand-soft">
+              <Icon as={icon} size={28} className="text-brand" />
+            </View>
+          ) : null}
 
-        <View className="flex-row flex-wrap items-center gap-2.5">
-          <Text className="font-display text-[30px] leading-[34px] tracking-[-0.5px] text-foreground">
-            {title}
-          </Text>
-          {titleBadge}
+          <View className="flex-row flex-wrap items-center gap-2.5">
+            <Text className="font-display text-[30px] leading-[34px] tracking-[-0.5px] text-foreground">
+              {title}
+            </Text>
+            {titleBadge}
+          </View>
         </View>
+
         <Text className="mt-2.5 text-[15px] leading-6 text-muted-foreground">
           {subtitle}
         </Text>

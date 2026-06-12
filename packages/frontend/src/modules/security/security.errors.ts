@@ -33,4 +33,8 @@ export const SecurityErrors = {
     code: 'SECURITY_CLIENT_008',
     message: 'Biometric authentication was not confirmed',
   },
+  INVALID_AUTO_LOCK: {
+    code: 'SECURITY_CLIENT_009',
+    message: 'Auto-lock timeout must be zero or positive',
+  },
 } as const satisfies Record<string, ErrorDefinition>;

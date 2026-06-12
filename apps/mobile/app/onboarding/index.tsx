@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { ImageBackground, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { Routes } from '../../lib/routes';
+import { buildRoute, Routes } from '../../lib/routes';
 
 // The immersive entry screen (onboarding/screens-immersive.jsx — Welcome, photo
 // variant): a full-bleed market photo under a cinematic veil, the Drops
@@ -70,7 +70,7 @@ export default function WelcomeScreen() {
               variant="glass"
               size="lg"
               className="w-full"
-              onPress={() => router.push(Routes.OnboardingImport)}
+              onPress={() => router.push(buildRoute.onboardingBackupInfo('import'))}
             >
               <Text>{t('onboarding.welcome.import')}</Text>
             </Button>

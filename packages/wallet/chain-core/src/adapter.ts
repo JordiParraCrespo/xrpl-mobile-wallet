@@ -1,5 +1,7 @@
 import type { Signer } from './signer';
 import type {
+  AccountTxPage,
+  AccountTxQuery,
   Balance,
   Block,
   NetworkConfig,
@@ -36,4 +38,11 @@ export interface ChainAdapter {
    * Optional: chains that require no on-chain registration omit it.
    */
   registerToken?(params: RegisterTokenParams, signer: Signer): Promise<TxResult>;
+  /**
+   * Past transactions for an account, newest first, with cursor pagination.
+   * Optional: requires an indexed history source (XRPL `account_tx`; EVM a
+   * block-explorer API via `config.explorerApiUrl`). Adapters without one omit
+   * it, and callers treat its absence as "history unavailable on this chain".
+   */
+  getAccountTransactions?(address: string, query?: AccountTxQuery): Promise<AccountTxPage>;
 }

@@ -9,13 +9,9 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { useFlamaApp } from './context';
+import { invalidateAfterTransfer, tokensKeys } from './query-keys';
 
-export const tokensKeys = {
-  all: ['tokens'] as const,
-  list: (chainId: string) => ['tokens', 'list', chainId] as const,
-  balance: (chainId: string, issuer: string, symbol: string) =>
-    ['tokens', 'balance', chainId, issuer, symbol] as const,
-};
+export { tokensKeys } from './query-keys';
 
 /** Non-native tokens (XRPL trustlines / ERC-20s) held on `chainId`. */
 export function useTokens(
@@ -65,7 +61,8 @@ export function useSendToken(
     mutationFn: ({ chainId, to, token, amount }: SendTokenInput) =>
       app.tokens.send(chainId, to, token, amount),
     onSuccess: (...args) => {
-      queryClient.invalidateQueries({ queryKey: tokensKeys.all });
+      // Token sends move the token balance, cost a native fee and add history.
+      invalidateAfterTransfer(queryClient);
       options?.onSuccess?.(...args);
     },
     ...options,
@@ -90,7 +87,8 @@ export function useRegisterToken(
     mutationFn: ({ chainId, token, limit }: RegisterTokenInput) =>
       app.tokens.register(chainId, token, limit),
     onSuccess: (...args) => {
-      queryClient.invalidateQueries({ queryKey: tokensKeys.all });
+      // A TrustSet raises the XRP reserve and costs a fee, beyond the token list.
+      invalidateAfterTransfer(queryClient);
       options?.onSuccess?.(...args);
     },
     ...options,

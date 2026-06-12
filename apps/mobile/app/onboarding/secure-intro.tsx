@@ -4,7 +4,7 @@ import { Download, EyeOff, FileText, ShieldCheck } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { OnboardingStepScreen } from '../../components/auth/onboarding-step-screen';
-import { Routes } from '../../lib/routes';
+import { buildRoute } from '../../lib/routes';
 
 const POINTS = [
   { key: 'masterKey', icon: FileText },
@@ -19,12 +19,13 @@ export default function SecureIntroScreen() {
   return (
     <OnboardingStepScreen
       step={1}
+      totalSteps={4}
       icon={ShieldCheck}
       title={t('onboarding.secureIntro.title')}
       subtitle={t('onboarding.secureIntro.subtitle')}
       cta={{
         label: t('onboarding.secureIntro.cta'),
-        onPress: () => router.push(Routes.OnboardingRevealPhrase),
+        onPress: () => router.push(buildRoute.onboardingBackupInfo('create')),
       }}
     >
       <View className="mt-5 gap-3">
