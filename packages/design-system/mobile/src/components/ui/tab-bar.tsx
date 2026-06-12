@@ -5,6 +5,7 @@ import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
+  withSequence,
   withTiming,
 } from "react-native-reanimated";
 import { cn } from "../../lib/utils";
@@ -35,6 +36,45 @@ type TabBarProps = Omit<React.ComponentProps<typeof View>, "children"> & {
 
 // Matches the container's gap-0.5 between tab items.
 const ITEM_GAP = 2;
+
+/** Tab icon that pops gently (a quick scale pulse) when it becomes active. */
+function TabIcon({
+  icon,
+  active,
+  className,
+}: {
+  icon: LucideIcon;
+  active: boolean;
+  className: string;
+}) {
+  const scale = useSharedValue(1);
+  const wasActive = React.useRef(active);
+
+  React.useEffect(() => {
+    if (active && !wasActive.current) {
+      scale.value = withSequence(
+        withTiming(1.18, { duration: 110, easing: Easing.out(Easing.quad) }),
+        withTiming(1, { duration: 140, easing: Easing.out(Easing.quad) }),
+      );
+    }
+    wasActive.current = active;
+  }, [active, scale]);
+
+  const style = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <Animated.View style={style}>
+      <Icon
+        as={icon}
+        size={22}
+        strokeWidth={active ? 2.4 : 2}
+        className={className}
+      />
+    </Animated.View>
+  );
+}
 
 function TabBar({
   items,
@@ -115,10 +155,9 @@ function TabBar({
               onPress={() => onChange(item.key)}
               className="flex-1 items-center gap-0.5 rounded-[22px] py-2 active:scale-[0.97]"
             >
-              <Icon
-                as={item.icon}
-                size={22}
-                strokeWidth={active ? 2.4 : 2}
+              <TabIcon
+                icon={item.icon}
+                active={active}
                 className={
                   active
                     ? glass
