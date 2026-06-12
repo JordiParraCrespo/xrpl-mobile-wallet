@@ -419,5 +419,54 @@
     },
     "notify": "Notify me when it's ready",
     "notified": "We'll let you know"
+  },
+  "payments": {
+    "title": "Payments",
+    "search": "Search",
+    "openProfile": "Open profile",
+    "newPayment": "New payment",
+    "you": "You",
+    "send": "Send",
+    "request": "Request",
+    "split": "Split",
+    "people": "People",
+    "new": "New",
+    "recent": "Recent",
+    "seeAll": "See all",
+    "emptyTitle": "No payments yet",
+    "emptyDescription": "Money you send and receive will show up here.",
+    "relationship": {
+      "in": "Sent you",
+      "out": "You sent",
+      "self": "You moved"
+    },
+    "unknown": "Unknown",
+    "addRecipient": {
+      "back": "Back",
+      "title": "Add recipient",
+      "network": "Network",
+      "address": "Address",
+      "addressPlaceholder": "r… or 0x…",
+      "paste": "Paste",
+      "destinationTag": "Destination tag (optional)",
+      "destinationTagPlaceholder": "e.g. 584213",
+      "recipientName": "Recipient name",
+      "namePlaceholder": "Name to save",
+      "securityNote": "Double-check the address. XRPL transactions can't be reversed once sent.",
+      "save": "Save recipient",
+      "saving": "Saving…",
+      "errors": {
+        "invalidName": "Enter a name with at least 2 characters.",
+        "invalidAddress": "Enter a valid recipient address.",
+        "duplicate": "A contact with this address already exists.",
+        "generic": "Couldn't save the recipient. Try again."
+      },
+      "networkSubtitle": "Where this recipient's address lives. It decides the address format.",
+      "networkHint": {
+        "xrp": "Classic r… addresses",
+        "evm": "0x… addresses"
+      },
+      "done": "Done"
+    }
   }
 }

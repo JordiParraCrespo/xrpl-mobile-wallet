@@ -1,6 +1,8 @@
 import 'reflect-metadata';
 import type { ChainAdapter } from '@flama/chain-core';
 import { Container, type ContainerModule } from 'inversify';
+import type { AddressBookService } from '../modules/address-book';
+import { AddressBookModule } from '../modules/address-book';
 import type { AuthService } from '../modules/auth';
 import { AuthModule } from '../modules/auth';
 import type { IAuthClient } from '../modules/auth/auth.client';
@@ -61,6 +63,7 @@ export class FlamaApp {
     container.load(ProfileModule);
     container.load(WalletModule);
     container.load(ExplorerModule);
+    container.load(AddressBookModule);
     container.load(TokensModule);
     container.load(createPricesModule(config.priceProvider));
     container.load(createSecurityModule(config.biometricProvider));
@@ -93,6 +96,10 @@ export class FlamaApp {
 
   get explorer(): ExplorerService {
     return this.container.get(TOKENS.ExplorerService);
+  }
+
+  get addressBook(): AddressBookService {
+    return this.container.get(TOKENS.AddressBookService);
   }
 
   get tokens(): TokensService {
