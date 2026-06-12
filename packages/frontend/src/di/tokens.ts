@@ -6,6 +6,8 @@ export const TOKENS = {
   AuthService: Symbol.for('AuthService'),
   UserRepository: Symbol.for('UserRepository'),
   UsersService: Symbol.for('UsersService'),
+  ProfileStore: Symbol.for('ProfileStore'),
+  ProfileService: Symbol.for('ProfileService'),
   KeyringManager: Symbol.for('KeyringManager'),
   ChainRegistry: Symbol.for('ChainRegistry'),
   WalletStore: Symbol.for('WalletStore'),

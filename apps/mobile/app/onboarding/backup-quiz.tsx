@@ -62,8 +62,8 @@ export default function BackupQuizScreen() {
 
   return (
     <OnboardingStepScreen
-      step={4}
-      totalSteps={4}
+      step={5}
+      totalSteps={5}
       title={t('onboarding.backupQuiz.title')}
       subtitle={t('onboarding.backupQuiz.subtitle')}
       cta={{

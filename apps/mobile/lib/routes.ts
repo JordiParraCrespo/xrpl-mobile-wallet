@@ -16,6 +16,7 @@ export enum Routes {
 
   // Onboarding (pre-wallet flow)
   Onboarding = '/onboarding',
+  OnboardingName = '/onboarding/name',
   OnboardingBackupInfo = '/onboarding/backup-info',
   OnboardingSetPasscode = '/onboarding/set-passcode',
   OnboardingSecureIntro = '/onboarding/secure-intro',
@@ -26,6 +27,7 @@ export enum Routes {
   OnboardingImportSeed = '/onboarding/import-seed',
   OnboardingImportSecretNumbers = '/onboarding/import-secret-numbers',
   OnboardingSuccess = '/onboarding/success',
+  OnboardingBiometrics = '/onboarding/biometrics',
   OnboardingNotifications = '/onboarding/notifications',
 
   // Hub (tabs)
@@ -73,6 +75,10 @@ export const buildRoute = {
     pathname: Routes.OnboardingSuccess,
     params: { via },
   }),
+  onboardingName: (next: OnboardingPath): Href => ({
+    pathname: Routes.OnboardingName,
+    params: { next },
+  }),
   onboardingBackupInfo: (next: OnboardingPath): Href => ({
     pathname: Routes.OnboardingBackupInfo,
     params: { next },
@@ -81,8 +87,8 @@ export const buildRoute = {
     pathname: Routes.OnboardingSetPasscode,
     params: { next },
   }),
-  onboardingNotifications: (next: OnboardingPath): Href => ({
-    pathname: Routes.OnboardingNotifications,
+  onboardingBiometrics: (next: OnboardingPath): Href => ({
+    pathname: Routes.OnboardingBiometrics,
     params: { next },
   }),
 } as const;
