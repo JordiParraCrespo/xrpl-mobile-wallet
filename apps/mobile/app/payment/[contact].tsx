@@ -60,7 +60,10 @@ export default function PaymentChatScreen() {
       <PaymentComposer
         onSplit={() => router.push(Routes.Swap)}
         onRequest={() => router.push(Routes.Receive)}
-        onSend={() => router.push(Routes.Send)}
+        // Carry this thread's recipient into the Send flow. `contact` is the
+        // address-book contact id, so the flow resolves the real saved address
+        // (chain + destination tag) from the domain; name/handle pre-fill the UI.
+        onSend={() => router.push(buildRoute.send({ contactId: slug, name, handle }))}
       />
     </View>
   );
