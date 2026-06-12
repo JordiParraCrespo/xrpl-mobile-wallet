@@ -17,4 +17,8 @@ export const TokensErrors = {
     code: 'TOKENS_CLIENT_004',
     message: 'This chain does not require token registration',
   },
+  WALLET_LOCKED: {
+    code: 'TOKENS_CLIENT_005',
+    message: 'The wallet is locked',
+  },
 } as const satisfies Record<string, ErrorDefinition>;

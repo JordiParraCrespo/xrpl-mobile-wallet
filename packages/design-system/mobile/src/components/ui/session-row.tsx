@@ -15,8 +15,8 @@ const sessionRowVariants = cva(
   {
     variants: {
       active: {
-        true: "bg-card border-border",
-        false: "border-transparent active:bg-muted",
+        true: "bg-chat-card border-chat-border",
+        false: "border-transparent active:opacity-70",
       },
     },
     defaultVariants: {
@@ -48,23 +48,21 @@ function SessionRow({
       className={cn(sessionRowVariants({ active }), className)}
       {...props}
     >
-      <View className="bg-secondary h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full">
-        <Icon as={History} size={16} className="text-muted-foreground" />
+      <View className="bg-chat-chip h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full">
+        <Icon as={History} size={16} className="text-chat-dim" />
       </View>
       <View className="min-w-0 flex-1 gap-0.5">
         <Text
           numberOfLines={1}
-          className="text-foreground text-[14.5px] font-semibold"
+          className="text-chat-fg text-[14.5px] font-semibold"
         >
           {title}
         </Text>
-        <Text numberOfLines={1} className="text-muted-foreground text-[12.5px]">
+        <Text numberOfLines={1} className="text-chat-faint text-[12.5px]">
           {preview}
         </Text>
       </View>
-      <Text className="text-muted-foreground shrink-0 text-[11.5px]">
-        {time}
-      </Text>
+      <Text className="text-chat-faint shrink-0 text-[11.5px]">{time}</Text>
     </Pressable>
   );
 }

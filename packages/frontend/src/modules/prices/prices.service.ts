@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { TOKENS } from '../../di/tokens';
 import { AppError } from '../core/errors';
-import type { IPriceProvider } from './price.provider';
+import type { IPriceProvider, MarketRate } from './price.provider';
 import { PricesErrors } from './prices.errors';
 import type { PricesStore } from './prices.state';
 
@@ -37,6 +37,33 @@ export class PricesService {
       rates: { ...state.rates, [key]: { rate, updatedAt: Date.now() } },
     }));
     return rate;
+  }
+
+  /**
+   * Fetches a live market snapshot (price + 24h change + sparkline) for several
+   * assets in one request, caches each spot price in the store (so {@link toFiat}
+   * keeps working) and returns the snapshots. Rejects with RATE_UNAVAILABLE on
+   * provider error.
+   */
+  async getMarkets(symbols: string[], currency = DEFAULT_CURRENCY): Promise<MarketRate[]> {
+    let markets: MarketRate[];
+    try {
+      markets = await this.provider.getMarkets(symbols, currency);
+    } catch {
+      throw new AppError(PricesErrors.RATE_UNAVAILABLE);
+    }
+    const updatedAt = Date.now();
+    this.store.setState((state) => {
+      const rates = { ...state.rates };
+      for (const market of markets) {
+        rates[rateKey(market.symbol, currency)] = {
+          rate: market.price,
+          updatedAt,
+        };
+      }
+      return { rates };
+    });
+    return markets;
   }
 
   /** Synchronous read of the last cached rate, or null if none is cached. */

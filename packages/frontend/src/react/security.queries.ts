@@ -40,13 +40,13 @@ export function useSetupPasscode(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: (passcode: string) => app.security.setupPasscode(passcode),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: walletKeys.all });
       queryClient.invalidateQueries({ queryKey: securityKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -55,13 +55,13 @@ export function useUnlock(options?: Omit<UseMutationOptions<void, Error, string>
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: (passcode: string) => app.security.unlock(passcode),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: walletKeys.all });
       queryClient.invalidateQueries({ queryKey: securityKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -72,13 +72,13 @@ export function useUnlockWithBiometrics(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: () => app.security.unlockWithBiometrics(),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: walletKeys.all });
       queryClient.invalidateQueries({ queryKey: securityKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -88,8 +88,8 @@ export function useChangePasscode(
   const app = useFlamaApp();
 
   return useMutation({
-    mutationFn: ({ current, next }) => app.security.changePasscode(current, next),
     ...options,
+    mutationFn: ({ current, next }) => app.security.changePasscode(current, next),
   });
 }
 
@@ -109,8 +109,8 @@ export function useEnableBiometrics(
   const app = useFlamaApp();
 
   return useMutation({
-    mutationFn: () => app.security.enableBiometrics(),
     ...options,
+    mutationFn: () => app.security.enableBiometrics(),
   });
 }
 
@@ -120,8 +120,8 @@ export function useDisableBiometrics(
   const app = useFlamaApp();
 
   return useMutation({
-    mutationFn: () => app.security.disableBiometrics(),
     ...options,
+    mutationFn: () => app.security.disableBiometrics(),
   });
 }
 
@@ -132,12 +132,12 @@ export function useSetAutoLockTimeout(
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: (ms: number) => app.security.setAutoLockTimeout(ms),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: securityKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }
 
@@ -146,6 +146,7 @@ export function useWipeWallet(options?: Omit<UseMutationOptions<void, Error, voi
   const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     // The whole teardown lives in the mutation: delete the vault, then settle
     // the wallet store to 'no_wallet' before onSuccess fires — otherwise a
     // navigation on success races the stale 'ready' wallet state back to Home.
@@ -158,6 +159,5 @@ export function useWipeWallet(options?: Omit<UseMutationOptions<void, Error, voi
       queryClient.invalidateQueries({ queryKey: securityKeys.all });
       options?.onSuccess?.(...args);
     },
-    ...options,
   });
 }

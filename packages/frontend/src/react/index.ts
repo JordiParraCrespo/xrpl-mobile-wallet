@@ -1,3 +1,21 @@
+export type {
+  AddContactInput,
+  Contact,
+  ContactKind,
+  PaymentParty,
+  PaymentPerson,
+  PaymentsFeed,
+  RecentPayment,
+} from '../modules/address-book';
+export {
+  addressBookKeys,
+  type UsePaymentsFeedResult,
+  useAddContact,
+  useAddressBookRestore,
+  useContacts,
+  usePaymentsFeed,
+  useRemoveContact,
+} from './address-book.queries';
 export {
   authKeys,
   useChangePassword,
@@ -16,13 +34,19 @@ export {
   useRecentBlocks,
 } from './explorer.queries';
 export {
+  useAddressBookState,
   useAuthState,
   useProfileState,
   useSecurityState,
   useSettingsState,
   useWalletState,
 } from './hooks';
-export { pricesKeys, useExchangeRate } from './prices.queries';
+export {
+  notificationsKeys,
+  useMarkAllNotificationsRead,
+  useNotifications,
+} from './notifications.queries';
+export { pricesKeys, useExchangeRate, useMarkets } from './prices.queries';
 export {
   profileKeys,
   useProfileRestore,
@@ -69,6 +93,7 @@ export {
 export {
   type SendTransactionInput,
   useChainBalance,
+  useChainBalances,
   useCreateWallet,
   useImportFamilySeed,
   useImportSecretNumbers,

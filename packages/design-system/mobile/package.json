@@ -16,6 +16,7 @@
     "./asset-icon": "./src/components/ui/asset-icon.tsx",
     "./assistant-avatar": "./src/components/ui/assistant-avatar.tsx",
     "./avatar": "./src/components/ui/avatar.tsx",
+    "./avatar-tile": "./src/components/ui/avatar-tile.tsx",
     "./badge": "./src/components/ui/badge.tsx",
     "./bottom-sheet": "./src/components/ui/bottom-sheet.tsx",
     "./button": "./src/components/ui/button.tsx",
@@ -31,6 +32,7 @@
     "./dialog": "./src/components/ui/dialog.tsx",
     "./dropdown-menu": "./src/components/ui/dropdown-menu.tsx",
     "./feature-row": "./src/components/ui/feature-row.tsx",
+    "./flow-header": "./src/components/ui/flow-header.tsx",
     "./glass-panel": "./src/components/ui/glass-panel.tsx",
     "./hover-card": "./src/components/ui/hover-card.tsx",
     "./icon": "./src/components/ui/icon.tsx",
@@ -49,7 +51,6 @@
     "./notification-row": "./src/components/ui/notification-row.tsx",
     "./passcode-dots": "./src/components/ui/passcode-dots.tsx",
     "./passcode-keypad": "./src/components/ui/passcode-keypad.tsx",
-    "./pin-keypad": "./src/components/ui/pin-keypad.tsx",
     "./popover": "./src/components/ui/popover.tsx",
     "./price-change": "./src/components/ui/price-change.tsx",
     "./progress": "./src/components/ui/progress.tsx",
@@ -90,6 +91,7 @@
     "tailwind-merge": "^3.5.0"
   },
   "peerDependencies": {
+    "@gorhom/bottom-sheet": ">=5.2.0",
     "@rn-primitives/accordion": "1.4.0",
     "@rn-primitives/alert-dialog": "1.4.0",
     "@rn-primitives/aspect-ratio": "1.4.0",
@@ -127,6 +129,7 @@
     "react-native-worklets": ">=0.5.0"
   },
   "devDependencies": {
+    "@gorhom/bottom-sheet": "5.2.14",
     "@rn-primitives/accordion": "1.4.0",
     "@rn-primitives/alert-dialog": "1.4.0",
     "@rn-primitives/aspect-ratio": "1.4.0",

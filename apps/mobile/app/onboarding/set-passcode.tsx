@@ -1,6 +1,6 @@
 import { Icon } from '@flama/design-system-mobile/icon';
 import { PasscodeDots } from '@flama/design-system-mobile/passcode-dots';
-import { PinKeypad } from '@flama/design-system-mobile/pin-keypad';
+import { PasscodeKeypad } from '@flama/design-system-mobile/passcode-keypad';
 import { ScreenHeader } from '@flama/design-system-mobile/screen-header';
 import { Text } from '@flama/design-system-mobile/text';
 import { cn } from '@flama/design-system-mobile/utils';
@@ -179,7 +179,12 @@ export default function SetPasscodeScreen() {
       </View>
 
       <View className="px-6" style={{ paddingBottom: insets.bottom + 16 }}>
-        <PinKeypad onKey={pressKey} onBackspace={pressBackspace} disabled={locked} />
+        <PasscodeKeypad
+          variant="light"
+          onDigit={pressKey}
+          onBackspace={pressBackspace}
+          disabled={locked}
+        />
       </View>
     </View>
   );
