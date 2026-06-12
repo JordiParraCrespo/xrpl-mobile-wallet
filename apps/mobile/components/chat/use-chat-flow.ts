@@ -8,11 +8,6 @@ import type { ChatPayload, Msg, Session } from './types';
 const RATE = 0.6184;
 const XRPL_BAL = 1204.51;
 
-/** Matches an XRPL classic r-address anywhere in a message. */
-const XRPL_ADDRESS = /\br[1-9A-HJ-NP-Za-km-z]{24,34}\b/;
-/** "raHZ…w9r" — a compact, readable label for a raw address. */
-const shortAddress = (a: string): string => `${a.slice(0, 6)}…${a.slice(-4)}`;
-
 /** Safe text accessor for the live session title/preview sync. */
 function textOf(m: Msg): string | undefined {
   return 'text' in m ? m.text : undefined;
@@ -329,6 +324,7 @@ export function useChatFlow() {
 
   const routeUser = (text: string) => {
     const lc = text.toLowerCase();
+    // Custom amount typed into a seeded/demo scripted card.
     if (pendingRef.current === 'amount') {
       const n = Number.parseFloat(text.replace(/[^0-9.]/g, ''));
       pendingRef.current = null;
@@ -336,34 +332,7 @@ export function useChatFlow() {
       afterAmountChosen();
       return;
     }
-    if (/balance|how much do i|what.*have/.test(lc)) {
-      void runAgent(text);
-      return;
-    }
-    // Latest block / recent ledgers — answered by the agent's get_recent_blocks.
-    if (/block|ledger|latest|validated/.test(lc)) {
-      void runAgent(text);
-      return;
-    }
-    // A real XRPL payment: the message contains an r-address. With an amount we
-    // hand it to the agent (prepare → approval card → submit on-device). With
-    // just the address, capture it as the recipient and ask for the amount.
-    const inlineAddress = text.match(XRPL_ADDRESS)?.[0];
-    if (inlineAddress) {
-      const inlineAmount = text.match(/([\d][\d,]*(?:\.\d+)?)\s*xrp/i)?.[1];
-      if (inlineAmount) {
-        void runAgent(
-          `Send ${inlineAmount.replace(/,/g, '')} XRP to ${inlineAddress}. Go ahead and submit it.`,
-        );
-        return;
-      }
-      flowRef.current = {
-        name: 'send',
-        recipient: shortAddress(inlineAddress),
-        recipientAddress: inlineAddress,
-      };
-      return think(askAmount);
-    }
+    // Swap stays scripted for now (the agent has no swap tool yet).
     if (/swap|convert|exchange/.test(lc)) {
       flowRef.current = { name: 'swap' };
       return think(() => {
@@ -381,34 +350,10 @@ export function useChatFlow() {
         });
       });
     }
-    if (/recipient|address|contact/.test(lc))
-      return think(() =>
-        add({
-          role: 'bot',
-          kind: 'text',
-          text: 'Share the address (r… or 0x…) or scan a QR and I’ll save them as a recipient.',
-        }),
-      );
-    const num = text.match(/([\d][\d,]*(?:\.\d+)?)\s*xrp/i);
-    const nameM = text.match(/to\s+([A-Z][a-z]+)/);
-    if (nameM) {
-      // A named contact without an on-chain address yet (e.g. "Send to Maria").
-      flowRef.current = { name: 'send', recipient: nameM[1] };
-      if (num) {
-        flowRef.current.amount = Number.parseFloat(num[1].replace(/,/g, ''));
-        return think(askNetwork);
-      }
-      return think(askAmount);
-    }
-    // A send with no recipient yet — ask for the address rather than assume one.
-    flowRef.current = { name: 'send' };
-    return think(() =>
-      add({
-        role: 'bot',
-        kind: 'text',
-        text: 'Sure — who would you like to send to? Paste an r-address (or scan a QR), or pick a saved recipient.',
-      }),
-    );
+    // Everything else — balances, ledgers, sends, addresses, amounts, and any
+    // follow-up — goes to the agent, which keeps the conversation's context
+    // (so replies like "1" or a pasted address continue the same send).
+    void runAgent(text);
   };
 
   const onAnswer = (msg: Msg, opt: string) => {
