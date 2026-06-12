@@ -1,11 +1,11 @@
-import { Button } from "@flama/design-system-mobile/button";
-import { Text } from "@flama/design-system-mobile/text";
-import { useWipeWallet } from "@flama/frontend/react";
-import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { vars } from "nativewind";
-import { ScrollView, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Button } from '@flama/design-system-mobile/button';
+import { Text } from '@flama/design-system-mobile/text';
+import { useWipeWallet } from '@flama/frontend/react';
+import { useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { vars } from 'nativewind';
+import { ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   AccountsSection,
   ActionsRow,
@@ -16,9 +16,9 @@ import {
   HomeBackground,
   HomeHeader,
   totalUsd,
-} from "../../components/drops/home";
-import { Routes } from "../../lib/routes";
-import { darkVars } from "../../lib/theme";
+} from '../../components/drops/home';
+import { Routes } from '../../lib/routes';
+import { darkVars } from '../../lib/theme';
 
 /**
  * Home — the signed-in hub (design: `home.html`, the "Dark" gradient theme).
@@ -83,7 +83,7 @@ export default function HomeScreen() {
             disabled={wipe.isPending}
             onPress={() => wipe.mutate()}
           >
-            <Text>{wipe.isPending ? "Wiping…" : "Wipe wallet data (dev)"}</Text>
+            <Text>{wipe.isPending ? 'Wiping…' : 'Wipe wallet data (dev)'}</Text>
           </Button>
         </View>
       </ScrollView>

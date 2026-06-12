@@ -298,5 +298,12 @@
       "errorImport": "Algo ha ido mal al crear tu cartera. Inténtalo de nuevo.",
       "reassurance": "Ya casi está. Confirmar demuestra que tu frase está bien anotada."
     }
+  },
+  "tabs": {
+    "home": "Inicio",
+    "market": "Mercado",
+    "payments": "Pagos",
+    "droppoints": "DropPoints",
+    "dewy": "Abrir Dewy, tu asistente"
   }
 }

@@ -41,7 +41,9 @@ function TabBar({
       accessibilityRole="tablist"
       className={cn(
         "flex-row items-center gap-0.5 overflow-hidden rounded-[30px] border p-1.5",
-        glass ? "border-white/15 bg-white/10" : "bg-card/90 border-border",
+        glass
+          ? "border-white/[0.18] bg-white/[0.12]"
+          : "bg-card/90 border-border",
         className,
       )}
       {...props}
@@ -57,7 +59,7 @@ function TabBar({
             onPress={() => onChange(item.key)}
             className={cn(
               "flex-1 items-center gap-0.5 rounded-[22px] py-2 active:scale-[0.97]",
-              active && (glass ? "bg-white/15" : "bg-secondary"),
+              active && (glass ? "bg-white/[0.18]" : "bg-secondary"),
             )}
           >
             <Icon
