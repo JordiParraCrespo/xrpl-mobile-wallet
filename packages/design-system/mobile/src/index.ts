@@ -108,6 +108,7 @@ export {
   GlassPanel,
   glassPanelVariants,
 } from './components/ui/glass-panel';
+export { GradientBackdrop } from './components/ui/gradient-backdrop';
 export {
   HoverCard,
   HoverCardContent,

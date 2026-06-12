@@ -32,6 +32,7 @@
     "./dropdown-menu": "./src/components/ui/dropdown-menu.tsx",
     "./feature-row": "./src/components/ui/feature-row.tsx",
     "./glass-panel": "./src/components/ui/glass-panel.tsx",
+    "./gradient-backdrop": "./src/components/ui/gradient-backdrop.tsx",
     "./hover-card": "./src/components/ui/hover-card.tsx",
     "./icon": "./src/components/ui/icon.tsx",
     "./icon-button": "./src/components/ui/icon-button.tsx",
