@@ -42,7 +42,7 @@ export default function ImportSeedScreen() {
 
   return (
     <OnboardingStepScreen
-      step={2}
+      step={3}
       title={t('onboarding.importSeed.title')}
       titleBadge={
         <Badge variant="secondary">

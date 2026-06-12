@@ -10,14 +10,20 @@ export {
   useSocialLogin,
 } from './auth.queries';
 export { FlamaProvider, useFlamaApp } from './context';
-export { explorerKeys, useRecentBlocks } from './explorer.queries';
+export {
+  explorerKeys,
+  useAccountTransactions,
+  useRecentBlocks,
+} from './explorer.queries';
 export { useAuthState, useSecurityState, useWalletState } from './hooks';
+export { pricesKeys, useExchangeRate } from './prices.queries';
 export {
   securityKeys,
   useChangePasscode,
   useDisableBiometrics,
   useEnableBiometrics,
   useSecurityRestore,
+  useSetAutoLockTimeout,
   useSetupPasscode,
   useUnlock,
   useUnlockWithBiometrics,
