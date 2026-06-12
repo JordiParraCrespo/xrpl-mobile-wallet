@@ -56,7 +56,8 @@ export default function ImportPhraseScreen() {
 
   return (
     <OnboardingStepScreen
-      step={3}
+      step={4}
+      totalSteps={4}
       title={t('onboarding.importPhrase.title')}
       subtitle={t('onboarding.importPhrase.subtitle')}
       cta={{

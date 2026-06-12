@@ -1,6 +1,7 @@
 'use client';
 import { useStore } from 'zustand';
 import type { AuthState } from '../modules/auth/auth.state';
+import type { ProfileState } from '../modules/profile/profile.state';
 import type { SecurityState } from '../modules/security/security.state';
 import type { WalletState } from '../modules/wallet/wallet.state';
 import { useFlamaApp } from './context';
@@ -18,4 +19,9 @@ export function useWalletState(): WalletState {
 export function useSecurityState(): SecurityState {
   const security = useFlamaApp().security;
   return useStore(security.store);
+}
+
+export function useProfileState(): ProfileState {
+  const profile = useFlamaApp().profile;
+  return useStore(profile.store);
 }

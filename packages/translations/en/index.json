@@ -151,6 +151,20 @@
       "import": "Import existing wallet",
       "legal": "By continuing you agree to the Terms & Privacy Policy."
     },
+    "name": {
+      "title": "What should we call you?",
+      "subtitle": "We'll use this on your profile and when you chat with Dewy, your wallet assistant. You can change it any time.",
+      "label": "Your name",
+      "fieldPlaceholder": "e.g. Jordan Pierce",
+      "preview": "Preview",
+      "placeholderName": "Your name",
+      "greeting": {
+        "before": "Hi ",
+        "after": " — I'm Dewy, your wallet assistant. What would you like to do first?"
+      },
+      "cta": "Continue",
+      "ctaEmpty": "Enter your name"
+    },
     "backupInfo": {
       "title": "Set a passcode",
       "subtitle": "It locks Drops on this device and approves every payment.",
@@ -267,6 +281,31 @@
       "defaultWalletName": "Account 1",
       "cta": "Open my wallet"
     },
+    "biometrics": {
+      "method": {
+        "face": "Face ID",
+        "touch": "Fingerprint"
+      },
+      "title": "Unlock with {{method}}",
+      "subtitle": "Use {{method}} to open Drops and approve payments. It's faster than a passcode — and never leaves your device.",
+      "scanning": {
+        "face": "Look at your phone to set up Face ID…",
+        "touch": "Touch the sensor to set up your fingerprint…"
+      },
+      "doneTitle": "{{method}} enabled",
+      "doneSubtitle": "You're all set. You can manage this any time in Settings.",
+      "benefits": {
+        "instant": "Unlock Drops instantly — no passcode to type",
+        "approve": "Approve payments with a glance",
+        "enclave": "{{method}} data stays in your device's secure enclave"
+      },
+      "enable": "Enable {{method}}",
+      "enabling": "Setting up {{method}}…",
+      "switch": "Use {{method}} instead",
+      "skip": "Not now",
+      "continue": "Continue",
+      "error": "Couldn't enable {{method}}. Try again."
+    },
     "notifications": {
       "title": "Stay on top of your money",
       "subtitle": "Get a heads-up the moment money moves, so you never have to keep checking.",
@@ -298,5 +337,15 @@
       "errorImport": "Something went wrong creating your wallet. Please try again.",
       "reassurance": "Almost there. Confirming proves your phrase is safely written down."
     }
+  },
+  "unlock": {
+    "welcomeBack": "Welcome back",
+    "forgotPasscode": "Forgot your passcode?",
+    "wrongPasscode": "Wrong passcode. Try again.",
+    "lockedOut": "Too many attempts. Try again in a moment.",
+    "wipeTitle": "Reset wallet?",
+    "wipeMessage": "This deletes the wallet from this device. You can only restore it with your recovery phrase, family seed or secret numbers.",
+    "wipeConfirm": "Delete wallet",
+    "wipeCancel": "Cancel"
   }
 }

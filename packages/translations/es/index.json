@@ -151,6 +151,20 @@
       "import": "Importar una cartera existente",
       "legal": "Al continuar aceptas los Términos y la Política de privacidad."
     },
+    "name": {
+      "title": "¿Cómo te llamamos?",
+      "subtitle": "Lo usaremos en tu perfil y cuando hables con Dewy, tu asistente de cartera. Puedes cambiarlo cuando quieras.",
+      "label": "Tu nombre",
+      "fieldPlaceholder": "p. ej. Jordan Pierce",
+      "preview": "Vista previa",
+      "placeholderName": "Tu nombre",
+      "greeting": {
+        "before": "Hola ",
+        "after": ", soy Dewy, tu asistente de cartera. ¿Qué te gustaría hacer primero?"
+      },
+      "cta": "Continuar",
+      "ctaEmpty": "Escribe tu nombre"
+    },
     "backupInfo": {
       "title": "Configura un código",
       "subtitle": "Bloquea Drops en este dispositivo y aprueba cada pago.",
@@ -267,6 +281,31 @@
       "defaultWalletName": "Cuenta 1",
       "cta": "Abrir mi cartera"
     },
+    "biometrics": {
+      "method": {
+        "face": "Face ID",
+        "touch": "huella"
+      },
+      "title": "Desbloquea con {{method}}",
+      "subtitle": "Usa {{method}} para abrir Drops y aprobar pagos. Es más rápido que un código — y nunca sale de tu dispositivo.",
+      "scanning": {
+        "face": "Mira tu teléfono para configurar Face ID…",
+        "touch": "Toca el sensor para configurar tu huella…"
+      },
+      "doneTitle": "Has activado {{method}}",
+      "doneSubtitle": "Todo listo. Puedes gestionarlo cuando quieras en Ajustes.",
+      "benefits": {
+        "instant": "Abre Drops al instante — sin escribir el código",
+        "approve": "Aprueba pagos con un vistazo",
+        "enclave": "Los datos de {{method}} permanecen en el enclave seguro de tu dispositivo"
+      },
+      "enable": "Activar {{method}}",
+      "enabling": "Configurando {{method}}…",
+      "switch": "Usar {{method}} en su lugar",
+      "skip": "Ahora no",
+      "continue": "Continuar",
+      "error": "No se pudo activar {{method}}. Inténtalo de nuevo."
+    },
     "notifications": {
       "title": "Mantente al tanto de tu dinero",
       "subtitle": "Recibe un aviso en cuanto se mueva tu dinero, sin tener que estar mirando.",
@@ -298,5 +337,15 @@
       "errorImport": "Algo ha ido mal al crear tu cartera. Inténtalo de nuevo.",
       "reassurance": "Ya casi está. Confirmar demuestra que tu frase está bien anotada."
     }
+  },
+  "unlock": {
+    "welcomeBack": "Hola de nuevo",
+    "forgotPasscode": "¿Has olvidado tu código?",
+    "wrongPasscode": "Código incorrecto. Inténtalo de nuevo.",
+    "lockedOut": "Demasiados intentos. Vuelve a intentarlo en un momento.",
+    "wipeTitle": "¿Restablecer la cartera?",
+    "wipeMessage": "Esto elimina la cartera de este dispositivo. Solo podrás restaurarla con tu frase de recuperación, semilla familiar o números secretos.",
+    "wipeConfirm": "Eliminar cartera",
+    "wipeCancel": "Cancelar"
   }
 }

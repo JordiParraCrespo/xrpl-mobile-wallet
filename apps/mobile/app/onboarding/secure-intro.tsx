@@ -18,8 +18,8 @@ export default function SecureIntroScreen() {
 
   return (
     <OnboardingStepScreen
-      step={1}
-      totalSteps={4}
+      step={2}
+      totalSteps={5}
       icon={ShieldCheck}
       title={t('onboarding.secureIntro.title')}
       subtitle={t('onboarding.secureIntro.subtitle')}
