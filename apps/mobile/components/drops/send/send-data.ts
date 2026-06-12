@@ -1,16 +1,24 @@
 // Send-screen data — the paying account comes from the wallet domain
-// (`useWalletState().accounts`), mapped onto the presentational `SendAccount`;
-// the recipient comes from the route (a payment chat), with a demo peer as the
-// walkable fallback. Pure mapping/formatting only — no React, no domain calls.
+// (`useWalletState().accounts`) and the recipient from the address-book domain
+// (`useContacts()`), each mapped onto a presentational shape. Pure
+// mapping/formatting only — no React, no domain calls.
 
-import type { WalletAccount } from '@flama/frontend';
+import type { Contact, WalletAccount } from '@flama/frontend';
 
-/** Who the payment is going to — passed in via route params from a chat. */
+/**
+ * Who the payment is going to. `address` (+ `chainId`) is what the broadcast
+ * actually pays; it comes from a saved address-book contact, an explicit param,
+ * or the demo peer. `destinationTag` is carried for XRPL recipients that need it.
+ */
 export type SendRecipient = {
   name: string;
   handle: string | null;
-  /** Classic address the broadcast pays; null when only a demo peer is known. */
+  /** Classic address the broadcast pays; null when no payable target is known. */
   address: string | null;
+  /** Chain the address belongs to (e.g. "xrpl:testnet"); null when unknown. */
+  chainId: string | null;
+  /** XRPL destination tag, when the recipient requires one. */
+  destinationTag: string | null;
 };
 
 /** The paying account, projected from a domain `WalletAccount`. */
@@ -30,9 +38,26 @@ export const DEMO_RECIPIENT: SendRecipient = {
   name: 'Maria Gutiérrez',
   handle: '@mariawvv2',
   address: 'rPEPPER7kfTD9w2To4CQk6UCfuHM9c6GDY',
+  chainId: null,
+  destinationTag: null,
 };
 
-/** Resolve the recipient from (partial) route params, falling back to the demo. */
+/** Map a saved address-book contact onto the recipient the Send flow pays. */
+export function toRecipientFromContact(contact: Contact, handle?: string | null): SendRecipient {
+  return {
+    name: contact.name,
+    handle: handle ?? null,
+    address: contact.address,
+    chainId: contact.chainId,
+    destinationTag: contact.destinationTag ?? null,
+  };
+}
+
+/**
+ * Resolve the recipient from route params, falling back to the demo peer. An
+ * explicit `address` is honoured as-is; otherwise we keep the demo's payable
+ * address so the flow stays walkable while still showing the passed identity.
+ */
 export function toRecipient(params: {
   name?: string;
   handle?: string;
@@ -42,7 +67,9 @@ export function toRecipient(params: {
   return {
     name: params.name ?? DEMO_RECIPIENT.name,
     handle: params.handle ?? null,
-    address: params.address ?? null,
+    address: params.address ?? DEMO_RECIPIENT.address,
+    chainId: null,
+    destinationTag: null,
   };
 }
 

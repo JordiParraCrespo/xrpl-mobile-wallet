@@ -424,7 +424,9 @@
     "schedule": "Schedule",
     "submit": "Send {{amount}}",
     "sending": "Sending…",
-    "noRecipient": "No recipient address",
+    "noRecipient": "No valid recipient",
+    "to": "To",
+    "destinationTag": "Destination tag",
     "from": "From",
     "network": "Network",
     "fee": "Fee",
@@ -435,6 +437,7 @@
     "sendAgain": "Send again",
     "done": "Done",
     "failed": "Couldn't send. Please try again.",
+    "invalidAddress": "That recipient address isn't valid on this network.",
     "locked": "Unlock your wallet to send.",
     "empty": "No account is available to send from yet."
   },
@@ -516,6 +519,43 @@
         "evm": "0x… addresses"
       },
       "done": "Done"
+    },
+    "chat": {
+      "received": "You received",
+      "sent": "You sent",
+      "split": "Split",
+      "request": "Request",
+      "send": "Send",
+      "messagePlaceholder": "Type a message…",
+      "back": "Back"
+    },
+    "transaction": {
+      "actions": {
+        "send": "Send",
+        "request": "Request",
+        "schedule": "Schedule",
+        "split": "Split"
+      },
+      "status": "Status",
+      "settled": "Settled",
+      "from": "From",
+      "to": "To",
+      "account": "Account",
+      "accountValue": "Personal · XRP",
+      "date": "Date",
+      "submitted": "Submitted",
+      "validated": "Validated",
+      "network": "Network",
+      "networkValue": "XRP Ledger",
+      "ledgerIndex": "Ledger index",
+      "networkFee": "Network fee",
+      "transaction": "Transaction",
+      "confirmation": "Confirmation",
+      "download": "Download",
+      "openExplorer": "Open in explorer",
+      "getHelp": "Get help with this payment",
+      "close": "Close",
+      "more": "More"
     }
   }
 }

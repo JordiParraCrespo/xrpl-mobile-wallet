@@ -12,10 +12,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { fmtUsd, fmtXrp } from './send-data';
 import type { UseSend } from './use-send';
 
+/** Middle-truncate an address so the chain destination is legible: rPEP…6GDY. */
+function shortAddress(address: string): string {
+  return address.length > 14 ? `${address.slice(0, 6)}…${address.slice(-4)}` : address;
+}
+
 /**
  * Review step — the safety gate for an irreversible payment. Restates who, how
- * much, and the From / Network / Fee / Note breakdown, then the brand Send
- * button. A failed broadcast surfaces inline rather than dropping the user.
+ * much, and the To / From / Network / Fee / Note breakdown (the real on-chain
+ * destination address + tag), then the brand Send button. A failed broadcast
+ * surfaces inline rather than dropping the user.
  */
 export function ReviewStep({ send }: { send: UseSend }) {
   const { t } = useTranslation();
@@ -52,6 +58,12 @@ export function ReviewStep({ send }: { send: UseSend }) {
         ) : null}
 
         <DetailList card className="mt-6">
+          {recipient.address ? (
+            <DetailRow label={t('send.to')} value={shortAddress(recipient.address)} mono />
+          ) : null}
+          {recipient.destinationTag ? (
+            <DetailRow label={t('send.destinationTag')} value={recipient.destinationTag} mono />
+          ) : null}
           <DetailRow
             label={t('send.from')}
             value={`${account?.label ?? ''} · ${account?.network ?? ''}`}
@@ -63,7 +75,7 @@ export function ReviewStep({ send }: { send: UseSend }) {
 
         {send.error ? (
           <Callout variant="negative" className="mt-4">
-            {t('send.failed')}
+            {t(send.error === 'invalidAddress' ? 'send.invalidAddress' : 'send.failed')}
           </Callout>
         ) : null}
       </ScrollView>
@@ -80,7 +92,7 @@ export function ReviewStep({ send }: { send: UseSend }) {
           <Text>
             {send.isSending
               ? t('send.sending')
-              : recipient.address
+              : send.recipientValid
                 ? t('send.submit', { amount: fmtUsd(send.value) })
                 : t('send.noRecipient')}
           </Text>

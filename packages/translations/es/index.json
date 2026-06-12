@@ -424,7 +424,9 @@
     "schedule": "Programar",
     "submit": "Enviar {{amount}}",
     "sending": "Enviando…",
-    "noRecipient": "Sin dirección de destinatario",
+    "noRecipient": "Sin destinatario válido",
+    "to": "Para",
+    "destinationTag": "Etiqueta de destino",
     "from": "Desde",
     "network": "Red",
     "fee": "Comisión",
@@ -435,6 +437,7 @@
     "sendAgain": "Enviar de nuevo",
     "done": "Listo",
     "failed": "No se pudo enviar. Inténtalo de nuevo.",
+    "invalidAddress": "Esa dirección de destinatario no es válida en esta red.",
     "locked": "Desbloquea tu cartera para enviar.",
     "empty": "Todavía no hay ninguna cuenta disponible para enviar."
   },
@@ -516,6 +519,43 @@
         "evm": "Direcciones 0x…"
       },
       "done": "Hecho"
+    },
+    "chat": {
+      "received": "Recibiste",
+      "sent": "Enviaste",
+      "split": "Dividir",
+      "request": "Solicitar",
+      "send": "Enviar",
+      "messagePlaceholder": "Escribe un mensaje…",
+      "back": "Atrás"
+    },
+    "transaction": {
+      "actions": {
+        "send": "Enviar",
+        "request": "Solicitar",
+        "schedule": "Programar",
+        "split": "Dividir"
+      },
+      "status": "Estado",
+      "settled": "Liquidado",
+      "from": "De",
+      "to": "Para",
+      "account": "Cuenta",
+      "accountValue": "Personal · XRP",
+      "date": "Fecha",
+      "submitted": "Enviada",
+      "validated": "Validada",
+      "network": "Red",
+      "networkValue": "XRP Ledger",
+      "ledgerIndex": "Índice del ledger",
+      "networkFee": "Comisión de red",
+      "transaction": "Transacción",
+      "confirmation": "Confirmación",
+      "download": "Descargar",
+      "openExplorer": "Abrir en el explorador",
+      "getHelp": "Obtener ayuda con este pago",
+      "close": "Cerrar",
+      "more": "Más"
     }
   }
 }

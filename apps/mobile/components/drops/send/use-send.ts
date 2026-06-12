@@ -1,13 +1,21 @@
 import { applyKeypadKey } from '@flama/design-system-mobile/keypad';
 import {
   useChainBalance,
+  useContacts,
   useExchangeRate,
+  useFlamaApp,
   useSendTransaction,
   useWalletState,
 } from '@flama/frontend/react';
 import { useLocalSearchParams } from 'expo-router';
 import * as React from 'react';
-import { type SendAccount, type SendRecipient, toRecipient, toSendAccount } from './send-data';
+import {
+  type SendAccount,
+  type SendRecipient,
+  toRecipient,
+  toRecipientFromContact,
+  toSendAccount,
+} from './send-data';
 
 export type SendStep = 'amount' | 'review' | 'sent';
 export type SendStatus = 'idle' | 'no_wallet' | 'locked' | 'ready';
@@ -17,6 +25,8 @@ export type UseSend = {
   /** The paying account, or null while restoring / locked. */
   account: SendAccount | null;
   recipient: SendRecipient;
+  /** The recipient's address is a well-formed destination on the paying chain. */
+  recipientValid: boolean;
   step: SendStep;
   /** Raw USD amount string driven by the keypad ("0", "12", "12.50"). */
   amount: string;
@@ -31,7 +41,7 @@ export type UseSend = {
   over: boolean;
   /** Amount + rate are valid and within balance (gates Continue). */
   canContinue: boolean;
-  /** Everything Continue needs, plus a payable address and no in-flight send. */
+  /** Everything Continue needs, plus a valid on-chain address and no in-flight send. */
   canSend: boolean;
   isSending: boolean;
   /** A failed broadcast, surfaced on the review step. */
@@ -48,37 +58,52 @@ export type UseSend = {
 
 const QUICK_AMOUNTS = [10, 20, 50, 100];
 
+/** The wallet AppError code for a malformed destination address. */
+const INVALID_ADDRESS_CODE = 'WALLET_CLIENT_003';
+
 /**
- * Connects the Send flow to the wallet domain. The paying account is the active
- * wallet's XRPL account (`useWalletState().accounts`); its spendable balance and
- * the XRP→USD rate come from the chain + price domains so the amount the user
- * types in dollars maps to a real XRP broadcast (`useSendTransaction`). The
- * recipient is read from the route (a payment chat), with a demo peer as the
- * walkable fallback. Step advances to "sent" only on a confirmed broadcast.
+ * Connects the Send flow to the wallet + address-book + price domains.
+ *
+ * The recipient is resolved from the **address book** (`useContacts()`) by the
+ * contact id the payment chat passes — a real saved `{ address, chainId,
+ * destinationTag }` — falling back to an explicit address param or a demo peer.
+ * The paying account is the wallet account on the recipient's chain
+ * (`useWalletState().accounts`), so the broadcast settles on the right network;
+ * its spendable balance and the XRP→USD rate come from the chain + price domains
+ * so a dollar amount maps to a real XRP broadcast (`useSendTransaction`). The
+ * destination is validated on-chain (`wallet.isValidAddress`) before Send is
+ * enabled, and the step advances to "sent" only on a confirmed broadcast.
  */
 export function useSend(): UseSend {
   const params = useLocalSearchParams<{
+    contactId?: string;
     name?: string;
     handle?: string;
     address?: string;
   }>();
+  const app = useFlamaApp();
   const { status, accounts, wallets, activeWalletId } = useWalletState();
+  const contacts = useContacts();
 
-  const recipient = React.useMemo(
-    () =>
-      toRecipient({
-        name: params.name,
-        handle: params.handle,
-        address: params.address,
-      }),
-    [params.name, params.handle, params.address],
-  );
+  const recipient = React.useMemo<SendRecipient>(() => {
+    // A saved contact is the real domain source: address + chain + tag.
+    const saved = params.contactId ? contacts.find((c) => c.id === params.contactId) : undefined;
+    if (saved) return toRecipientFromContact(saved, params.handle);
+    return toRecipient({
+      name: params.name,
+      handle: params.handle,
+      address: params.address,
+    });
+  }, [contacts, params.contactId, params.name, params.handle, params.address]);
 
-  // Prefer the XRP Ledger account (this flow settles on XRPL), else the first.
-  const domainAccount = React.useMemo(
-    () => accounts.find((a) => a.kind === 'xrpl') ?? accounts[0] ?? null,
-    [accounts],
-  );
+  // Pay from the account on the recipient's chain; otherwise prefer the XRP
+  // Ledger (this flow's home), else the first available account.
+  const domainAccount = React.useMemo(() => {
+    const onRecipientChain = recipient.chainId
+      ? accounts.find((a) => a.chainId === recipient.chainId)
+      : undefined;
+    return onRecipientChain ?? accounts.find((a) => a.kind === 'xrpl') ?? accounts[0] ?? null;
+  }, [accounts, recipient.chainId]);
 
   const walletName =
     wallets.find((w) => w.id === activeWalletId)?.name ?? domainAccount?.chainName ?? '';
@@ -106,10 +131,18 @@ export function useSend(): UseSend {
   const usdBalance = rate != null && balanceXrp != null ? balanceXrp * rate : null;
   const over = usdBalance != null && value > usdBalance;
 
+  // Validate the destination against the paying chain's adapter (XRPL classic
+  // r-address, EVM 0x…) before allowing a broadcast — the same check `send`
+  // enforces, surfaced up front so we never sign a doomed transaction.
+  const recipientValid =
+    !!account &&
+    !!recipient.address &&
+    app.wallet.isValidAddress(account.chainId, recipient.address);
+
   const send = useSendTransaction({ onSuccess: () => setStep('sent') });
 
   const canContinue = value > 0 && rate != null && !over;
-  const canSend = canContinue && !!recipient.address && !send.isPending;
+  const canSend = canContinue && recipientValid && !send.isPending;
 
   const onKey = React.useCallback((key: string) => {
     setAmount((prev) => applyKeypadKey(prev, key));
@@ -138,10 +171,18 @@ export function useSend(): UseSend {
     send.reset();
   }, [send]);
 
+  // Surface a malformed-address rejection distinctly from a generic failure.
+  const error = send.isError
+    ? (send.error as { code?: string } | null)?.code === INVALID_ADDRESS_CODE
+      ? 'invalidAddress'
+      : 'failed'
+    : null;
+
   return {
     status,
     account,
     recipient,
+    recipientValid,
     step,
     amount,
     value,
@@ -152,7 +193,7 @@ export function useSend(): UseSend {
     canContinue,
     canSend,
     isSending: send.isPending,
-    error: send.isError ? (send.error?.message ?? 'error') : null,
+    error,
     quickAmounts: QUICK_AMOUNTS,
     setNote,
     onKey,
