@@ -1,9 +1,14 @@
-// Mocked home-screen data — mirrors the Drops design handoff
-// (`home/home-parts.jsx`: H_RATE, H_NETWORKS, H_ACTIVITY). Stand-in
-// numbers until the wallet + explorer modules feed real balances and
-// activity. Two networks sum to the $942.76 hero in the design.
+// Home-screen view models + formatters.
+//
+// Account balances are now live: `use-home.ts` reads the active wallet's
+// per-chain accounts (`useWalletState().accounts`), their on-chain balances
+// (`useChainBalances`) and USD prices (`useMarkets`), and shapes them into the
+// `HomeAccount` view models the tiles render. Recent activity is still mocked
+// (the explorer history feed is a follow-up); `XRP_USD_RATE` derives its fiat.
 
-/** XRP → USD, the single rate the mocked fiat figures are derived from. */
+import type { WalletAccount } from '@flama/frontend';
+
+/** Fallback XRP → USD rate for the still-mocked activity feed. */
 export const XRP_USD_RATE = 0.6184;
 
 export type ChainBadgeKind =
@@ -14,11 +19,11 @@ export type ChainBadgeKind =
 export type HomeAccount = {
   id: string;
   name: string;
-  /** Balance in the account's native unit (XRP unless `unit` says otherwise). */
+  /** Balance in the account's native unit (e.g. XRP). */
   amount: number;
   unit: string;
-  /** USD per unit; defaults to the XRP rate when omitted. */
-  rate?: number;
+  /** Fiat value of the balance, already converted to USD. */
+  usd: number;
   badge: ChainBadgeKind;
 };
 
@@ -32,22 +37,10 @@ export type HomeActivity = {
   media: { avatar: string } | { glyph: 'coffee' } | { asset: string };
 };
 
-export const HOME_ACCOUNTS: HomeAccount[] = [
-  {
-    id: 'xrpl',
-    name: 'XRP Ledger',
-    amount: 1204.5072,
-    unit: 'XRP',
-    badge: { kind: 'xrp' },
-  },
-  {
-    id: 'evm',
-    name: 'XRPL EVM',
-    amount: 320,
-    unit: 'XRP',
-    badge: { kind: 'evm' },
-  },
-];
+/** Maps a chain kind onto the home tile's badge descriptor. */
+export function badgeForChainKind(kind: WalletAccount['kind']): ChainBadgeKind {
+  return kind === 'xrpl' ? { kind: 'xrp' } : { kind: 'evm' };
+}
 
 export const HOME_ACTIVITY: HomeActivity[] = [
   {
@@ -79,14 +72,9 @@ export const HOME_ACTIVITY: HomeActivity[] = [
   },
 ];
 
-/** USD value of an account, honoring a non-XRP rate when present. */
-export function accountUsd(account: HomeAccount): number {
-  return account.amount * (account.rate ?? XRP_USD_RATE);
-}
-
 /** Total fiat across every account — the balance hero figure. */
 export function totalUsd(accounts: HomeAccount[]): number {
-  return accounts.reduce((sum, a) => sum + accountUsd(a), 0);
+  return accounts.reduce((sum, account) => sum + account.usd, 0);
 }
 
 export function formatUsd(value: number): string {

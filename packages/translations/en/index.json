@@ -97,7 +97,54 @@
     "reset": "Reset",
     "signOut": "Sign out",
     "signingOut": "Signing out...",
-    "openWallet": "Open wallet"
+    "openWallet": "Open wallet",
+    "hub": {
+      "search": "Search",
+      "testnet": "TESTNET",
+      "addMoney": "Add money",
+      "receive": "Receive",
+      "swap": "Swap",
+      "more": "More",
+      "accounts": "Accounts",
+      "addAccount": "Add account",
+      "activity": "Activity",
+      "seeAll": "See all",
+      "profile": "Profile",
+      "notifications": "Notifications"
+    },
+    "more": {
+      "title": "More",
+      "buy": {
+        "label": "Buy XRP",
+        "sub": "Card or bank transfer"
+      },
+      "request": {
+        "label": "Request money",
+        "sub": "Ask someone to pay you"
+      },
+      "convert": {
+        "label": "Convert",
+        "sub": "Between your tokens"
+      },
+      "statements": {
+        "label": "Statements",
+        "sub": "Export your activity"
+      },
+      "rewards": {
+        "label": "Rewards",
+        "sub": "DropPoints · coming soon"
+      }
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "close": "Close notifications",
+    "markAllRead": "Mark all as read",
+    "groups": {
+      "today": "Today",
+      "earlier": "Earlier"
+    },
+    "empty": "You're all caught up."
   },
   "wallet": {
     "title": "Wallet",
@@ -354,5 +401,86 @@
     "wipeMessage": "This deletes the wallet from this device. You can only restore it with your recovery phrase, family seed or secret numbers.",
     "wipeConfirm": "Delete wallet",
     "wipeCancel": "Cancel"
+  },
+  "receive": {
+    "title": "Receive",
+    "yourAddress": "Your {{name}} address",
+    "destinationTag": "Destination tag",
+    "warning": "Only send assets on the <network>{{network}}</network>. Sending from another network may lose your funds.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "share": "Share",
+    "locked": "Unlock your wallet to receive.",
+    "empty": "No receiving account is available yet."
+  },
+  "droppoints": {
+    "comingSoon": "COMING SOON",
+    "title": "DropPoints",
+    "subtitle": "A rewards programme that gives back every time you move money on Drops. We're putting the finishing touches on it.",
+    "perks": {
+      "earn": {
+        "title": "Earn on every move",
+        "description": "Collect points when you send, receive or swap."
+      },
+      "rebates": {
+        "title": "Fee rebates",
+        "description": "Redeem points to cut your network fees."
+      },
+      "perks": {
+        "title": "Member perks",
+        "description": "Unlock boosts, early features and surprises."
+      }
+    },
+    "notify": "Notify me when it's ready",
+    "notified": "We'll let you know"
+  },
+  "payments": {
+    "title": "Payments",
+    "search": "Search",
+    "openProfile": "Open profile",
+    "newPayment": "New payment",
+    "you": "You",
+    "send": "Send",
+    "request": "Request",
+    "split": "Split",
+    "people": "People",
+    "new": "New",
+    "recent": "Recent",
+    "seeAll": "See all",
+    "emptyTitle": "No payments yet",
+    "emptyDescription": "Money you send and receive will show up here.",
+    "relationship": {
+      "in": "Sent you",
+      "out": "You sent",
+      "self": "You moved"
+    },
+    "unknown": "Unknown",
+    "addRecipient": {
+      "back": "Back",
+      "title": "Add recipient",
+      "network": "Network",
+      "address": "Address",
+      "addressPlaceholder": "r… or 0x…",
+      "paste": "Paste",
+      "destinationTag": "Destination tag (optional)",
+      "destinationTagPlaceholder": "e.g. 584213",
+      "recipientName": "Recipient name",
+      "namePlaceholder": "Name to save",
+      "securityNote": "Double-check the address. XRPL transactions can't be reversed once sent.",
+      "save": "Save recipient",
+      "saving": "Saving…",
+      "errors": {
+        "invalidName": "Enter a name with at least 2 characters.",
+        "invalidAddress": "Enter a valid recipient address.",
+        "duplicate": "A contact with this address already exists.",
+        "generic": "Couldn't save the recipient. Try again."
+      },
+      "networkSubtitle": "Where this recipient's address lives. It decides the address format.",
+      "networkHint": {
+        "xrp": "Classic r… addresses",
+        "evm": "0x… addresses"
+      },
+      "done": "Done"
+    }
   }
 }

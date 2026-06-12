@@ -75,6 +75,35 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Dewy assistant (chat.html) self-contained palette. Full-colour vars
+        // (not hsl triplets) so the dark theme can use translucent-white
+        // overlays. Defined in global.css for both modes.
+        chat: {
+          bg: "var(--chat-bg)",
+          fg: "var(--chat-fg)",
+          dim: "var(--chat-dim)",
+          faint: "var(--chat-faint)",
+          bubble: "var(--chat-bubble)",
+          "bubble-line": "var(--chat-bubble-line)",
+          card: "var(--chat-card)",
+          border: "var(--chat-border)",
+          hairline: "var(--chat-hairline)",
+          line: "var(--chat-line)",
+          chip: "var(--chat-chip)",
+          "chip-line": "var(--chat-chip-line)",
+          input: "var(--chat-input)",
+          opt: "var(--chat-opt)",
+          "opt-dim": "var(--chat-opt-dim)",
+          brand: "var(--chat-brand)",
+          positive: "var(--chat-positive)",
+          "positive-fg": "var(--chat-positive-fg)",
+          negative: "var(--chat-negative)",
+          "negative-strong": "var(--chat-negative-strong)",
+          "result-bg": "var(--chat-result-bg)",
+          "result-line": "var(--chat-result-line)",
+          "error-bg": "var(--chat-error-bg)",
+          "error-line": "var(--chat-error-line)",
+        },
       },
       // Drops shape language: inputs 12, cards 20, sheets 24, pills full.
       borderRadius: {

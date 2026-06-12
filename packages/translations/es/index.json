@@ -97,7 +97,54 @@
     "reset": "Reiniciar",
     "signOut": "Cerrar sesión",
     "signingOut": "Cerrando sesión...",
-    "openWallet": "Abrir cartera"
+    "openWallet": "Abrir cartera",
+    "hub": {
+      "search": "Buscar",
+      "testnet": "TESTNET",
+      "addMoney": "Añadir dinero",
+      "receive": "Recibir",
+      "swap": "Intercambiar",
+      "more": "Más",
+      "accounts": "Cuentas",
+      "addAccount": "Añadir cuenta",
+      "activity": "Actividad",
+      "seeAll": "Ver todo",
+      "profile": "Perfil",
+      "notifications": "Notificaciones"
+    },
+    "more": {
+      "title": "Más",
+      "buy": {
+        "label": "Comprar XRP",
+        "sub": "Tarjeta o transferencia bancaria"
+      },
+      "request": {
+        "label": "Solicitar dinero",
+        "sub": "Pide a alguien que te pague"
+      },
+      "convert": {
+        "label": "Convertir",
+        "sub": "Entre tus tokens"
+      },
+      "statements": {
+        "label": "Extractos",
+        "sub": "Exporta tu actividad"
+      },
+      "rewards": {
+        "label": "Recompensas",
+        "sub": "DropPoints · muy pronto"
+      }
+    }
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "close": "Cerrar notificaciones",
+    "markAllRead": "Marcar todo como leído",
+    "groups": {
+      "today": "Hoy",
+      "earlier": "Anterior"
+    },
+    "empty": "Estás al día."
   },
   "wallet": {
     "title": "Cartera",
@@ -354,5 +401,86 @@
     "wipeMessage": "Esto elimina la cartera de este dispositivo. Solo podrás restaurarla con tu frase de recuperación, semilla familiar o números secretos.",
     "wipeConfirm": "Eliminar cartera",
     "wipeCancel": "Cancelar"
+  },
+  "receive": {
+    "title": "Recibir",
+    "yourAddress": "Tu dirección de {{name}}",
+    "destinationTag": "Etiqueta de destino",
+    "warning": "Envía activos solo por la red <network>{{network}}</network>. Enviar desde otra red puede suponer la pérdida de tus fondos.",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "share": "Compartir",
+    "locked": "Desbloquea tu cartera para recibir.",
+    "empty": "Todavía no hay ninguna cuenta disponible para recibir."
+  },
+  "droppoints": {
+    "comingSoon": "MUY PRONTO",
+    "title": "DropPoints",
+    "subtitle": "Un programa de recompensas que te devuelve algo cada vez que mueves dinero en Drops. Le estamos dando los últimos retoques.",
+    "perks": {
+      "earn": {
+        "title": "Gana con cada movimiento",
+        "description": "Acumula puntos cuando envías, recibes o intercambias."
+      },
+      "rebates": {
+        "title": "Descuentos en comisiones",
+        "description": "Canjea puntos para reducir tus comisiones de red."
+      },
+      "perks": {
+        "title": "Ventajas de miembro",
+        "description": "Desbloquea mejoras, funciones anticipadas y sorpresas."
+      }
+    },
+    "notify": "Avísame cuando esté listo",
+    "notified": "Te avisaremos"
+  },
+  "payments": {
+    "title": "Pagos",
+    "search": "Buscar",
+    "openProfile": "Abrir perfil",
+    "newPayment": "Nuevo pago",
+    "you": "Tú",
+    "send": "Enviar",
+    "request": "Solicitar",
+    "split": "Dividir",
+    "people": "Personas",
+    "new": "Nuevo",
+    "recent": "Recientes",
+    "seeAll": "Ver todo",
+    "emptyTitle": "Aún no hay pagos",
+    "emptyDescription": "El dinero que envíes y recibas aparecerá aquí.",
+    "relationship": {
+      "in": "Te envió",
+      "out": "Enviaste",
+      "self": "Moviste"
+    },
+    "unknown": "Desconocido",
+    "addRecipient": {
+      "back": "Atrás",
+      "title": "Añadir destinatario",
+      "network": "Red",
+      "address": "Dirección",
+      "addressPlaceholder": "r… o 0x…",
+      "paste": "Pegar",
+      "destinationTag": "Etiqueta de destino (opcional)",
+      "destinationTagPlaceholder": "p. ej. 584213",
+      "recipientName": "Nombre del destinatario",
+      "namePlaceholder": "Nombre para guardar",
+      "securityNote": "Comprueba bien la dirección. Las transacciones XRPL no se pueden revertir una vez enviadas.",
+      "save": "Guardar destinatario",
+      "saving": "Guardando…",
+      "errors": {
+        "invalidName": "Introduce un nombre de al menos 2 caracteres.",
+        "invalidAddress": "Introduce una dirección de destinatario válida.",
+        "duplicate": "Ya existe un contacto con esta dirección.",
+        "generic": "No se pudo guardar el destinatario. Inténtalo de nuevo."
+      },
+      "networkSubtitle": "La red de la dirección del destinatario. Determina el formato de la dirección.",
+      "networkHint": {
+        "xrp": "Direcciones clásicas r…",
+        "evm": "Direcciones 0x…"
+      },
+      "done": "Hecho"
+    }
   }
 }
