@@ -103,6 +103,7 @@ export {
   DropdownMenuTrigger,
 } from './components/ui/dropdown-menu';
 export { FeatureRow } from './components/ui/feature-row';
+export { FlowHeader } from './components/ui/flow-header';
 export {
   GlassBackdrop,
   GlassPanel,
