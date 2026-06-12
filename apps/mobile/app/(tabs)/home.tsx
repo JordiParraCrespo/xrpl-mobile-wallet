@@ -58,6 +58,7 @@ export default function HomeScreen() {
 
         <AccountsSection
           accounts={accounts}
+          loading={isLoading}
           onAccountPress={() => router.push(Routes.Receive)}
           onAddAccount={() => {}}
         />

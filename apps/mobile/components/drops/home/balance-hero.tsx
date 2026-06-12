@@ -1,9 +1,10 @@
 import { Badge } from '@flama/design-system-mobile/badge';
 import { Icon } from '@flama/design-system-mobile/icon';
+import { Skeleton } from '@flama/design-system-mobile/skeleton';
 import { Text } from '@flama/design-system-mobile/text';
 import { ChevronDown } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { formatUsd } from './home-data';
 
 /**
@@ -36,7 +37,7 @@ export function BalanceHero({
 
       {loading ? (
         <View className="h-[56px] justify-center">
-          <ActivityIndicator />
+          <Skeleton className="h-11 w-[210px] rounded-[14px]" />
         </View>
       ) : (
         <Text className="font-display text-[46px] leading-[56px] tracking-[-0.8px] text-foreground tabular-nums">

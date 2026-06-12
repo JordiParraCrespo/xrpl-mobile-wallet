@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
-import { AccountTile } from './account-tile';
+import { AccountTile, AccountTileSkeleton } from './account-tile';
 import type { HomeAccount } from './home-data';
 
 /**
@@ -14,10 +14,13 @@ import type { HomeAccount } from './home-data';
  */
 export function AccountsSection({
   accounts,
+  loading,
   onAccountPress,
   onAddAccount,
 }: {
   accounts: HomeAccount[];
+  /** First-load state: renders two placeholder tiles instead of the grid. */
+  loading?: boolean;
   onAccountPress: (account: HomeAccount) => void;
   onAddAccount: () => void;
 }) {
@@ -40,9 +43,20 @@ export function AccountsSection({
       </View>
 
       <View className="flex-row gap-3">
-        {accounts.map((account) => (
-          <AccountTile key={account.id} account={account} onPress={() => onAccountPress(account)} />
-        ))}
+        {loading ? (
+          <>
+            <AccountTileSkeleton />
+            <AccountTileSkeleton />
+          </>
+        ) : (
+          accounts.map((account) => (
+            <AccountTile
+              key={account.id}
+              account={account}
+              onPress={() => onAccountPress(account)}
+            />
+          ))
+        )}
       </View>
     </View>
   );

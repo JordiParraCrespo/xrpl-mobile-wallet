@@ -1,5 +1,6 @@
 import { ChainBadge } from '@flama/design-system-mobile/chain-badge';
 import { Icon } from '@flama/design-system-mobile/icon';
+import { Skeleton } from '@flama/design-system-mobile/skeleton';
 import { Text } from '@flama/design-system-mobile/text';
 import { ChevronRight } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
@@ -39,5 +40,24 @@ export function AccountTile({ account, onPress }: { account: HomeAccount; onPres
         </View>
       </HomeCard>
     </Pressable>
+  );
+}
+
+/**
+ * The loading placeholder for an account tile (home-parts.jsx `HAccountTile`
+ * with `loading`): a skeleton badge disc and the name / fiat value lines.
+ */
+export function AccountTileSkeleton() {
+  return (
+    <View className="flex-1">
+      <HomeCard className="min-h-[134px] justify-between rounded-xl p-4">
+        <Skeleton className="h-[38px] w-[38px] rounded-full" />
+        <View className="mt-4 gap-1.5">
+          <Skeleton className="h-[11px] w-[70px] rounded-md" />
+          <Skeleton className="h-5 w-24 rounded-md" />
+          <Skeleton className="h-3 w-14 rounded-md" />
+        </View>
+      </HomeCard>
+    </View>
   );
 }
