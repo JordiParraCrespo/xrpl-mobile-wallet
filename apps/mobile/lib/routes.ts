@@ -49,6 +49,7 @@ export enum Routes {
   Send = '/flows/send',
   AddRecipient = '/add-recipient',
   Transaction = '/transaction/[id]',
+  Notifications = '/notifications',
 }
 
 /** Which identity a successful onboarding restored (phrase = all chains). */

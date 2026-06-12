@@ -25,9 +25,10 @@ import { Text } from "./text";
 // ChatMessage — Dewy's chat surface. A user bubble on the right, and
 // bot messages on the left: plain bubbles, a typing indicator and the
 // tool cards (questions, action review, result, error, balance).
-// Bubbles are rounded 16–18 with one small "tail" corner; cards sit on
-// bg-card with hairline borders; results/errors use the soft semantic
-// tints so they read calmly in both light and dark mode.
+// Bubbles are rounded 16–18 with one small "tail" corner; everything
+// rides the self-contained `chat-*` palette (chat.html): translucent-white
+// surfaces over #0b0b0f in dark, solid neutrals in light, brand-600 actions,
+// and fixed positive/negative tints for results/errors.
 
 type ChatActionStatus = "pending" | "approved" | "declined";
 
@@ -78,8 +79,8 @@ type ChatMessageData =
 const chatBubbleVariants = cva("px-[15px] py-[11px]", {
   variants: {
     side: {
-      user: "max-w-[80%] self-end rounded-[18px] rounded-br-[6px] bg-brand",
-      bot: "self-start rounded-lg rounded-bl-[5px] bg-secondary",
+      user: "max-w-[80%] self-end rounded-[18px] rounded-br-[6px] bg-chat-brand",
+      bot: "border-chat-bubble-line self-start rounded-lg rounded-bl-[5px] border bg-chat-bubble",
     },
   },
   defaultVariants: {
@@ -90,8 +91,8 @@ const chatBubbleVariants = cva("px-[15px] py-[11px]", {
 const chatBubbleTextVariants = cva("text-[15px] leading-[22px]", {
   variants: {
     side: {
-      user: "text-brand-foreground",
-      bot: "text-foreground",
+      user: "text-white",
+      bot: "text-chat-fg",
     },
   },
   defaultVariants: {
@@ -129,7 +130,7 @@ function TypingDot({ delay }: { delay: number }) {
   return (
     <Animated.View
       style={style}
-      className="bg-muted-foreground h-1.5 w-1.5 rounded-full"
+      className="bg-chat-fg h-[7px] w-[7px] rounded-full"
     />
   );
 }
@@ -147,15 +148,15 @@ function ActionFooter({
         <View className="flex-row gap-[9px]">
           <Pressable
             onPress={() => onAction?.(false)}
-            className="border-input h-[46px] flex-1 items-center justify-center rounded-full border active:opacity-70"
+            className="border-chat-opt h-[46px] flex-1 items-center justify-center rounded-full border active:opacity-70"
           >
-            <Text className="text-foreground text-[15px] font-semibold">
+            <Text className="text-chat-fg text-[15px] font-semibold">
               Decline
             </Text>
           </Pressable>
           <Pressable
             onPress={() => onAction?.(true)}
-            className="bg-brand active:bg-brand/90 h-[46px] flex-[1.4] flex-row items-center justify-center gap-[7px] rounded-full"
+            className="bg-chat-brand h-[46px] flex-[1.4] flex-row items-center justify-center gap-[7px] rounded-full active:opacity-90"
           >
             <Icon as={Check} size={17} className="text-white" />
             <Text className="text-[15px] font-semibold text-white">
@@ -163,7 +164,7 @@ function ActionFooter({
             </Text>
           </Pressable>
         </View>
-        <Text className="text-muted-foreground mt-2 text-center text-xs">
+        <Text className="text-chat-faint mt-2 text-center text-xs">
           Or type a change below
         </Text>
       </View>
@@ -175,12 +176,12 @@ function ActionFooter({
       <Icon
         as={approved ? Check : X}
         size={16}
-        className={approved ? "text-positive" : "text-muted-foreground"}
+        className={approved ? "text-chat-positive-fg" : "text-chat-faint"}
       />
       <Text
         className={cn(
           "text-[13.5px] font-semibold",
-          approved ? "text-positive" : "text-muted-foreground",
+          approved ? "text-chat-positive-fg" : "text-chat-faint",
         )}
       >
         {approved ? "Approved" : "Declined"}
@@ -227,10 +228,10 @@ function BotMessageBody({
     case "questions": {
       const done = !!message.answered;
       return (
-        <View className="bg-card border-border w-full rounded-lg border p-3.5">
+        <View className="bg-chat-card border-chat-border w-full rounded-lg border p-3.5">
           <View className="mb-3 flex-row items-center gap-2">
-            <Icon as={Sparkles} size={14} className="text-brand" />
-            <Text className="text-muted-foreground text-[12.5px] font-bold uppercase tracking-wide">
+            <Icon as={Sparkles} size={14} className="text-chat-brand" />
+            <Text className="text-chat-dim text-[12.5px] font-bold uppercase tracking-wide">
               {message.title}
             </Text>
           </View>
@@ -245,15 +246,15 @@ function BotMessageBody({
                   className={cn(
                     "rounded-full border px-[15px] py-[9px]",
                     chosen
-                      ? "border-brand bg-brand"
-                      : "border-input bg-transparent active:bg-muted",
+                      ? "border-chat-brand bg-chat-brand"
+                      : "border-chat-opt bg-transparent active:opacity-70",
                     done && !chosen && "opacity-60",
                   )}
                 >
                   <Text
                     className={cn(
                       "text-sm font-semibold",
-                      chosen ? "text-white" : "text-foreground",
+                      chosen ? "text-white" : "text-chat-fg",
                     )}
                   >
                     {option}
@@ -268,9 +269,9 @@ function BotMessageBody({
 
     case "action":
       return (
-        <View className="bg-card border-border w-full overflow-hidden rounded-[18px] border">
-          <View className="border-border flex-row items-center gap-2.5 border-b-hairline px-4 py-[13px]">
-            <View className="bg-brand h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px]">
+        <View className="bg-chat-card border-chat-border w-full overflow-hidden rounded-[18px] border">
+          <View className="border-chat-hairline flex-row items-center gap-2.5 border-b-hairline px-4 py-[13px]">
+            <View className="bg-chat-brand h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px]">
               <Icon
                 as={message.actionKind === "swap" ? ArrowLeftRight : Send}
                 size={16}
@@ -279,39 +280,31 @@ function BotMessageBody({
             </View>
             <Text
               numberOfLines={1}
-              className="text-foreground min-w-0 flex-1 text-[15px] font-bold"
+              className="text-chat-fg min-w-0 flex-1 text-[15px] font-bold"
             >
               {message.title}
             </Text>
-            <Text className="text-muted-foreground text-xs font-bold">
-              Review
-            </Text>
+            <Text className="text-chat-faint text-xs font-bold">Review</Text>
           </View>
           <View className="px-4 pb-1 pt-1.5">
-            {message.rows.map((row, index) => (
+            {message.rows.map((row) => (
               <View
                 key={row.label}
-                className={cn(
-                  "flex-row items-baseline justify-between gap-3 py-[9px]",
-                  index < message.rows.length - 1 &&
-                    "border-border border-b-hairline",
-                )}
+                className="border-chat-line flex-row items-baseline justify-between gap-3 border-b-hairline py-[9px]"
               >
-                <Text className="text-muted-foreground text-[13.5px]">
-                  {row.label}
-                </Text>
+                <Text className="text-chat-dim text-[13.5px]">{row.label}</Text>
                 <View className="min-w-0 shrink items-end">
                   <Text
                     numberOfLines={1}
                     className={cn(
-                      "text-foreground text-[14.5px] font-semibold",
+                      "text-chat-fg text-[14.5px] font-semibold",
                       row.mono && "font-mono",
                     )}
                   >
                     {row.value}
                   </Text>
                   {row.sub ? (
-                    <Text className="text-muted-foreground font-mono text-xs">
+                    <Text className="text-chat-faint font-mono text-xs">
                       {row.sub}
                     </Text>
                   ) : null}
@@ -325,33 +318,33 @@ function BotMessageBody({
 
     case "result":
       return (
-        <View className="bg-positive-soft border-positive/30 w-full rounded-[18px] border p-4">
+        <View className="bg-chat-result-bg border-chat-result-line w-full rounded-[18px] border p-4">
           <View className="flex-row items-center gap-2.5">
-            <View className="bg-positive h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full">
+            <View className="bg-chat-positive h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full">
               <Icon as={Check} size={19} className="text-white" />
             </View>
-            <Text className="text-foreground min-w-0 flex-1 text-[15.5px] font-semibold">
+            <Text className="text-chat-fg min-w-0 flex-1 text-[15.5px] font-semibold">
               {message.text}
             </Text>
           </View>
           {message.meta ? (
-            <Text className="text-muted-foreground mt-2 text-[13px] leading-snug">
+            <Text className="text-chat-dim mt-2 text-[13px] leading-snug">
               {message.meta}
             </Text>
           ) : null}
           {message.tx ? (
-            <View className="border-positive/20 mt-3 flex-row items-center justify-between border-t pt-3">
-              <Text className="text-muted-foreground font-mono text-[13px]">
+            <View className="border-chat-line mt-3 flex-row items-center justify-between border-t pt-3">
+              <Text className="text-chat-dim font-mono text-[13px]">
                 {message.tx}
               </Text>
               <Pressable className="flex-row items-center gap-1 active:opacity-70">
-                <Text className="text-positive-soft-foreground text-[13px] font-semibold">
+                <Text className="text-chat-positive-fg text-[13px] font-semibold">
                   View
                 </Text>
                 <Icon
                   as={ChevronRight}
                   size={15}
-                  className="text-positive-soft-foreground"
+                  className="text-chat-positive-fg"
                 />
               </Pressable>
             </View>
@@ -361,31 +354,31 @@ function BotMessageBody({
 
     case "error":
       return (
-        <View className="bg-destructive-soft border-destructive/30 w-full rounded-[18px] border p-4">
+        <View className="bg-chat-error-bg border-chat-error-line w-full rounded-[18px] border p-4">
           <View className="flex-row items-center gap-2.5">
-            <View className="bg-destructive h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full">
+            <View className="bg-chat-negative h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full">
               <Icon as={X} size={18} className="text-white" />
             </View>
-            <Text className="text-foreground min-w-0 flex-1 text-[15.5px] font-semibold">
+            <Text className="text-chat-fg min-w-0 flex-1 text-[15.5px] font-semibold">
               {message.title}
             </Text>
           </View>
-          <Text className="text-muted-foreground mt-2 text-[13.5px] leading-snug">
+          <Text className="text-chat-dim mt-2 text-[13.5px] leading-snug">
             {message.text}
           </Text>
           {!message.handled ? (
             <View className="mt-3 flex-row gap-2">
               <Pressable
                 onPress={() => onErrorAction?.(false)}
-                className="border-input h-11 flex-1 items-center justify-center rounded-full border active:opacity-70"
+                className="border-chat-opt h-11 flex-1 items-center justify-center rounded-full border active:opacity-70"
               >
-                <Text className="text-foreground text-[14.5px] font-semibold">
+                <Text className="text-chat-fg text-[14.5px] font-semibold">
                   Dismiss
                 </Text>
               </Pressable>
               <Pressable
                 onPress={() => onErrorAction?.(true)}
-                className="bg-destructive active:bg-destructive/90 h-11 flex-[1.2] items-center justify-center rounded-full"
+                className="bg-chat-negative-strong h-11 flex-[1.2] items-center justify-center rounded-full active:opacity-90"
               >
                 <Text className="text-[14.5px] font-semibold text-white">
                   Try again
@@ -398,11 +391,11 @@ function BotMessageBody({
 
     case "balance":
       return (
-        <View className="bg-card border-border w-full rounded-[18px] border p-4">
-          <Text className="text-muted-foreground text-[12.5px] font-semibold">
+        <View className="bg-chat-card border-chat-border w-full rounded-[18px] border p-4">
+          <Text className="text-chat-dim text-[12.5px] font-semibold">
             Total balance
           </Text>
-          <Text className="text-foreground font-display mb-3 mt-0.5 text-3xl font-normal tracking-[-0.4px]">
+          <Text className="text-chat-fg font-display mb-3 mt-0.5 text-3xl font-normal tracking-[-0.4px]">
             $
             {message.total.toLocaleString("en-US", {
               minimumFractionDigits: 2,
@@ -412,24 +405,24 @@ function BotMessageBody({
           {message.rows.map((row) => (
             <View
               key={row.name}
-              className="border-border flex-row items-center gap-3 border-t-hairline py-[9px]"
+              className="border-chat-line flex-row items-center gap-3 border-t-hairline py-[9px]"
             >
               <AssetIcon symbol={row.symbol} color={row.color} size={32} />
               <Text
                 numberOfLines={1}
-                className="text-foreground min-w-0 flex-1 text-[14.5px] font-semibold"
+                className="text-chat-fg min-w-0 flex-1 text-[14.5px] font-semibold"
               >
                 {row.name}
               </Text>
               <View className="shrink-0 items-end">
-                <Text className="text-foreground font-mono text-sm">
+                <Text className="text-chat-fg font-mono text-sm">
                   $
                   {row.usd.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 </Text>
-                <Text className="text-muted-foreground font-mono text-xs">
+                <Text className="text-chat-faint font-mono text-xs">
                   {row.xrp.toLocaleString("en-US", {
                     maximumFractionDigits: 2,
                   })}{" "}

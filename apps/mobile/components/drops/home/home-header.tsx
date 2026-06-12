@@ -6,6 +6,7 @@ import { Text } from '@flama/design-system-mobile/text';
 import { cn } from '@flama/design-system-mobile/utils';
 import { Bell, Search } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
+import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
 /**
@@ -23,12 +24,13 @@ export function HomeHeader({
   onNotifications: () => void;
 }) {
   const dark = useColorScheme().colorScheme === 'dark';
+  const { t } = useTranslation();
 
   const searchInner = (
     <>
       <Icon as={Search} size={18} className={dark ? 'text-white/60' : 'text-muted-foreground'} />
       <Text className={cn('text-[15px]', dark ? 'text-white/60' : 'text-muted-foreground')}>
-        Search
+        {t('home.hub.search')}
       </Text>
     </>
   );
@@ -37,7 +39,7 @@ export function HomeHeader({
     <View className="flex-row items-center gap-3 px-5">
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Profile"
+        accessibilityLabel={t('home.hub.profile')}
         onPress={onProfile}
         className="active:opacity-80"
       >
@@ -46,7 +48,7 @@ export function HomeHeader({
 
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Search"
+        accessibilityLabel={t('home.hub.search')}
         onPress={onSearch}
         className="h-11 flex-1 active:opacity-80"
       >
@@ -67,7 +69,7 @@ export function HomeHeader({
 
       <IconButton
         variant={dark ? 'glass' : 'soft'}
-        accessibilityLabel="Notifications"
+        accessibilityLabel={t('home.hub.notifications')}
         onPress={onNotifications}
       >
         <Icon as={Bell} size={20} />

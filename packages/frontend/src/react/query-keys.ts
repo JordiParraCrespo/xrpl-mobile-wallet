@@ -23,6 +23,11 @@ export const tokensKeys = {
     ['tokens', 'balance', chainId, issuer, symbol] as const,
 };
 
+export const addressBookKeys = {
+  all: ['addressBook'] as const,
+  restore: ['addressBook', 'restore'] as const,
+};
+
 export const explorerKeys = {
   all: ['explorer'] as const,
   blocks: (chainId: string) => ['explorer', 'blocks', chainId] as const,
