@@ -427,6 +427,11 @@
         "invalidAddress": "Enter a valid recipient address.",
         "duplicate": "A contact with this address already exists.",
         "generic": "Couldn't save the recipient. Try again."
+      },
+      "networkSubtitle": "Where this recipient's address lives. It decides the address format.",
+      "networkHint": {
+        "xrp": "Classic r… addresses",
+        "evm": "0x… addresses"
       }
     }
   }

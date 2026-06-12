@@ -427,6 +427,11 @@
         "invalidAddress": "Introduce una dirección de destinatario válida.",
         "duplicate": "Ya existe un contacto con esta dirección.",
         "generic": "No se pudo guardar el destinatario. Inténtalo de nuevo."
+      },
+      "networkSubtitle": "La red de la dirección del destinatario. Determina el formato de la dirección.",
+      "networkHint": {
+        "xrp": "Direcciones clásicas r…",
+        "evm": "Direcciones 0x…"
       }
     }
   }
