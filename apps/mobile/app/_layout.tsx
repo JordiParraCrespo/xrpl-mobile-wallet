@@ -1,11 +1,8 @@
-import "../global.css";
-import "../lib/i18n";
-import "react-native-gesture-handler";
-import "reflect-metadata";
-import {
-  configureReanimatedLogger,
-  ReanimatedLogLevel,
-} from "react-native-reanimated";
+import '../global.css';
+import '../lib/i18n';
+import 'react-native-gesture-handler';
+import 'reflect-metadata';
+import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 
 configureReanimatedLogger({ level: ReanimatedLogLevel.warn, strict: false });
 
@@ -17,20 +14,20 @@ import {
   useSecurityState,
   useSessionRestore,
   useWalletRestore,
-} from "@flama/frontend/react";
-import { ThemeProvider } from "@react-navigation/native";
-import { PortalHost } from "@rn-primitives/portal";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { SplashScreen, Stack, usePathname, useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { useColorScheme, vars } from "nativewind";
-import * as React from "react";
-import { View } from "react-native";
-import { app } from "../lib/flama";
-import { queryClient } from "../lib/query";
-import { Routes } from "../lib/routes";
-import { darkVars, lightVars, NAV_THEME } from "../lib/theme";
-import { useLoadFonts } from "../lib/use-load-fonts";
+} from '@flama/frontend/react';
+import { ThemeProvider } from '@react-navigation/native';
+import { PortalHost } from '@rn-primitives/portal';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { SplashScreen, Stack, usePathname, useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useColorScheme, vars } from 'nativewind';
+import * as React from 'react';
+import { View } from 'react-native';
+import { app } from '../lib/flama';
+import { queryClient } from '../lib/query';
+import { Routes } from '../lib/routes';
+import { darkVars, lightVars, NAV_THEME } from '../lib/theme';
+import { useLoadFonts } from '../lib/use-load-fonts';
 
 // Keep the native splash up until fonts and the session are ready.
 SplashScreen.preventAutoHideAsync();
@@ -38,8 +35,8 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const { fontsLoaded } = useLoadFonts();
   const { colorScheme } = useColorScheme();
-  const theme = colorScheme === "dark" ? darkVars : lightVars;
-  const isDark = colorScheme === "dark";
+  const theme = colorScheme === 'dark' ? darkVars : lightVars;
+  const isDark = colorScheme === 'dark';
 
   // Hold on the splash (rendered by the OS) until the fonts are in.
   if (!fontsLoaded) return null;
@@ -47,7 +44,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <FlamaProvider app={app}>
-        <ThemeProvider value={NAV_THEME[colorScheme ?? "light"]}>
+        <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
           <View
             style={vars(theme)}
             // Every touch re-arms the security auto-lock timer; returning
@@ -56,11 +53,9 @@ export default function RootLayout() {
               app.security.touch();
               return false;
             }}
-            className={
-              isDark ? "dark flex-1 bg-background" : "flex-1 bg-background"
-            }
+            className={isDark ? 'dark flex-1 bg-background' : 'flex-1 bg-background'}
           >
-            <StatusBar style={isDark ? "light" : "dark"} />
+            <StatusBar style={isDark ? 'light' : 'dark'} />
             <SessionGate />
             <PortalHost />
           </View>
@@ -107,7 +102,7 @@ function useLockGate() {
   const pathname = usePathname();
 
   React.useEffect(() => {
-    if (status === "locked" && pathname !== Routes.Unlock) {
+    if (status === 'locked' && pathname !== Routes.Unlock) {
       router.replace(Routes.Unlock);
     }
   }, [status, pathname, router]);
@@ -147,18 +142,12 @@ function DropsStack() {
       <Stack.Screen name="payment/[contact]" />
 
       {/* Modals — slide up over everything, including the tab bar. */}
-      <Stack.Screen
-        name="flows/add-money"
-        options={{ presentation: "modal" }}
-      />
-      <Stack.Screen name="flows/receive" options={{ presentation: "modal" }} />
-      <Stack.Screen name="flows/swap" options={{ presentation: "modal" }} />
-      <Stack.Screen name="flows/send" options={{ presentation: "modal" }} />
-      <Stack.Screen name="add-recipient" options={{ presentation: "modal" }} />
-      <Stack.Screen
-        name="transaction/[id]"
-        options={{ presentation: "modal" }}
-      />
+      <Stack.Screen name="flows/add-money" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="flows/receive" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="flows/swap" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="flows/send" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="add-recipient" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="transaction/[id]" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }
