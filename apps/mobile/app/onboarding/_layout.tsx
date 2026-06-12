@@ -2,20 +2,21 @@ import { Stack } from 'expo-router';
 import { CreateWalletProvider } from '../../components/auth/create-wallet';
 
 /**
- * Onboarding — account entry. Twelve screens across two paths plus shared
- * success + notifications screens (see onboarding/README.md). Both paths run
- * through backup-info → set-passcode, where set-passcode initializes the vault
- * — nothing can be persisted before it:
+ * Onboarding — account entry. Both paths open with the name screen (the local
+ * display name, saved to the device) and run through backup-info →
+ * set-passcode, where set-passcode initializes the vault — nothing wallet-side
+ * can be persisted before it:
  *
- *   welcome ─┬─ create ── secure-intro → backup-info → set-passcode → notifications → reveal-phrase → backup-quiz ─┐
- *            └─ import ── backup-info → set-passcode → notifications → import (picker) → phrase | seed | secret-numbers ─┤
- *                                                                                            └─→ success → home
+ *   welcome ─┬─ create ── name → secure-intro → backup-info → set-passcode → notifications → reveal-phrase → backup-quiz ─┐
+ *            └─ import ── name → backup-info → set-passcode → notifications → import (picker) → phrase | seed | secret-numbers ─┤
+ *                                                                                                  └─→ success → home
  */
 export default function OnboardingLayout() {
   return (
     <CreateWalletProvider>
       <Stack screenOptions={{ headerShown: false, gestureEnabled: true }}>
         <Stack.Screen name="index" />
+        <Stack.Screen name="name" />
         <Stack.Screen name="backup-info" />
         <Stack.Screen name="set-passcode" />
         <Stack.Screen name="secure-intro" />

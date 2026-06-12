@@ -151,6 +151,20 @@
       "import": "Importar una cartera existente",
       "legal": "Al continuar aceptas los Términos y la Política de privacidad."
     },
+    "name": {
+      "title": "¿Cómo te llamamos?",
+      "subtitle": "Lo usaremos en tu perfil y cuando hables con Dewy, tu asistente de cartera. Puedes cambiarlo cuando quieras.",
+      "label": "Tu nombre",
+      "fieldPlaceholder": "p. ej. Jordan Pierce",
+      "preview": "Vista previa",
+      "placeholderName": "Tu nombre",
+      "greeting": {
+        "before": "Hola ",
+        "after": ", soy Dewy, tu asistente de cartera. ¿Qué te gustaría hacer primero?"
+      },
+      "cta": "Continuar",
+      "ctaEmpty": "Escribe tu nombre"
+    },
     "backupInfo": {
       "title": "Configura un código",
       "subtitle": "Bloquea Drops en este dispositivo y aprueba cada pago.",

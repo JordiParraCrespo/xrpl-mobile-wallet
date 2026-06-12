@@ -133,8 +133,8 @@ export default function SetPasscodeScreen() {
     <View className="flex-1 bg-background">
       <View style={{ paddingTop: insets.top + 8 }} className="px-6">
         <ScreenHeader
-          step={isImport ? 1 : 2}
-          total={isImport ? 3 : 4}
+          step={isImport ? 2 : 3}
+          total={isImport ? 4 : 5}
           onBack={confirming && !locked ? resetToCreate : () => router.back()}
         />
       </View>

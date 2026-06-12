@@ -16,6 +16,7 @@ export enum Routes {
 
   // Onboarding (pre-wallet flow)
   Onboarding = '/onboarding',
+  OnboardingName = '/onboarding/name',
   OnboardingBackupInfo = '/onboarding/backup-info',
   OnboardingSetPasscode = '/onboarding/set-passcode',
   OnboardingSecureIntro = '/onboarding/secure-intro',
@@ -72,6 +73,10 @@ export const buildRoute = {
   onboardingSuccess: (via: OnboardingVia): Href => ({
     pathname: Routes.OnboardingSuccess,
     params: { via },
+  }),
+  onboardingName: (next: OnboardingPath): Href => ({
+    pathname: Routes.OnboardingName,
+    params: { next },
   }),
   onboardingBackupInfo: (next: OnboardingPath): Href => ({
     pathname: Routes.OnboardingBackupInfo,
