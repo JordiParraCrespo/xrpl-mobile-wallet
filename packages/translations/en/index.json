@@ -438,6 +438,16 @@
     "locked": "Unlock your wallet to send.",
     "empty": "No account is available to send from yet."
   },
+  "flows": {
+    "addMoney": {
+      "title": "Add money",
+      "destination": "To {{ledger}} · {{balance}}",
+      "noFee": "No fee",
+      "arrivingLabel": "Arriving",
+      "arrivingValue": "Usually instantly",
+      "submit": "Add money securely"
+    }
+  },
   "droppoints": {
     "comingSoon": "COMING SOON",
     "title": "DropPoints",

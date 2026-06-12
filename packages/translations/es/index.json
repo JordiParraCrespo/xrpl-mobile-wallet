@@ -438,6 +438,16 @@
     "locked": "Desbloquea tu cartera para enviar.",
     "empty": "Todavía no hay ninguna cuenta disponible para enviar."
   },
+  "flows": {
+    "addMoney": {
+      "title": "Añadir dinero",
+      "destination": "A {{ledger}} · {{balance}}",
+      "noFee": "Sin comisión",
+      "arrivingLabel": "Llega",
+      "arrivingValue": "Normalmente al instante",
+      "submit": "Añadir dinero de forma segura"
+    }
+  },
   "droppoints": {
     "comingSoon": "MUY PRONTO",
     "title": "DropPoints",
