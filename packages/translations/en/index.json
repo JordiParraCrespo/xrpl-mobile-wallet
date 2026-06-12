@@ -151,6 +151,36 @@
       "import": "Import existing wallet",
       "legal": "By continuing you agree to the Terms & Privacy Policy."
     },
+    "backupInfo": {
+      "title": "Set a passcode",
+      "subtitle": "It locks Drops on this device and approves every payment.",
+      "cta": "Continue",
+      "points": {
+        "unlock": {
+          "title": "Unlocks Drops",
+          "description": "You'll enter it to open the app and approve each payment."
+        },
+        "device": {
+          "title": "Stays on this device",
+          "description": "Your passcode never leaves this phone — we can't see it."
+        },
+        "noReset": {
+          "title": "Can't be reset",
+          "description": "We can't recover it for you. Your recovery phrase is the only backup."
+        }
+      }
+    },
+    "setPasscode": {
+      "title": "Create a passcode",
+      "subtitle": "Choose six digits you'll remember.",
+      "confirmTitle": "Confirm your passcode",
+      "confirmSubtitle": "Enter the same six digits again to confirm.",
+      "doneTitle": "Passcode set",
+      "doneSubtitle": "Your wallet is now protected on this device.",
+      "mismatch": "Passcodes didn't match. Try again.",
+      "error": "Couldn't set up your passcode. Try again.",
+      "note": "Your passcode never leaves this device. We can't see it or reset it for you."
+    },
     "secureIntro": {
       "title": "Back up your new wallet",
       "subtitle": "You're about to create a recovery phrase. Three things to know before you do.",
@@ -236,6 +266,26 @@
       "footnoteXrpl": "The XRPL EVM sidechain isn't available for this import method. Import a recovery phrase to add it.",
       "defaultWalletName": "Account 1",
       "cta": "Open my wallet"
+    },
+    "notifications": {
+      "title": "Stay on top of your money",
+      "subtitle": "Get a heads-up the moment money moves, so you never have to keep checking.",
+      "points": {
+        "alerts": {
+          "title": "Instant payment alerts",
+          "description": "Know the moment XRP or stablecoins land — or leave — your wallet."
+        },
+        "security": {
+          "title": "Security you can trust",
+          "description": "We'll flag new sign-ins and anything that needs a second look."
+        },
+        "noise": {
+          "title": "Only what matters",
+          "description": "No noise. Mute any alert type later in settings."
+        }
+      },
+      "enable": "Enable notifications",
+      "skip": "Not now"
     },
     "backupQuiz": {
       "title": "Confirm your backup",

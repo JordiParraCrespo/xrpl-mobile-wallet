@@ -56,7 +56,7 @@ export default function ImportPhraseScreen() {
 
   return (
     <OnboardingStepScreen
-      step={2}
+      step={3}
       title={t('onboarding.importPhrase.title')}
       subtitle={t('onboarding.importPhrase.subtitle')}
       cta={{
@@ -64,7 +64,10 @@ export default function ImportPhraseScreen() {
           ? t('onboarding.common.importing')
           : allValid
             ? t('onboarding.common.continue')
-            : t('onboarding.importPhrase.ctaProgress', { filled, total: wordCount }),
+            : t('onboarding.importPhrase.ctaProgress', {
+                filled,
+                total: wordCount,
+              }),
         disabled: !allValid || importWallet.isPending,
         onPress: confirm,
       }}

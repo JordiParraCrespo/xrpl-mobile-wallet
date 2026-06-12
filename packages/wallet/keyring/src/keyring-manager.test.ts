@@ -1,5 +1,4 @@
 import { secp256k1 } from '@noble/curves/secp256k1';
-import { randomBytes } from '@noble/hashes/utils';
 import { generateSeed } from 'ripple-keypairs';
 import { describe, expect, it } from 'vitest';
 import {
@@ -7,11 +6,12 @@ import {
   InvalidPasscodeError,
   KeyringLockedError,
   UnsupportedChainError,
+  VaultCorruptedError,
   WalletNotFoundError,
 } from './errors';
 import { KeyringManager } from './keyring-manager';
 import type { SecureStorage } from './storage';
-import type { KdfParams } from './vault';
+import { LEGACY_VAULT_STORAGE_KEY, PASSCODE_STORAGE_KEY, VAULT_STORAGE_KEY } from './vault';
 import { InvalidFamilySeedError } from './xrpl';
 
 const MNEMONIC =
@@ -33,8 +33,6 @@ const SECRET_NUMBERS_ROWS = Array.from({ length: 8 }, (_, i) => {
   return `${String(value).padStart(5, '0')}${(value * (i * 2 + 1)) % 9}`;
 });
 
-const KDF: KdfParams = { n: 1024, r: 8, p: 1 };
-
 function memoryStorage(): SecureStorage & { data: Map<string, string> } {
   const data = new Map<string, string>();
   return {
@@ -51,7 +49,7 @@ function memoryStorage(): SecureStorage & { data: Map<string, string> } {
 
 async function unlockedKeyring() {
   const storage = memoryStorage();
-  const keyring = new KeyringManager(storage, KDF);
+  const keyring = new KeyringManager(storage);
   await keyring.initialize('123456');
   return { storage, keyring };
 }
@@ -60,7 +58,7 @@ describe('KeyringManager', () => {
   describe('lifecycle', () => {
     it('initializes, locks and unlocks', async () => {
       const storage = memoryStorage();
-      const keyring = new KeyringManager(storage, KDF);
+      const keyring = new KeyringManager(storage);
       expect(await keyring.isInitialized()).toBe(false);
 
       await keyring.initialize('123456');
@@ -85,7 +83,7 @@ describe('KeyringManager', () => {
 
     it('refuses to initialize twice', async () => {
       const { storage } = await unlockedKeyring();
-      const again = new KeyringManager(storage, KDF);
+      const again = new KeyringManager(storage);
       await expect(again.initialize('999999')).rejects.toThrow(/already initialized/);
     });
 
@@ -100,59 +98,58 @@ describe('KeyringManager', () => {
       const { storage, keyring } = await unlockedKeyring();
       const wallet = await keyring.createWallet({ name: 'Fresh' });
 
-      const second = new KeyringManager(storage, KDF);
+      const second = new KeyringManager(storage);
       await second.unlock('123456');
       expect(second.getWallets()).toEqual([expect.objectContaining({ id: wallet.id })]);
       expect(second.getActiveWallet()?.id).toBe(wallet.id);
     });
   });
 
-  describe('vault key (biometric path)', () => {
-    it('unlockWithKey works with the key from getVaultKey', async () => {
+  describe('unlock', () => {
+    it('opens the same wallets that were created before locking', async () => {
+      const { keyring } = await unlockedKeyring();
+      const first = await keyring.importMnemonic(MNEMONIC, 'Main');
+      const second = await keyring.importFamilySeed(SECP_SEED, 'Cold');
+      keyring.lock();
+
+      await keyring.unlock('123456');
+      expect(keyring.getWallets()).toEqual([
+        expect.objectContaining({ id: first.id, name: 'Main' }),
+        expect.objectContaining({ id: second.id, name: 'Cold' }),
+      ]);
+    });
+
+    it('throws VaultCorruptedError on a corrupted stored vault', async () => {
+      const { storage, keyring } = await unlockedKeyring();
+      keyring.lock();
+      await storage.set(VAULT_STORAGE_KEY, 'not json');
+      await expect(keyring.unlock('123456')).rejects.toThrow(VaultCorruptedError);
+    });
+  });
+
+  describe('unlockTrusted (biometric path)', () => {
+    it('re-opens the vault without a passcode', async () => {
       const { keyring } = await unlockedKeyring();
       const wallet = await keyring.createWallet();
-      const vaultKey = keyring.getVaultKey();
 
       keyring.lock();
-      await keyring.unlockWithKey(vaultKey);
+      await keyring.unlockTrusted();
+      expect(keyring.isUnlocked).toBe(true);
       expect(keyring.getWallets()).toEqual([expect.objectContaining({ id: wallet.id })]);
     });
 
-    it('getVaultKey returns a defensive copy', async () => {
-      const { keyring } = await unlockedKeyring();
-      await keyring.createWallet();
-      const copy = keyring.getVaultKey();
-      copy.fill(0);
-      // The manager's own key is untouched: persisting and unlocking still work.
-      await expect(keyring.createWallet()).resolves.toBeDefined();
-      const intact = keyring.getVaultKey();
-      keyring.lock();
-      await keyring.unlockWithKey(intact);
-      expect(keyring.getWallets()).toHaveLength(2);
-    });
-
-    it('unlockWithKey keeps its own copy of the key', async () => {
-      const { keyring } = await unlockedKeyring();
-      await keyring.createWallet();
-      const vaultKey = keyring.getVaultKey();
-      keyring.lock();
-      await keyring.unlockWithKey(vaultKey);
-      vaultKey.fill(0); // caller wipes its copy; the keyring must keep working
-      await expect(keyring.createWallet()).resolves.toBeDefined();
-    });
-
-    it('rejects a wrong vault key', async () => {
-      const { keyring } = await unlockedKeyring();
-      keyring.lock();
-      await expect(keyring.unlockWithKey(randomBytes(32))).rejects.toThrow(InvalidPasscodeError);
+    it('rejects on an uninitialized keyring', async () => {
+      const storage = memoryStorage();
+      const keyring = new KeyringManager(storage);
+      await expect(keyring.unlockTrusted()).rejects.toThrow();
+      expect(keyring.isUnlocked).toBe(false);
     });
   });
 
   describe('changePasscode', () => {
-    it('invalidates the old passcode but keeps the vault key', async () => {
+    it('invalidates the old passcode but leaves secrets untouched', async () => {
       const { keyring } = await unlockedKeyring();
       await keyring.createWallet();
-      const vaultKey = keyring.getVaultKey();
 
       await keyring.changePasscode('123456', '654321');
       keyring.lock();
@@ -162,7 +159,7 @@ describe('KeyringManager', () => {
       expect(keyring.getWallets()).toHaveLength(1);
 
       keyring.lock();
-      await keyring.unlockWithKey(vaultKey); // same vault key still opens the data blob
+      await keyring.unlockTrusted(); // secrets untouched: the biometric path still opens it
       expect(keyring.getWallets()).toHaveLength(1);
     });
 
@@ -187,7 +184,7 @@ describe('KeyringManager', () => {
     it('migrates legacy wallets on initialize and removes the legacy key', async () => {
       const storage = memoryStorage();
       storage.data.set(
-        'flama.wallet.vault',
+        LEGACY_VAULT_STORAGE_KEY,
         JSON.stringify({
           version: 1,
           wallets: [
@@ -196,11 +193,11 @@ describe('KeyringManager', () => {
           ],
         }),
       );
-      const keyring = new KeyringManager(storage, KDF);
+      const keyring = new KeyringManager(storage);
       expect(await keyring.hasLegacyVault()).toBe(true);
 
       await keyring.initialize('123456');
-      expect(storage.data.has('flama.wallet.vault')).toBe(false);
+      expect(storage.data.has(LEGACY_VAULT_STORAGE_KEY)).toBe(false);
       expect(await keyring.hasLegacyVault()).toBe(false);
 
       const wallets = keyring.getWallets();
@@ -393,7 +390,6 @@ describe('KeyringManager', () => {
 
       expect(() => keyring.getWallets()).toThrow(KeyringLockedError);
       expect(() => keyring.getActiveWallet()).toThrow(KeyringLockedError);
-      expect(() => keyring.getVaultKey()).toThrow(KeyringLockedError);
       expect(() => keyring.exportMnemonic(wallet.id)).toThrow(KeyringLockedError);
       expect(() => keyring.exportFamilySeed(wallet.id)).toThrow(KeyringLockedError);
       expect(() => keyring.getSigner(wallet.id, 'xrpl')).toThrow(KeyringLockedError);
@@ -413,8 +409,8 @@ describe('KeyringManager', () => {
   describe('reset', () => {
     it('removes both vaults from storage and locks', async () => {
       const storage = memoryStorage();
-      storage.data.set('flama.wallet.vault', JSON.stringify({ version: 1, wallets: [] }));
-      const keyring = new KeyringManager(storage, KDF);
+      storage.data.set(LEGACY_VAULT_STORAGE_KEY, JSON.stringify({ version: 1, wallets: [] }));
+      const keyring = new KeyringManager(storage);
       await keyring.initialize('123456');
       await keyring.createWallet();
 
@@ -426,23 +422,27 @@ describe('KeyringManager', () => {
   });
 
   describe('storage format', () => {
-    it('never persists secrets in plaintext', async () => {
+    it('persists a plaintext v2 vault under the v2 key', async () => {
       const { storage, keyring } = await unlockedKeyring();
       await keyring.importMnemonic(MNEMONIC);
       await keyring.importFamilySeed(SECP_SEED);
 
-      const raw = storage.data.get('flama.wallet.vault.v2');
+      const raw = storage.data.get(VAULT_STORAGE_KEY);
       expect(raw).toBeDefined();
-      expect(raw).not.toContain('abandon');
-      expect(raw).not.toContain(SECP_SEED);
+      // Secrets live as plaintext: the secure store is the protection boundary.
+      expect(raw).toContain('abandon');
+      expect(raw).toContain(SECP_SEED);
 
-      const envelope = JSON.parse(raw as string);
-      expect(envelope).toMatchObject({
-        version: 2,
-        kdf: { algo: 'scrypt', n: 1024, r: 8, p: 1 },
-      });
-      expect(typeof envelope.wrappedKey.nonce).toBe('string');
-      expect(typeof envelope.data.ciphertext).toBe('string');
+      const vault = JSON.parse(raw as string);
+      expect(vault).toMatchObject({ version: 2 });
+      expect(vault.wallets).toHaveLength(2);
+    });
+
+    it('keeps the passcode out of the stored verifier', async () => {
+      const { storage } = await unlockedKeyring();
+      const verifier = storage.data.get(PASSCODE_STORAGE_KEY);
+      expect(verifier).toBeDefined();
+      expect(verifier).not.toContain('123456');
     });
   });
 });

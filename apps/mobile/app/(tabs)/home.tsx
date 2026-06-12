@@ -1,21 +1,46 @@
+import { Button } from '@flama/design-system-mobile/button';
+import { Text } from '@flama/design-system-mobile/text';
+import { useWipeWallet } from '@flama/frontend/react';
+import { useRouter } from 'expo-router';
+import { View } from 'react-native';
 import { ScreenStub } from '../../components/drops/screen-stub';
 import { Routes } from '../../lib/routes';
 
 export default function HomeScreen() {
+  const router = useRouter();
+
+  // TEMPORARY (dev): wipes the vault + security state so onboarding can be
+  // re-tested without clearing Expo Go's storage. Remove before release.
+  const wipe = useWipeWallet({
+    onSuccess: () => router.replace(Routes.Root),
+  });
+
   return (
-    <ScreenStub
-      eyebrow="$942.76 · Wallet 1"
-      title="Home"
-      blurb="The hub: fiat-first balance hero, action circles, account tiles per chain, and recent activity. Search, notifications and More open as glass overlays."
-      design="home.html · home/home-app.jsx (+ home-parts.jsx, home-parts2.jsx)"
-      showBack={false}
-      links={[
-        { label: 'Add money', href: Routes.AddMoney },
-        { label: 'Receive', href: Routes.Receive, variant: 'secondary' },
-        { label: 'Swap', href: Routes.Swap, variant: 'secondary' },
-        { label: 'Profile', href: Routes.Profile, variant: 'outline' },
-        { label: 'Ask Dewy', href: Routes.Chat, variant: 'outline' },
-      ]}
-    />
+    <View className="flex-1">
+      <ScreenStub
+        eyebrow="$942.76 · Wallet 1"
+        title="Home"
+        blurb="The hub: fiat-first balance hero, action circles, account tiles per chain, and recent activity. Search, notifications and More open as glass overlays."
+        design="home.html · home/home-app.jsx (+ home-parts.jsx, home-parts2.jsx)"
+        showBack={false}
+        links={[
+          { label: 'Add money', href: Routes.AddMoney },
+          { label: 'Receive', href: Routes.Receive, variant: 'secondary' },
+          { label: 'Swap', href: Routes.Swap, variant: 'secondary' },
+          { label: 'Profile', href: Routes.Profile, variant: 'outline' },
+          { label: 'Ask Dewy', href: Routes.Chat, variant: 'outline' },
+        ]}
+      />
+      <View className="px-6 pb-3">
+        <Button
+          variant="destructive"
+          className="w-full"
+          disabled={wipe.isPending}
+          onPress={() => wipe.mutate()}
+        >
+          <Text>{wipe.isPending ? 'Wiping…' : 'Wipe wallet data (dev)'}</Text>
+        </Button>
+      </View>
+    </View>
   );
 }

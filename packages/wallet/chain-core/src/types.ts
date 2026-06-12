@@ -1,6 +1,6 @@
-import type { ChainErrorCode } from './errors';
+import type { ChainErrorCode } from "./errors";
 
-export type ChainKind = 'xrpl' | 'evm';
+export type ChainKind = "xrpl" | "evm";
 
 export interface NetworkConfig {
   /** Unique id, e.g. "xrpl:testnet" or "evm:1449000". */
@@ -9,6 +9,13 @@ export interface NetworkConfig {
   name: string;
   rpcUrl: string;
   explorerUrl?: string;
+  /**
+   * Indexed history endpoint, when the chain needs one to list an account's
+   * past transactions. XRPL serves history from its own RPC, so it omits this;
+   * EVM has no native account-history RPC and points here at a block explorer
+   * REST API (e.g. Blockscout's `/api`).
+   */
+  explorerApiUrl?: string;
   /** Test-network faucet endpoint, when the chain has one. */
   faucetUrl?: string;
   nativeCurrency: {
@@ -103,4 +110,73 @@ export interface Block {
   timestamp: number;
   /** Number of transactions included in the block. */
   transactionCount: number;
+}
+
+/**
+ * Read-only chain state needed to build and validate a transaction before
+ * signing. An adapter assembles this once (see `XrplAdapter.buildContext`) and
+ * hands it to the transaction layer, which builds the canonical tx from it.
+ */
+export interface TxContext {
+  /** The sender's address. */
+  account: string;
+  /** Current account sequence / nonce. */
+  sequence: number;
+  /** Current ledger index / block height; used to bound transaction validity. */
+  ledgerIndex: number;
+  /** Spendable native balance, in base units (drops, wei). */
+  balanceDrops: bigint;
+  /** Reserve that must remain untouched, in base units. */
+  reserveDrops: bigint;
+  /** Network fee to apply, in base units. */
+  feeDrops: bigint;
+}
+
+/** Direction of a transaction relative to the queried account. */
+export type TxDirection = "in" | "out" | "self";
+
+/** What a historical transaction did, normalized across chains. */
+export type LedgerTxKind = "payment" | "token-payment" | "trustset" | "other";
+
+/**
+ * A past transaction touching an account, normalized across chains for the
+ * activity feed. Amounts are in the relevant base units (native: drops/wei;
+ * token-payment: the token's base units).
+ */
+export interface LedgerTransaction {
+  hash: string;
+  /** Inclusion/validation time in unix seconds. */
+  timestamp: number;
+  kind: LedgerTxKind;
+  /** Direction relative to the queried address. */
+  direction: TxDirection;
+  /** Whether the transaction succeeded on chain. */
+  success: boolean;
+  /** Value moved, in base units. Zero for transactions that move no value. */
+  amount: bigint;
+  /** Ticker of the moved asset (native symbol, or the token's symbol). */
+  symbol: string;
+  /** The other party: recipient for 'out', sender for 'in'. */
+  counterparty?: string;
+  /** Network fee paid, in native base units (present on the payer's side). */
+  fee?: bigint;
+  explorerUrl?: string;
+}
+
+/** Pagination request for an account's transaction history. */
+export interface AccountTxQuery {
+  /** Max transactions to return (chains may cap this). */
+  limit?: number;
+  /**
+   * Opaque cursor from a previous page's `nextCursor`. Chain-specific under the
+   * hood (XRPL ledger marker, EVM page token); callers treat it as opaque.
+   */
+  cursor?: string;
+}
+
+/** One page of account history, newest first. */
+export interface AccountTxPage {
+  transactions: LedgerTransaction[];
+  /** Cursor for the next (older) page; undefined when history is exhausted. */
+  nextCursor?: string;
 }

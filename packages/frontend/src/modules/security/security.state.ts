@@ -10,6 +10,8 @@ export interface SecurityState {
   failedAttempts: number;
   /** Millisecond epoch until which passcode unlock is locked out, or null. */
   lockoutUntil: number | null;
+  /** Inactivity timeout before the wallet auto-locks, in ms. 0 disables it. */
+  autoLockMs: number;
 }
 
 export type SecurityStore = ReturnType<typeof createSecurityStore>;
@@ -21,4 +23,5 @@ export const createSecurityStore = () =>
     biometricsEnabled: false,
     failedAttempts: 0,
     lockoutUntil: null,
+    autoLockMs: 60_000,
   }));

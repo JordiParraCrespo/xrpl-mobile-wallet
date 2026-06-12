@@ -16,6 +16,8 @@ export enum Routes {
 
   // Onboarding (pre-wallet flow)
   Onboarding = '/onboarding',
+  OnboardingBackupInfo = '/onboarding/backup-info',
+  OnboardingSetPasscode = '/onboarding/set-passcode',
   OnboardingSecureIntro = '/onboarding/secure-intro',
   OnboardingRevealPhrase = '/onboarding/reveal-phrase',
   OnboardingBackupQuiz = '/onboarding/backup-quiz',
@@ -24,6 +26,7 @@ export enum Routes {
   OnboardingImportSeed = '/onboarding/import-seed',
   OnboardingImportSecretNumbers = '/onboarding/import-secret-numbers',
   OnboardingSuccess = '/onboarding/success',
+  OnboardingNotifications = '/onboarding/notifications',
 
   // Hub (tabs)
   Home = '/(tabs)/home',
@@ -49,6 +52,9 @@ export enum Routes {
 /** Which identity a successful onboarding restored (phrase = all chains). */
 export type OnboardingVia = 'phrase' | 'xrpl';
 
+/** Which onboarding path the passcode step continues into. */
+export type OnboardingPath = 'create' | 'import';
+
 /** Builders for routes that take params, returning an Expo Router `Href`. */
 export const buildRoute = {
   paymentChat: (contact: string): Href => ({
@@ -66,5 +72,17 @@ export const buildRoute = {
   onboardingSuccess: (via: OnboardingVia): Href => ({
     pathname: Routes.OnboardingSuccess,
     params: { via },
+  }),
+  onboardingBackupInfo: (next: OnboardingPath): Href => ({
+    pathname: Routes.OnboardingBackupInfo,
+    params: { next },
+  }),
+  onboardingSetPasscode: (next: OnboardingPath): Href => ({
+    pathname: Routes.OnboardingSetPasscode,
+    params: { next },
+  }),
+  onboardingNotifications: (next: OnboardingPath): Href => ({
+    pathname: Routes.OnboardingNotifications,
+    params: { next },
   }),
 } as const;
