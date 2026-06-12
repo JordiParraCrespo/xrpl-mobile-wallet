@@ -4,15 +4,30 @@ import { Text } from '@flama/design-system-mobile/text';
 import { deriveFirstName, deriveHandle } from '@flama/frontend';
 import { Sparkles } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+
+// The design's Dewy gradient (150deg, brand-500 → brand-700). SVG can't read
+// CSS vars, so these are the brand constants, like ChainBadge's discs.
+const DEWY_GRADIENT_FROM = '#6f59ea';
+const DEWY_GRADIENT_TO = '#4a33ba';
 
 /** Small sparkle disc standing in for Dewy, the wallet assistant. */
 function DewyAvatar({ size = 28 }: { size?: number }) {
   return (
     <View
-      className="shrink-0 items-center justify-center rounded-full bg-brand"
+      className="shrink-0 items-center justify-center overflow-hidden rounded-full"
       style={{ width: size, height: size }}
     >
+      <Svg style={StyleSheet.absoluteFill} width={size} height={size}>
+        <Defs>
+          <LinearGradient id="dewy-disc" x1="0%" y1="0%" x2="58%" y2="100%">
+            <Stop offset="0" stopColor={DEWY_GRADIENT_FROM} />
+            <Stop offset="1" stopColor={DEWY_GRADIENT_TO} />
+          </LinearGradient>
+        </Defs>
+        <Rect width="100%" height="100%" fill="url(#dewy-disc)" />
+      </Svg>
       <Icon as={Sparkles} size={size * 0.5} className="text-brand-foreground" />
     </View>
   );
@@ -41,7 +56,7 @@ export function NamePreview({ name }: { name: string }) {
       </Text>
 
       {/* Profile identity */}
-      <View className="flex-row items-center gap-3.5 rounded-2xl bg-muted px-4 py-3.5">
+      <View className="flex-row items-center gap-3.5 rounded-lg bg-muted px-4 py-3.5">
         <InitialsAvatar name={valid ? trimmed : 'Your Name'} size={46} />
         <View className="min-w-0 flex-1">
           <Text
@@ -59,7 +74,7 @@ export function NamePreview({ name }: { name: string }) {
       {/* Assistant greeting */}
       <View className="mt-3 flex-row items-end gap-2.5">
         <DewyAvatar size={28} />
-        <View className="flex-1 rounded-2xl rounded-bl-[5px] border border-border bg-card px-[15px] py-3">
+        <View className="flex-1 rounded-lg rounded-bl-[5px] border border-border bg-card px-[15px] py-3">
           <Text className="text-[14.5px] leading-[21px] text-foreground">
             {t('onboarding.name.greeting.before')}
             <Text className="font-semibold text-foreground">{deriveFirstName(name)}</Text>
