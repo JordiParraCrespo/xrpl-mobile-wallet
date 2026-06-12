@@ -111,7 +111,40 @@
       "seeAll": "Ver todo",
       "profile": "Perfil",
       "notifications": "Notificaciones"
+    },
+    "more": {
+      "title": "Más",
+      "buy": {
+        "label": "Comprar XRP",
+        "sub": "Tarjeta o transferencia bancaria"
+      },
+      "request": {
+        "label": "Solicitar dinero",
+        "sub": "Pide a alguien que te pague"
+      },
+      "convert": {
+        "label": "Convertir",
+        "sub": "Entre tus tokens"
+      },
+      "statements": {
+        "label": "Extractos",
+        "sub": "Exporta tu actividad"
+      },
+      "rewards": {
+        "label": "Recompensas",
+        "sub": "DropPoints · muy pronto"
+      }
     }
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "close": "Cerrar notificaciones",
+    "markAllRead": "Marcar todo como leído",
+    "groups": {
+      "today": "Hoy",
+      "earlier": "Anterior"
+    },
+    "empty": "Estás al día."
   },
   "wallet": {
     "title": "Cartera",

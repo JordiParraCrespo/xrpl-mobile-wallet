@@ -1,8 +1,9 @@
-import { useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useColorScheme } from 'nativewind';
-import { ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useColorScheme } from "nativewind";
+import * as React from "react";
+import { ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   AccountsSection,
   ActionsRow,
@@ -11,9 +12,10 @@ import {
   HOME_ACTIVITY,
   HomeBackground,
   HomeHeader,
+  MoreMenu,
   useHome,
-} from '../../components/drops/home';
-import { Routes } from '../../lib/routes';
+} from "../../components/drops/home";
+import { Routes } from "../../lib/routes";
 
 /**
  * Home — the signed-in hub (design: `home.html`). Fiat-first balance hero,
@@ -21,24 +23,27 @@ import { Routes } from '../../lib/routes';
  * activity, in both design themes: the light lavender "Glow" (default) and
  * the indigo→ink "Dark" gradient, following the system color scheme. The
  * theme tokens come from the root layout. Balances and their USD value are
- * live (`useHome`); recent activity is still mocked (`home-data.ts`).
+ * live (`useHome`); recent activity is still mocked (`home-data.ts`). The
+ * bell opens the notifications centre and More opens the options sheet;
+ * search is a follow-up overlay.
  */
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const dark = useColorScheme().colorScheme === 'dark';
+  const dark = useColorScheme().colorScheme === "dark";
   const { walletName, accounts, totalUsd, isLoading } = useHome();
+  const [moreOpen, setMoreOpen] = React.useState(false);
 
   return (
     <View className="flex-1 bg-background">
-      <StatusBar style={dark ? 'light' : 'dark'} />
+      <StatusBar style={dark ? "light" : "dark"} />
       <HomeBackground dark={dark} />
 
       <View style={{ paddingTop: insets.top + 8 }}>
         <HomeHeader
           onProfile={() => router.push(Routes.Profile)}
           onSearch={() => {}}
-          onNotifications={() => {}}
+          onNotifications={() => router.push(Routes.Notifications)}
         />
       </View>
 
@@ -47,13 +52,17 @@ export default function HomeScreen() {
         contentContainerClassName="px-4"
         contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
       >
-        <BalanceHero usd={totalUsd} walletName={walletName} loading={isLoading} />
+        <BalanceHero
+          usd={totalUsd}
+          walletName={walletName}
+          loading={isLoading}
+        />
 
         <ActionsRow
           onAddMoney={() => router.push(Routes.AddMoney)}
           onReceive={() => router.push(Routes.Receive)}
           onSwap={() => router.push(Routes.Swap)}
-          onMore={() => {}}
+          onMore={() => setMoreOpen(true)}
         />
 
         <AccountsSection
@@ -65,6 +74,8 @@ export default function HomeScreen() {
 
         <ActivitySection activity={HOME_ACTIVITY} onSeeAll={() => {}} />
       </ScrollView>
+
+      <MoreMenu open={moreOpen} onClose={() => setMoreOpen(false)} />
     </View>
   );
 }
