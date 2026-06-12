@@ -18,6 +18,8 @@ export const TOKENS = {
   BiometricProvider: Symbol.for('BiometricProvider'),
   SecurityStore: Symbol.for('SecurityStore'),
   SecurityService: Symbol.for('SecurityService'),
+  SettingsStore: Symbol.for('SettingsStore'),
+  SettingsService: Symbol.for('SettingsService'),
   TokensService: Symbol.for('TokensService'),
   PriceProvider: Symbol.for('PriceProvider'),
   PricesStore: Symbol.for('PricesStore'),
