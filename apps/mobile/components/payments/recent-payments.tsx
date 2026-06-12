@@ -4,6 +4,7 @@ import { ListRow } from '@flama/design-system-mobile/list-row';
 import { Skeleton } from '@flama/design-system-mobile/skeleton';
 import { Text } from '@flama/design-system-mobile/text';
 import type { RecentPayment } from '@flama/frontend/react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import { formatPaymentDate } from './format-date';
 
@@ -25,13 +26,17 @@ export function RecentPayments({
   onOpenPayment,
   onSeeAll,
 }: RecentPaymentsProps) {
+  const { t } = useTranslation();
+
   return (
     <View className="px-4">
       <View className="flex-row items-baseline justify-between px-1 pb-2.5">
-        <Text variant="h4">Recent</Text>
+        <Text variant="h4">{t('payments.recent')}</Text>
         {payments.length > 0 ? (
           <Pressable onPress={onSeeAll} disabled={!onSeeAll} className="active:opacity-70">
-            <Text className="text-muted-foreground text-[13.5px] font-semibold">See all</Text>
+            <Text className="text-muted-foreground text-[13.5px] font-semibold">
+              {t('payments.seeAll')}
+            </Text>
           </Pressable>
         ) : null}
       </View>
@@ -50,8 +55,8 @@ export function RecentPayments({
                 key={payment.id}
                 onPress={() => onOpenPayment(payment)}
                 media={<InitialsAvatar name={payment.name} size="md" />}
-                title={payment.name}
-                subtitle={payment.subtitle}
+                title={payment.key === 'unknown' ? t('payments.unknown') : payment.name}
+                subtitle={t(`payments.relationship.${payment.direction}`)}
                 value={
                   <AmountText
                     value={incoming ? payment.amount : -payment.amount}
@@ -74,11 +79,13 @@ export function RecentPayments({
 }
 
 function EmptyRecent() {
+  const { t } = useTranslation();
+
   return (
     <View className="items-center gap-1 px-6 py-10">
-      <Text className="text-foreground text-[15px] font-semibold">No payments yet</Text>
+      <Text className="text-foreground text-[15px] font-semibold">{t('payments.emptyTitle')}</Text>
       <Text className="text-muted-foreground text-center text-[13px]">
-        Money you send and receive will show up here.
+        {t('payments.emptyDescription')}
       </Text>
     </View>
   );

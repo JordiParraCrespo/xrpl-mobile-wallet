@@ -375,5 +375,27 @@
     },
     "notify": "Notify me when it's ready",
     "notified": "We'll let you know"
+  },
+  "payments": {
+    "title": "Payments",
+    "search": "Search",
+    "openProfile": "Open profile",
+    "newPayment": "New payment",
+    "you": "You",
+    "send": "Send",
+    "request": "Request",
+    "split": "Split",
+    "people": "People",
+    "new": "New",
+    "recent": "Recent",
+    "seeAll": "See all",
+    "emptyTitle": "No payments yet",
+    "emptyDescription": "Money you send and receive will show up here.",
+    "relationship": {
+      "in": "Sent you",
+      "out": "You sent",
+      "self": "You moved"
+    },
+    "unknown": "Unknown"
   }
 }

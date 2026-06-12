@@ -39,7 +39,6 @@ describe('buildPaymentsFeed', () => {
       known: true,
       amount: 60,
       direction: 'in',
-      subtitle: 'Sent you',
     });
   });
 
@@ -57,7 +56,7 @@ describe('buildPaymentsFeed', () => {
 
     expect(recents[0].known).toBe(false);
     expect(recents[0].name).toBe(shortenAddress('rUNKNOWNxxxxxxxxxxxxxxxxxxxWXYZ'));
-    expect(recents[0].subtitle).toBe('You sent');
+    expect(recents[0].direction).toBe('out');
   });
 
   it('matches addresses case-insensitively', () => {

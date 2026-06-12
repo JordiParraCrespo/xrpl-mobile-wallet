@@ -31,8 +31,6 @@ export interface RecentPayment extends PaymentParty {
   /** Inclusion time in unix seconds. */
   timestamp: number;
   success: boolean;
-  /** Relationship copy: "Sent you" / "You sent" / "You moved". */
-  subtitle: string;
 }
 
 /** One entry on the people rail: a saved contact and/or a recent counterparty. */
@@ -66,12 +64,6 @@ export function shortenAddress(address: string, lead = 5, tail = 4): string {
   if (address.length <= lead + tail + 1) return address;
   return `${address.slice(0, lead)}…${address.slice(-tail)}`;
 }
-
-const SUBTITLE: Record<TxDirection, string> = {
-  in: 'Sent you',
-  out: 'You sent',
-  self: 'You moved',
-};
 
 /**
  * Merge an account's transaction history with the address book into the two
@@ -122,7 +114,6 @@ export function buildPaymentsFeed(
       symbol: tx.symbol,
       timestamp: tx.timestamp,
       success: tx.success,
-      subtitle: SUBTITLE[tx.direction],
     };
   });
 

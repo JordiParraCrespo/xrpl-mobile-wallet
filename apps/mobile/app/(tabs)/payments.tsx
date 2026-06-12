@@ -7,6 +7,7 @@ import {
   useWalletState,
 } from '@flama/frontend/react';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PaymentQuickActions } from '../../components/payments/payment-quick-actions';
@@ -29,6 +30,7 @@ const FALLBACK_CHAIN_ID = 'xrpl:testnet';
 export default function PaymentsListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const profile = useProfileState();
   const { accounts } = useWalletState();
 
@@ -56,7 +58,7 @@ export default function PaymentsListScreen() {
 
       <View style={{ paddingTop: insets.top + 12 }}>
         <PaymentsHeader
-          name={profile.name ?? 'You'}
+          name={profile.name ?? t('payments.you')}
           onOpenProfile={() => router.push(Routes.Profile)}
           onNewRecipient={() => router.push(Routes.AddRecipient)}
         />
@@ -64,7 +66,7 @@ export default function PaymentsListScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-5 pb-28 pt-5">
         <Text variant="h2" className="px-5">
-          Payments
+          {t('payments.title')}
         </Text>
 
         <PaymentQuickActions
