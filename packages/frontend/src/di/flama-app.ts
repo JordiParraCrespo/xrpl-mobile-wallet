@@ -19,6 +19,8 @@ import type { ProfileService } from '../modules/profile';
 import { ProfileModule } from '../modules/profile';
 import type { IBiometricProvider, SecurityService } from '../modules/security';
 import { createSecurityModule } from '../modules/security';
+import type { SettingsService } from '../modules/settings';
+import { SettingsModule } from '../modules/settings';
 import type { TokensService } from '../modules/tokens';
 import { TokensModule } from '../modules/tokens';
 import type { UsersService } from '../modules/users';
@@ -63,6 +65,7 @@ export class FlamaApp {
     container.load(AuthModule);
     container.load(UsersModule);
     container.load(ProfileModule);
+    container.load(SettingsModule);
     container.load(WalletModule);
     container.load(ExplorerModule);
     container.load(NotificationsModule);
@@ -91,6 +94,10 @@ export class FlamaApp {
 
   get profile(): ProfileService {
     return this.container.get(TOKENS.ProfileService);
+  }
+
+  get settings(): SettingsService {
+    return this.container.get(TOKENS.SettingsService);
   }
 
   get wallet(): WalletService {

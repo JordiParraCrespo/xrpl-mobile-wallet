@@ -1,24 +1,70 @@
-import { useLocalSearchParams } from 'expo-router';
-import { ScreenStub } from '../../components/drops/screen-stub';
+import { Text } from '@flama/design-system-mobile/text';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { ScrollView, View } from 'react-native';
+import { LightWashBackground } from '../../components/drops/light-wash-background';
+import {
+  getContact,
+  PAYMENT_THREAD,
+  PaymentBubble,
+  PaymentChatHeader,
+  PaymentComposer,
+} from '../../components/drops/payments';
 import { buildRoute, Routes } from '../../lib/routes';
 
+/**
+ * Payment chat — a money conversation with one contact (design: `payments.html`
+ * · `payments/payments-screens.jsx` Chat). Over the light gradient wash: a
+ * header with the contact's name + XRPL handle, a thread of date separators and
+ * money bubbles (received left, sent right), and the Split · Request · Send
+ * composer. Tapping a bubble opens its transaction detail.
+ *
+ * Mocked: the thread comes from `PAYMENT_THREAD`; nothing touches the wallet
+ * domain yet. A full-screen push, so it covers the tab bar.
+ */
 export default function PaymentChatScreen() {
+  const router = useRouter();
   const { contact } = useLocalSearchParams<{ contact: string }>();
+  const { slug, name, handle } = getContact(contact);
 
   return (
-    <ScreenStub
-      eyebrow={`@${contact ?? 'recipient'}`}
-      title="Payment chat"
-      blurb="Money bubbles — received (left) and sent (right) — with date separators and a composer (Split · Request · Send). Tap a bubble for the transaction detail."
-      design="payments/payments-screens.jsx (Payment chat)"
-      links={[
-        { label: 'Send money', href: Routes.Send },
-        {
-          label: 'Open a transaction',
-          href: buildRoute.transaction('tx_demo'),
-          variant: 'secondary',
-        },
-      ]}
-    />
+    <View className="bg-background flex-1">
+      <StatusBar style="dark" />
+      <LightWashBackground />
+
+      <PaymentChatHeader name={name} handle={handle} onBack={() => router.back()} />
+
+      <ScrollView
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerClassName="gap-3 px-4 pb-2 pt-1.5"
+      >
+        {PAYMENT_THREAD.map((entry) =>
+          entry.type === 'date' ? (
+            <Text
+              key={`date-${entry.label}`}
+              className="text-muted-foreground my-1.5 text-center text-[12.5px]"
+            >
+              {entry.label}
+            </Text>
+          ) : (
+            <PaymentBubble
+              key={entry.tx.id}
+              tx={entry.tx}
+              onPress={() => router.push(buildRoute.transaction(entry.tx.id, slug))}
+            />
+          ),
+        )}
+      </ScrollView>
+
+      <PaymentComposer
+        onSplit={() => router.push(Routes.Swap)}
+        onRequest={() => router.push(Routes.Receive)}
+        // Carry this thread's recipient into the Send flow. `contact` is the
+        // address-book contact id, so the flow resolves the real saved address
+        // (chain + destination tag) from the domain; name/handle pre-fill the UI.
+        onSend={() => router.push(buildRoute.send({ contactId: slug, name, handle }))}
+      />
+    </View>
   );
 }

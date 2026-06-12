@@ -3,7 +3,7 @@ import { vars } from 'nativewind';
 import type * as React from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { darkVars } from '../../lib/theme';
+import { darkVars, FLOW_BG } from '../../lib/theme';
 
 /**
  * FlowScreen — the dark surface shared by the money-flow modals (add money ·
@@ -15,13 +15,11 @@ import { darkVars } from '../../lib/theme';
  * subtree with `vars(darkVars)` (so every `@flama/design-system-mobile`
  * primitive resolves to its dark values) and add the `dark` class so
  * `dark:` utilities apply too — then paint the pure-black flow background
- * (`#08080b`) over the slightly-lifted app dark background.
+ * (`FLOW_BG`) over the slightly-lifted app dark background.
  *
  * Top/bottom safe-area insets are applied here so the children lay out as a
  * simple top-to-bottom column.
  */
-const FLOW_BG = '#08080b';
-
 type FlowScreenProps = {
   children: React.ReactNode;
   className?: string;

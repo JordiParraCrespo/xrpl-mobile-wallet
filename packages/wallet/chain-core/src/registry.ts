@@ -21,6 +21,11 @@ export class ChainRegistry {
     return adapter;
   }
 
+  /** Whether an adapter is registered for `chainId`. */
+  has(chainId: string): boolean {
+    return this.adapters.has(chainId);
+  }
+
   list(): ChainAdapter[] {
     return [...this.adapters.values()];
   }

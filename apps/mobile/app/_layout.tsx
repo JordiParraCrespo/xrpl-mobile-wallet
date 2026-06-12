@@ -13,6 +13,7 @@ import {
   useSecurityRestore,
   useSecurityState,
   useSessionRestore,
+  useSettingsRestore,
   useWalletRestore,
 } from '@flama/frontend/react';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -82,12 +83,17 @@ function SessionGate() {
   const wallet = useWalletRestore();
   const security = useSecurityRestore();
   const profile = useProfileRestore();
+  const settings = useSettingsRestore();
   // Restore the address book too so saved recipients resolve on the payments
   // screen from the first paint. It is local-only and must never hold the
   // splash, so it stays out of the `isLoading` gate below.
   useAddressBookRestore();
   const isLoading =
-    session.isLoading || wallet.isLoading || security.isLoading || profile.isLoading;
+    session.isLoading ||
+    wallet.isLoading ||
+    security.isLoading ||
+    profile.isLoading ||
+    settings.isLoading;
 
   React.useEffect(() => {
     if (!isLoading) SplashScreen.hideAsync();
