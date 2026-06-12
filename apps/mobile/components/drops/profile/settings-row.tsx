@@ -1,9 +1,9 @@
-import { Icon } from '@flama/design-system-mobile/icon';
-import { Switch } from '@flama/design-system-mobile/switch';
-import { Text } from '@flama/design-system-mobile/text';
-import { ChevronRight, type LucideIcon } from 'lucide-react-native';
-import { Pressable, View } from 'react-native';
-import type { ProfileTheme } from './profile-theme';
+import { Icon } from "@flama/design-system-mobile/icon";
+import { Switch } from "@flama/design-system-mobile/switch";
+import { Text } from "@flama/design-system-mobile/text";
+import { ChevronRight, type LucideIcon } from "lucide-react-native";
+import { Pressable, View } from "react-native";
+import type { ProfileTheme } from "./profile-theme";
 
 type SettingsRowProps = {
   theme: ProfileTheme;
@@ -29,6 +29,12 @@ type SettingsRowProps = {
  * and either a value + chevron or a trailing Switch. Mirrors `PrRow` from the
  * Drops profile design (profile/profile-app.jsx); divider-separated rather
  * than individually rounded.
+ *
+ * Layout primitives (`flex-row`, `flex-1`, centring) are expressed as NativeWind
+ * classes rather than inline `style` flexbox: under NativeWind v4 an inline
+ * `style={{ flexDirection: 'row' }}` is clobbered back to the RN `column`
+ * default, which would stack the icon, label and value vertically. Theme-driven
+ * colours and sizes stay in `style` since they're dynamic.
  */
 export function SettingsRow({
   theme,
@@ -48,21 +54,15 @@ export function SettingsRow({
   const content = (
     <>
       <View
-        style={{
-          width: 34,
-          height: 34,
-          borderRadius: 17,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: theme.iconBg,
-        }}
+        className="items-center justify-center rounded-full"
+        style={{ width: 34, height: 34, backgroundColor: theme.iconBg }}
       >
         <Icon as={icon} size={18} color={fg} />
       </View>
       <Text
         numberOfLines={1}
-        className="font-sans"
-        style={{ flex: 1, fontSize: 15.5, fontWeight: '500', color: fg }}
+        className="font-sans flex-1"
+        style={{ fontSize: 15.5, fontWeight: "500", color: fg }}
       >
         {label}
       </Text>
@@ -75,7 +75,10 @@ export function SettingsRow({
       ) : (
         <>
           {value ? (
-            <Text className="font-sans" style={{ fontSize: 14.5, color: theme.dim }}>
+            <Text
+              className="font-sans"
+              style={{ fontSize: 14.5, color: theme.dim }}
+            >
               {value}
             </Text>
           ) : null}
@@ -86,8 +89,6 @@ export function SettingsRow({
   );
 
   const rowStyle = {
-    flexDirection: 'row' as const,
-    alignItems: 'center' as const,
     gap: 13,
     paddingVertical: 14,
     paddingHorizontal: 15,
@@ -97,12 +98,23 @@ export function SettingsRow({
 
   // Toggle rows are not pressable as a whole — only the Switch is interactive.
   if (toggle || !onPress) {
-    return <View style={rowStyle}>{content}</View>;
+    return (
+      <View className="flex-row items-center" style={rowStyle}>
+        {content}
+      </View>
+    );
   }
 
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [rowStyle, pressed && { opacity: 0.6 }]}>
-      {content}
+    <Pressable onPress={onPress}>
+      {({ pressed }) => (
+        <View
+          className="flex-row items-center"
+          style={[rowStyle, pressed && { opacity: 0.6 }]}
+        >
+          {content}
+        </View>
+      )}
     </Pressable>
   );
 }
