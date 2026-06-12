@@ -354,5 +354,26 @@
     "wipeMessage": "This deletes the wallet from this device. You can only restore it with your recovery phrase, family seed or secret numbers.",
     "wipeConfirm": "Delete wallet",
     "wipeCancel": "Cancel"
+  },
+  "droppoints": {
+    "comingSoon": "COMING SOON",
+    "title": "DropPoints",
+    "subtitle": "A rewards programme that gives back every time you move money on Drops. We're putting the finishing touches on it.",
+    "perks": {
+      "earn": {
+        "title": "Earn on every move",
+        "description": "Collect points when you send, receive or swap."
+      },
+      "rebates": {
+        "title": "Fee rebates",
+        "description": "Redeem points to cut your network fees."
+      },
+      "perks": {
+        "title": "Member perks",
+        "description": "Unlock boosts, early features and surprises."
+      }
+    },
+    "notify": "Notify me when it's ready",
+    "notified": "We'll let you know"
   }
 }

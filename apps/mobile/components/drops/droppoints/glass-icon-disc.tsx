@@ -1,10 +1,13 @@
 import { GlassBackdrop } from '@flama/design-system-mobile/glass-panel';
 import { Icon } from '@flama/design-system-mobile/icon';
-import { type LucideIcon, Sparkles } from 'lucide-react-native';
+import { type LucideIcon, Sparkle } from 'lucide-react-native';
 import { View } from 'react-native';
 
 type GlassIconDiscProps = {
-  /** Lucide glyph shown inside the disc. Defaults to the DropPoints sparkle. */
+  /**
+   * Lucide glyph shown inside the disc. Defaults to the single four-point
+   * star — the design's `points` glyph (distinct from the perks' Sparkles).
+   */
   icon?: LucideIcon;
 };
 
@@ -13,7 +16,7 @@ type GlassIconDiscProps = {
  * white-glass disc (real backdrop blur via the DS `GlassBackdrop`) with a
  * brand-indigo glyph and the sanctioned ambient lift under floating glass.
  */
-export function GlassIconDisc({ icon = Sparkles }: GlassIconDiscProps) {
+export function GlassIconDisc({ icon = Sparkle }: GlassIconDiscProps) {
   return (
     <View
       className="h-[84px] w-[84px] items-center justify-center overflow-hidden rounded-full border border-white/[0.65] bg-white/50"
