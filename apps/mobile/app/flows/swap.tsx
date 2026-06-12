@@ -12,7 +12,7 @@ import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SwapFlipButton } from '../../components/flows/swap/swap-flip-button';
 import { SwapTokenCard } from '../../components/flows/swap/swap-token-card';
-import { DARK_THEME_VARS, FLOW_BG } from '../../lib/theme-vars';
+import { darkVars, FLOW_BG } from '../../lib/theme';
 
 // Mock token set for the swap UI — balances, USD price and tint per asset.
 // Static stand-in; a real build would source these from the wallet + a quote.
@@ -73,7 +73,7 @@ export default function SwapScreen() {
 
   return (
     <View
-      style={[vars(DARK_THEME_VARS), { backgroundColor: FLOW_BG, paddingTop: insets.top }]}
+      style={[vars(darkVars), { backgroundColor: FLOW_BG, paddingTop: insets.top }]}
       className="dark flex-1"
     >
       <StatusBar style="light" />

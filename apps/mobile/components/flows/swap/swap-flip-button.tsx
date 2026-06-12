@@ -1,7 +1,7 @@
 import { Icon } from '@flama/design-system-mobile/icon';
 import { ArrowDown } from 'lucide-react-native';
 import { Pressable } from 'react-native';
-import { FLOW_BG } from '../../../lib/theme-vars';
+import { FLOW_BG } from '../../../lib/theme';
 
 /**
  * The circular control that sits over the gap between the From and To cards and
