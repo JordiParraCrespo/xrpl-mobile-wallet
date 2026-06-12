@@ -138,4 +138,4 @@ export const darkVars = {
 // The full-screen money flows (add money · receive · swap · send) paint on a
 // near-black base — darker than the app's dark `--background` — matching the
 // Drops money-flow design (`flow-kit.jsx`).
-export const FLOW_BG = "#08080b";
+export const FLOW_BG = '#08080b';
