@@ -413,6 +413,16 @@
     "locked": "Unlock your wallet to receive.",
     "empty": "No receiving account is available yet."
   },
+  "flows": {
+    "addMoney": {
+      "title": "Add money",
+      "destination": "To {{ledger}} · {{balance}}",
+      "noFee": "No fee",
+      "arrivingLabel": "Arriving",
+      "arrivingValue": "Usually instantly",
+      "submit": "Add money securely"
+    }
+  },
   "droppoints": {
     "comingSoon": "COMING SOON",
     "title": "DropPoints",

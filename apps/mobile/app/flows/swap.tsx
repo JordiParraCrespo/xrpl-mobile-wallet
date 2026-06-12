@@ -5,14 +5,11 @@ import { applyKeypadKey, Keypad } from '@flama/design-system-mobile/keypad';
 import { Text } from '@flama/design-system-mobile/text';
 import { cn } from '@flama/design-system-mobile/utils';
 import { useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { vars } from 'nativewind';
 import * as React from 'react';
 import { View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { FlowScreen } from '../../components/flows/flow-screen';
 import { SwapFlipButton } from '../../components/flows/swap/swap-flip-button';
 import { SwapTokenCard } from '../../components/flows/swap/swap-token-card';
-import { darkVars, FLOW_BG } from '../../lib/theme';
 
 // Mock token set for the swap UI — balances, USD price and tint per asset.
 // Static stand-in; a real build would source these from the wallet + a quote.
@@ -43,7 +40,6 @@ function money(value: number, decimals = 2): string {
  */
 export default function SwapScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
 
   const [fromSym, setFromSym] = React.useState<TokenSymbol>('XRP');
   const [toSym, setToSym] = React.useState<TokenSymbol>('RLUSD');
@@ -72,12 +68,10 @@ export default function SwapScreen() {
   const rate = from.usd / to.usd;
 
   return (
-    <View
-      style={[vars(darkVars), { backgroundColor: FLOW_BG, paddingTop: insets.top }]}
-      className="dark flex-1"
-    >
-      <StatusBar style="light" />
-      <FlowHeader title="Swap" onBack={() => router.back()} />
+    <FlowScreen>
+      <View className="px-4">
+        <FlowHeader title="Swap" onBack={() => router.back()} />
+      </View>
 
       {/* From / To cards with the flip control notched over the gap. */}
       <View className="px-[18px] pt-2.5">
@@ -136,9 +130,9 @@ export default function SwapScreen() {
         </Button>
       </View>
 
-      <View className="px-2" style={{ paddingBottom: insets.bottom + 4 }}>
+      <View className="px-2">
         <Keypad onKey={(key) => setAmount((prev) => applyKeypadKey(prev, key))} />
       </View>
-    </View>
+    </FlowScreen>
   );
 }

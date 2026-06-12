@@ -128,8 +128,8 @@ function useLockGate() {
  * Presentation hierarchy (bottom → top):
  *   onboarding ─ pre-wallet, shown before the hub
  *   (tabs) ───── the hub (owns the tab bar)
- *   pushes ───── profile · chat · payment/[contact] · flows/receive  (full screen, with back)
- *   modals ───── flows/{add-money,swap,send} · add-recipient · transaction/[id]  (slide up, dismiss)
+ *   pushes ───── profile · chat · payment/[contact] · flows/{receive,add-money}  (full screen, with back)
+ *   modals ───── flows/{swap,send} · add-recipient · transaction/[id]  (slide up, dismiss)
  *
  * Modals stack on top of pushes, and modal-over-modal works (e.g. open Send
  * from a payment chat), because they all share this one root stack.
@@ -148,12 +148,13 @@ function DropsStack() {
       <Stack.Screen name="profile" />
       <Stack.Screen name="chat" />
       <Stack.Screen name="payment/[contact]" />
-      {/* Receive is a destination screen (account switcher, QR, address), so it
-          pushes full-screen with a back gesture rather than sliding up. */}
+      {/* Receive and Add money are destination screens (account switcher /
+          QR / amount entry), so they push full-screen with a back gesture
+          rather than sliding up. */}
       <Stack.Screen name="flows/receive" />
+      <Stack.Screen name="flows/add-money" />
 
       {/* Modals — slide up over everything, including the tab bar. */}
-      <Stack.Screen name="flows/add-money" options={{ presentation: 'modal' }} />
       <Stack.Screen name="flows/swap" options={{ presentation: 'modal' }} />
       <Stack.Screen name="flows/send" options={{ presentation: 'modal' }} />
       <Stack.Screen name="add-recipient" options={{ presentation: 'modal' }} />
