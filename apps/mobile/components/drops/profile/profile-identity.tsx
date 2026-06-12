@@ -1,25 +1,25 @@
-import { GlassPanel } from '@flama/design-system-mobile/glass-panel';
-import { Icon } from '@flama/design-system-mobile/icon';
-import { Text } from '@flama/design-system-mobile/text';
-import { User } from 'lucide-react-native';
-import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
-import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import type { ProfileTheme } from './profile-theme';
+import { GlassPanel } from "@flama/design-system-mobile/glass-panel";
+import { Icon } from "@flama/design-system-mobile/icon";
+import { Text } from "@flama/design-system-mobile/text";
+import { User } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
+import { Pressable, StyleSheet, View } from "react-native";
+import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
+import type { ProfileTheme } from "./profile-theme";
 
 // The profile avatar's emerald wash (150deg, #19c39a → #0c8f6c), lifted from
 // the design. SVG can't read CSS vars, so the stops are inlined.
-const AVATAR_FROM = '#19c39a';
-const AVATAR_TO = '#0c8f6c';
+const AVATAR_FROM = "#19c39a";
+const AVATAR_TO = "#0c8f6c";
 
 /** Up-to-two-letter initials from a display name (e.g. "Jordan Pierce" → "JP"). */
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/).slice(0, 2);
   return (
     parts
-      .map((p) => p[0] ?? '')
-      .join('')
-      .toUpperCase() || '?'
+      .map((p) => p[0] ?? "")
+      .join("")
+      .toUpperCase() || "?"
   );
 }
 
@@ -31,8 +31,8 @@ function ProfileAvatar({ name }: { name: string }) {
         width: 88,
         height: 88,
         borderWidth: 3,
-        borderColor: 'rgba(255,255,255,0.35)',
-        shadowColor: '#000',
+        borderColor: "rgba(255,255,255,0.35)",
+        shadowColor: "#000",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.22,
         shadowRadius: 15,
@@ -41,14 +41,23 @@ function ProfileAvatar({ name }: { name: string }) {
     >
       <Svg style={StyleSheet.absoluteFill}>
         <Defs>
-          <LinearGradient id="profile-avatar" x1="0%" y1="0%" x2="50%" y2="100%">
+          <LinearGradient
+            id="profile-avatar"
+            x1="0%"
+            y1="0%"
+            x2="50%"
+            y2="100%"
+          >
             <Stop offset="0" stopColor={AVATAR_FROM} />
             <Stop offset="1" stopColor={AVATAR_TO} />
           </LinearGradient>
         </Defs>
         <Rect width="100%" height="100%" fill="url(#profile-avatar)" />
       </Svg>
-      <Text className="font-sans text-white" style={{ fontSize: 32, fontWeight: '600' }}>
+      <Text
+        className="font-sans text-white"
+        style={{ fontSize: 32, fontWeight: "600" }}
+      >
         {getInitials(name)}
       </Text>
     </View>
@@ -67,7 +76,12 @@ type ProfileIdentityProps = {
  * with initials, the serif display name, the derived `@handle`, and a glass
  * "Edit profile" pill. Mirrors the identity column in the Drops profile design.
  */
-export function ProfileIdentity({ theme, name, handle, onEditPress }: ProfileIdentityProps) {
+export function ProfileIdentity({
+  theme,
+  name,
+  handle,
+  onEditPress,
+}: ProfileIdentityProps) {
   const { t } = useTranslation();
 
   return (
@@ -78,6 +92,9 @@ export function ProfileIdentity({ theme, name, handle, onEditPress }: ProfileIde
         className="font-display"
         style={{
           fontSize: 26,
+          // Refero's ascent (~1.105em) overshoots a tight line box; without
+          // explicit leading iOS shears the glyph tops. ~1.23em clears them.
+          lineHeight: 32,
           color: theme.fg,
           letterSpacing: -0.3,
           marginTop: 14,
@@ -85,7 +102,10 @@ export function ProfileIdentity({ theme, name, handle, onEditPress }: ProfileIde
       >
         {name}
       </Text>
-      <Text className="font-mono" style={{ fontSize: 13.5, color: theme.dim, marginTop: 3 }}>
+      <Text
+        className="font-mono"
+        style={{ fontSize: 13.5, color: theme.dim, marginTop: 3 }}
+      >
         {handle}
       </Text>
 
@@ -108,9 +128,9 @@ export function ProfileIdentity({ theme, name, handle, onEditPress }: ProfileIde
             <Icon as={User} size={16} color={theme.fg} />
             <Text
               className="font-sans"
-              style={{ fontSize: 14, fontWeight: '600', color: theme.fg }}
+              style={{ fontSize: 14, fontWeight: "600", color: theme.fg }}
             >
-              {t('profile.editProfile')}
+              {t("profile.editProfile")}
             </Text>
           </GlassPanel>
         )}
