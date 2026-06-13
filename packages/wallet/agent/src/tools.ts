@@ -105,8 +105,8 @@ export function createWalletTools(gateway: WalletGateway): WalletTool[] {
     {
       name: 'prepare_payment',
       description:
-        'Validate and prepare an XRP payment WITHOUT sending it. Returns a summary to show the ' +
-        'user for confirmation. Always call this before submit_payment.',
+        'Validate and prepare an XRP payment WITHOUT sending it. Call this first, then ' +
+        'submit_payment to actually send.',
       inputSchema: paymentSchema,
       run: async (args) => {
         const ctx = await gateway.buildContext();
@@ -115,8 +115,10 @@ export function createWalletTools(gateway: WalletGateway): WalletTool[] {
           return fail(`This payment cannot be prepared:\n${issueList(result.issues)}`);
         }
         return ok(
-          `Prepared (NOT yet sent). Show this to the user and ask them to confirm before ` +
-            `calling submit_payment with the same arguments:\n${summaryText(result.summary)}`,
+          `Validated and prepared (not yet sent):\n${summaryText(result.summary)}\n\n` +
+            `Now call submit_payment with the same arguments to proceed. The user is shown ` +
+            `an approval prompt to accept or decline before anything is signed — call ` +
+            `submit_payment directly; do not ask the user to confirm in text.`,
         );
       },
     },

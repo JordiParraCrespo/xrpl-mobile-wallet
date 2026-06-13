@@ -1,7 +1,8 @@
-import type { WalletAgent } from '@flama/wallet-agent';
+import { useProfileState } from '@flama/frontend/react';
+import type { ApproveFn, WalletAgent } from '@flama/wallet-agent';
 import * as React from 'react';
 import { createWalletAgent } from '../../lib/agent';
-import { GREETING, newSession, SESSION_SEEDS } from './chat-seeds';
+import { greeting, newSession, SESSION_SEEDS } from './chat-seeds';
 import type { ChatPayload, Msg, Session } from './types';
 
 const RATE = 0.6184;
@@ -18,39 +19,93 @@ function textOf(m: Msg): string | undefined {
  * approve/decline card — the flow never executes anything silently.
  */
 export function useChatFlow() {
+  const { name: profileName } = useProfileState();
   const idRef = React.useRef(1);
   const flowRef = React.useRef<{
     name?: 'send' | 'swap';
+    /** Display label for the recipient (a saved name or a shortened address). */
     recipient?: string;
+    /** The real XRPL destination address, when the user supplied one. */
+    recipientAddress?: string;
     amount?: number;
     network?: string;
     to?: string;
   }>({});
   const pendingRef = React.useRef<string | null>(null);
   const agentRef = React.useRef<WalletAgent | null>(null);
+  /** The single in-flight bot "typing" bubble, so the approval card can pause it. */
+  const typingRef = React.useRef<number | null>(null);
+  /** Resolver for the pending payment approval card (set while the agent waits). */
+  const approvalRef = React.useRef<{
+    id: number;
+    resolve: (ok: boolean) => void;
+  } | null>(null);
+
+  /**
+   * Approval gate handed to the agent: renders a send action card and resolves
+   * only when the user taps approve/decline. The agent signs + submits on-device
+   * *after* this resolves true — funds never move without an explicit tap.
+   */
+  const requestApproval: ApproveFn = (request) => {
+    stopTyping();
+    const input = request.input as {
+      destination?: unknown;
+      amount?: unknown;
+      destinationTag?: unknown;
+      memo?: unknown;
+    };
+    const rows: { label: string; value: string; mono?: boolean }[] = [
+      { label: 'To', value: String(input.destination ?? ''), mono: true },
+      { label: 'Amount', value: `${String(input.amount ?? '')} XRP` },
+    ];
+    if (input.destinationTag !== undefined) {
+      rows.push({
+        label: 'Destination tag',
+        value: String(input.destinationTag),
+      });
+    }
+    if (input.memo) {
+      rows.push({ label: 'Memo', value: String(input.memo) });
+    }
+    const id = add({
+      role: 'bot',
+      kind: 'action',
+      actionKind: 'send',
+      title: 'Send payment',
+      status: 'pending',
+      rows,
+    });
+    return new Promise<boolean>((resolve) => {
+      approvalRef.current = { id, resolve };
+    });
+  };
 
   /**
    * The on-device wallet agent (Claude + the XRPL tool loop), built lazily on
-   * first use. Reads (balance, ledgers) never trigger approval; payment flows
-   * will wire `approve` to an approve/decline card — for now any payment attempt
-   * is declined so nothing can move funds from the chat yet.
+   * first use. Reads (balance, ledgers) run freely; submitting a payment goes
+   * through {@link requestApproval}, so it always needs an explicit tap.
    */
   const getAgent = (): WalletAgent => {
     if (!agentRef.current) {
-      agentRef.current = createWalletAgent({ approve: async () => false });
+      agentRef.current = createWalletAgent({ approve: requestApproval });
     }
     return agentRef.current;
   };
 
-  /** Answers a read-only question with the real on-chain agent (e.g. balance). */
+  /**
+   * Drives a turn through the real on-chain agent — balances, ledgers, and
+   * payments (which pause on an approval card mid-loop). Renders the final reply.
+   */
   const runAgent = async (text: string) => {
-    const typingId = add({ role: 'bot', kind: 'typing' });
+    startTyping();
     try {
       const reply = await getAgent().ask(text);
-      remove(typingId);
-      add({ role: 'bot', kind: 'text', text: reply });
+      stopTyping();
+      if (reply.trim()) {
+        add({ role: 'bot', kind: 'text', text: reply });
+      }
     } catch (error) {
-      remove(typingId);
+      stopTyping();
       add({
         role: 'bot',
         kind: 'error',
@@ -67,13 +122,20 @@ export function useChatFlow() {
       preview: 'Start a conversation',
       time: 'Now',
       group: 'Today',
-      msgs: [GREETING],
+      msgs: [greeting(profileName)],
     },
     ...SESSION_SEEDS,
   ]);
   const [activeId, setActiveId] = React.useState('live');
   const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const [msgs, setMsgs] = React.useState<Msg[]>([GREETING]);
+  const [msgs, setMsgs] = React.useState<Msg[]>([greeting(profileName)]);
+
+  // Personalize the opening greeting once the profile name loads (if the live
+  // thread is still just the greeting).
+  React.useEffect(() => {
+    if (!profileName) return;
+    setMsgs((cur) => (cur.length === 1 && cur[0]?.id === 0 ? [greeting(profileName)] : cur));
+  }, [profileName]);
 
   // Keep the active session in sync — live title, preview and messages.
   React.useEffect(() => {
@@ -100,7 +162,7 @@ export function useChatFlow() {
     setDrawerOpen(false);
     if (id === activeId) return;
     const target = sessions.find((s) => s.id === id);
-    const tmsgs = target ? target.msgs : [GREETING];
+    const tmsgs = target ? target.msgs : [greeting(profileName)];
     setMsgs(tmsgs);
     idRef.current = Math.max(0, ...tmsgs.map((m) => m.id)) + 1;
     flowRef.current = {};
@@ -109,9 +171,9 @@ export function useChatFlow() {
   };
 
   const startNew = () => {
-    const s = newSession();
+    const s = newSession(profileName);
     setSessions((list) => [s, ...list]);
-    setMsgs([GREETING]);
+    setMsgs([greeting(profileName)]);
     idRef.current = 1;
     flowRef.current = {};
     pendingRef.current = null;
@@ -127,6 +189,18 @@ export function useChatFlow() {
   const remove = (id: number) => setMsgs((x) => x.filter((m) => m.id !== id));
   const update = (id: number, patch: Partial<Msg>) =>
     setMsgs((x) => x.map((m) => (m.id === id ? ({ ...m, ...patch } as Msg) : m)));
+  /** Shows a single bot "typing" bubble (idempotent) until {@link stopTyping}. */
+  const startTyping = () => {
+    if (typingRef.current == null) {
+      typingRef.current = add({ role: 'bot', kind: 'typing' });
+    }
+  };
+  const stopTyping = () => {
+    if (typingRef.current != null) {
+      remove(typingRef.current);
+      typingRef.current = null;
+    }
+  };
   const think = (then: () => void, d = 720) => {
     const id = add({ role: 'bot', kind: 'typing' });
     setTimeout(() => {
@@ -137,7 +211,7 @@ export function useChatFlow() {
 
   /* ---- scripted flow steps ---- */
   const askAmount = () => {
-    const who = (flowRef.current.recipient || 'Maria').split(' ')[0];
+    const who = (flowRef.current.recipient ?? 'them').split(' ')[0];
     add({
       role: 'bot',
       kind: 'text',
@@ -176,7 +250,7 @@ export function useChatFlow() {
       title: 'Send payment',
       status: 'pending',
       rows: [
-        { label: 'To', value: f.recipient ?? 'Maria Gutiérrez', mono: true },
+        { label: 'To', value: f.recipient ?? 'recipient', mono: true },
         {
           label: 'Amount',
           value: `${(f.amount ?? 0).toLocaleString('en-US')} XRP`,
@@ -230,18 +304,35 @@ export function useChatFlow() {
       ],
     });
   };
+  /**
+   * Routes the step after an amount is chosen: swaps ask for a token, a real
+   * address hands off to the agent (prepare → approval → submit), and a
+   * named/demo contact continues the scripted network → review path.
+   */
+  const afterAmountChosen = () => {
+    const f = flowRef.current;
+    if (f.name === 'swap') {
+      think(askSwapTo);
+      return;
+    }
+    if (f.recipientAddress) {
+      void runAgent(`Send ${f.amount} XRP to ${f.recipientAddress}. Go ahead and submit it.`);
+      return;
+    }
+    think(askNetwork);
+  };
+
   const routeUser = (text: string) => {
     const lc = text.toLowerCase();
+    // Custom amount typed into a seeded/demo scripted card.
     if (pendingRef.current === 'amount') {
       const n = Number.parseFloat(text.replace(/[^0-9.]/g, ''));
       pendingRef.current = null;
       flowRef.current.amount = Number.isNaN(n) ? 25 : n;
-      return think(flowRef.current.name === 'swap' ? askSwapTo : askNetwork);
-    }
-    if (/balance|how much do i|what.*have/.test(lc)) {
-      void runAgent(text);
+      afterAmountChosen();
       return;
     }
+    // Swap stays scripted for now (the agent has no swap tool yet).
     if (/swap|convert|exchange/.test(lc)) {
       flowRef.current = { name: 'swap' };
       return think(() => {
@@ -259,25 +350,10 @@ export function useChatFlow() {
         });
       });
     }
-    if (/recipient|address|contact/.test(lc))
-      return think(() =>
-        add({
-          role: 'bot',
-          kind: 'text',
-          text: 'Share the address (r… or 0x…) or scan a QR and I’ll save them as a recipient.',
-        }),
-      );
-    const num = text.match(/([\d][\d,]*(?:\.\d+)?)\s*xrp/i);
-    const nameM = text.match(/to\s+([A-Z][a-z]+)/);
-    flowRef.current = {
-      name: 'send',
-      recipient: nameM ? nameM[1] : 'Maria Gutiérrez',
-    };
-    if (num) {
-      flowRef.current.amount = Number.parseFloat(num[1].replace(/,/g, ''));
-      return think(askNetwork);
-    }
-    return think(askAmount);
+    // Everything else — balances, ledgers, sends, addresses, amounts, and any
+    // follow-up — goes to the agent, which keeps the conversation's context
+    // (so replies like "1" or a pasted address continue the same send).
+    void runAgent(text);
   };
 
   const onAnswer = (msg: Msg, opt: string) => {
@@ -297,7 +373,8 @@ export function useChatFlow() {
         );
       }
       flowRef.current.amount = Number.parseFloat(opt);
-      return think(flowRef.current.name === 'swap' ? askSwapTo : askNetwork);
+      afterAmountChosen();
+      return;
     }
     if (qid === 'network') {
       flowRef.current.network = opt;
@@ -314,6 +391,17 @@ export function useChatFlow() {
     update(msg.id, {
       status: approve ? 'approved' : 'declined',
     } as Partial<Msg>);
+
+    // Agent-driven payment: resolve the awaiting tool loop. On approval the
+    // agent signs + submits on-device and reports back as the final reply.
+    const pending = approvalRef.current;
+    if (pending && pending.id === msg.id) {
+      approvalRef.current = null;
+      if (approve) startTyping();
+      pending.resolve(approve);
+      return;
+    }
+
     const f = flowRef.current;
     if (!approve)
       return think(() =>
@@ -353,7 +441,7 @@ export function useChatFlow() {
         role: 'bot',
         kind: 'result',
         text: `Sent ${(f.amount ?? 0).toLocaleString('en-US')} XRP to ${
-          (f.recipient || 'Maria').split(' ')[0]
+          (f.recipient ?? 'them').split(' ')[0]
         }.`,
         meta: 'Settled on the XRP Ledger in 3.7s · fee 0.00001 XRP',
         tx: '0x9f3c…a1b2',
@@ -367,7 +455,7 @@ export function useChatFlow() {
     if (retry) {
       flowRef.current = {
         name: 'send',
-        recipient: flowRef.current.recipient || 'Maria Gutiérrez',
+        recipient: flowRef.current.recipient,
       };
       return think(askAmount);
     }

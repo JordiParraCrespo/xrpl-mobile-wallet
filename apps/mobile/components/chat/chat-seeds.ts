@@ -1,14 +1,21 @@
 import type { Msg, Session } from './types';
 
-// Mocked Dewy data — the greeting, the seeded conversation history shown in the
-// sessions drawer, and the composer quick-chips. No wallet wiring yet.
+// Seeded Dewy data — the greeting, the conversation history shown in the
+// sessions drawer, and the composer quick-chips.
 
-export const GREETING: Msg = {
-  id: 0,
-  role: 'bot',
-  kind: 'text',
-  text: 'Hi Jordan — I’m your wallet assistant. I can send or request XRP, swap tokens, check balances and add recipients. What would you like to do?',
-};
+/** Builds the opening greeting, personalized with the user's name when known. */
+export function greeting(name?: string | null): Msg {
+  const who = name?.trim().split(/\s+/)[0];
+  return {
+    id: 0,
+    role: 'bot',
+    kind: 'text',
+    text: `Hi${who ? ` ${who}` : ''} — I’m your wallet assistant. I can send or request XRP, swap tokens, check balances and add recipients. What would you like to do?`,
+  };
+}
+
+/** Generic greeting used where no profile name is available. */
+export const GREETING: Msg = greeting();
 
 /** Canned past conversations, each with its own full thread. */
 export const SESSION_SEEDS: Session[] = [
@@ -149,13 +156,13 @@ export const SESSION_SEEDS: Session[] = [
 export const CHIPS = ['Send to Maria', 'Check my balance', 'Swap XRP → RLUSD'];
 
 /** A fresh, empty conversation for the "New chat" action. */
-export function newSession(): Session {
+export function newSession(name?: string | null): Session {
   return {
     id: `new-${Date.now()}`,
     title: 'New chat',
     preview: 'Start a conversation',
     time: 'Now',
     group: 'Today',
-    msgs: [GREETING],
+    msgs: [greeting(name)],
   };
 }
